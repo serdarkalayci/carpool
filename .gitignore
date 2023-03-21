@@ -11,5 +11,10 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# Binary output from `go build` or `go install`
+api/api
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
+.DS_Store
+api/__debug_bin
