@@ -18,3 +18,4 @@ api/api
 # vendor/
 .DS_Store
 api/__debug_bin
+.vscode
