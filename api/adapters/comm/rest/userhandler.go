@@ -10,6 +10,7 @@ import (
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/mappers"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/middleware"
 	"github.com/serdarkalayci/carpool/api/application"
+	"github.com/serdarkalayci/carpool/api/domain"
 )
 
 type validatedUser struct{}
@@ -30,7 +31,7 @@ func (apiContext *APIContext) GetUser(rw http.ResponseWriter, r *http.Request) {
 	userService := application.NewUserService(apiContext.userRepo)
 	user, err := userService.GetUser(id)
 	if err == nil {
-		respondWithJSON(rw, r, 200, mappers.MapUser2UserResponse(user))
+		respondWithJSON(rw, r, 200, mappers.MapUser2SUserResponse(user))
 	}
 }
 
@@ -48,9 +49,37 @@ func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
 	userService := application.NewUserService(apiContext.userRepo)
 	err := userService.AddUser(user)
 	if err == nil {
-		respondWithJSON(rw, r, 200, user)
+		respondOK(rw, r, 200)
+	} else if e, ok := err.(*domain.DuplicateKeyError); ok {
+		respondWithError(rw, r, 400, e.Error())
+	} else {
+		log.Error().Err(err).Msg("error adding user")
+		respondWithError(rw, r, 500, "error adding user")
 	}
 }
+
+// // AddUser creates a new user on the system
+// func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
+// 	// Get user data from payload
+// 	userDTO := r.Context().Value(validatedUser{}).(dto.AddUserRequest)
+// 	user := mappers.MapAddUserRequest2User(userDTO)
+// 	userService := application.NewUserService(apiContext.userRepo)
+// 	if available, err := userService.CheckUserName(user.UserName); available == true {
+// 		err := userService.AddUser(user)
+// 		if err == nil {
+// 			respondWithJSON(rw, r, 200, mappers.MapUser2UserResponse(user))
+// 		} else {
+// 			log.Error().Err(err).Msg("error adding user")
+// 			respondWithError(rw, r, 500, "error adding user")
+// 		}
+// 	} else if err != nil {
+// 		log.Error().Err(err).Msg("error adding user")
+// 		respondWithError(rw, r, 500, "error adding user")
+// 	} else {
+// 		log.Error().Err(err).Msg("error adding user")
+// 		respondWithError(rw, r, 500, fmt.Sprintf("username %s is already taken", user.UserName))
+// 	}
+// }
 
 // MiddlewareValidateNewUser Checks the integrity of new user in the request and calls next if ok
 func (apiContext *APIContext) MiddlewareValidateNewUser(next http.Handler) http.Handler {
@@ -63,7 +92,7 @@ func (apiContext *APIContext) MiddlewareValidateNewUser(next http.Handler) http.
 		// validate the user
 		errs := apiContext.validation.Validate(user)
 		if errs != nil && len(errs) != 0 {
-			log.Error().Err(errs[0]).Msg("Error validating the user")
+			log.Error().Err(errs[0]).Msg("error validating the user")
 
 			// return the validation messages as an array
 			respondWithJSON(rw, r, http.StatusUnprocessableEntity, errs.Errors())

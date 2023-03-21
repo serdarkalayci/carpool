@@ -26,14 +26,12 @@ func SetConstValues() {
 	if _, ok := err.(*os.PathError); ok {
 		log.Warn().Msgf("No config file '%s' not found. Using default values", fullPath)
 	} else if err != nil { // Handle other errors that occurred while reading the config file
-		log.Err(err).Msgf("Error while reading the config file")
+		log.Err(err).Msgf("error while reading the config file")
 	}
 	viper.SetDefault("CannotReadPayloadMsg", "Cannot read payload")
 	viper.SetDefault("PayloadMissingMsg", "Payload is missing")
 	viper.SetDefault("CannotParsePayloadMsg", "Cannot parse payload")
 	viper.SetDefault("UsersCollection", "users")
-	viper.SetDefault("ProductsCollection", "products")
-	viper.SetDefault("FlagsCollection", "flags")
 }
 
 // SetLogLevels gets configuration values from the file and injects them
@@ -47,7 +45,7 @@ func SetLogLevels() {
 	if _, ok := err.(*os.PathError); ok {
 		log.Warn().Msgf("No config file '%s' not found. Using default values", fullPath)
 	} else if err != nil { // Handle other errors that occurred while reading the config file
-		log.Err(err).Msgf("Error while reading the config file")
+		log.Err(err).Msgf("error while reading the config file")
 	} else {
 		log.Info().Msgf("Log Level from config: %s", viper.GetString(logLevel))
 		setLogLevel(viper.GetString(logLevel))
@@ -71,7 +69,7 @@ func setLogLevel(level string) {
 	case "Warn":
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
 		break
-	case "Error":
+	case "error":
 		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 		break
 	default:

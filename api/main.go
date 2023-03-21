@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/serdarkalayci/carpool/api/adapters/data"
-	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/serdarkalayci/carpool/api/adapters/data"
+	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb"
 
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest"
 
@@ -35,7 +36,7 @@ func main() {
 
 		err := s.ListenAndServe()
 		if err != nil {
-			log.Error().Err(err).Msg("Error starting rest server")
+			log.Error().Err(err).Msg("error starting rest server")
 			os.Exit(1)
 		}
 	}()

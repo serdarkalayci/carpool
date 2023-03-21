@@ -30,7 +30,7 @@ func (apiContext *APIContext) Ready(rw http.ResponseWriter, r *http.Request) {
 	hs := application.NewHealthService(apiContext.healthRepo)
 	status := hs.Ready()
 	if status == false {
-		log.Error().Msg("Error connecting to database")
+		log.Error().Msg("error connecting to database")
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}

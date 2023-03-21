@@ -12,7 +12,7 @@ func ValidateNewUser(next http.Handler) http.Handler {
 
 		// 		err := data.FromJSON(product, r.Body)
 		// 		if err != nil {
-		// 			log.Error().Err(err).Msg("Error deserializing book product")
+		// 			log.Error().Err(err).Msg("error deserializing book product")
 
 		// 			rw.WriteHeader(http.StatusBadRequest)
 		// 			data.ToJSON(&GenericError{Message: err.Error()}, rw)
@@ -22,7 +22,7 @@ func ValidateNewUser(next http.Handler) http.Handler {
 		// 		// validate the product
 		// 		errs := apiContext.v.Validate(product)
 		// 		if len(errs) != 0 {
-		// 			log.Error().Err(errs[0]).Msg("Error validating book product")
+		// 			log.Error().Err(errs[0]).Msg("error validating book product")
 
 		// 			// return the validation messages as an array
 		// 			rw.WriteHeader(http.StatusUnprocessableEntity)
@@ -46,7 +46,7 @@ func ValidateNewUser(next http.Handler) http.Handler {
 
 // 		err := data.FromJSON(detprice, r.Body)
 // 		if err != nil {
-// 			log.Error().Err(err).Msg("Error deserializing price data")
+// 			log.Error().Err(err).Msg("error deserializing price data")
 
 // 			rw.WriteHeader(http.StatusBadRequest)
 // 			data.ToJSON(&GenericError{Message: err.Error()}, rw)
@@ -56,7 +56,7 @@ func ValidateNewUser(next http.Handler) http.Handler {
 // 		// validate the product
 // 		errs := apiContext.v.Validate(detprice)
 // 		if len(errs) != 0 {
-// 			log.Error().Err(errs[0]).Msg("Error validating book product")
+// 			log.Error().Err(errs[0]).Msg("error validating book product")
 
 // 			// return the validation messages as an array
 // 			rw.WriteHeader(http.StatusUnprocessableEntity)

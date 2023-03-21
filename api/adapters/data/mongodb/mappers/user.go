@@ -16,8 +16,8 @@ func MapUser2UserDAO(u domain.User) (dao.UserDAO, error) {
 	}
 	userDAO.ID = id
 	userDAO.Name = u.Name
-	userDAO.UserName = u.UserName
 	userDAO.Password = u.Password
+	userDAO.Email = u.Email
 	return userDAO, err
 }
 
@@ -26,8 +26,8 @@ func MapUser2NewUserDAO(u domain.User) dao.UserDAO {
 	userDAO := dao.UserDAO{}
 	userDAO.ID = primitive.NewObjectID()
 	userDAO.Name = u.Name
-	userDAO.UserName = u.UserName
 	userDAO.Password = u.Password
+	userDAO.Email = u.Email
 	return userDAO
 }
 
@@ -36,7 +36,8 @@ func MapUserDAO2User(u dao.UserDAO) domain.User {
 	user := domain.User{}
 	user.ID = u.ID.Hex()
 	user.Name = u.Name
-	user.UserName = u.UserName
 	user.Password = u.Password
+	user.Email = u.Email
+	user.Active = u.Active
 	return user
 }

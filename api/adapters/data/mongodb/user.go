@@ -35,13 +35,13 @@ func (ur UserRepository) GetUser(ID string) (domain.User, error) {
 	defer cancel()
 	objID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
-		log.Error().Err(err).Msgf("Error parsing UserID: %s", ID)
+		log.Error().Err(err).Msgf("error parsing UserID: %s", ID)
 		return domain.User{}, err
 	}
 	var userDAO dao.UserDAO
 	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&userDAO)
 	if err != nil {
-		log.Error().Err(err).Msgf("Error getting user with UserID: %s", ID)
+		log.Error().Err(err).Msgf("error getting user with UserID: %s", ID)
 		return domain.User{}, err
 	}
 	return mappers.MapUserDAO2User(userDAO), nil
@@ -55,11 +55,14 @@ func (ur UserRepository) AddUser(u domain.User) error {
 	userDAO := mappers.MapUser2NewUserDAO(u)
 	result, err := collection.InsertOne(ctx, userDAO)
 	if err != nil {
-		log.Error().Err(err).Msg("Error while writing user")
-	} else {
-		log.Info().Msgf("User written: %s", result.InsertedID)
+		log.Error().Err(err).Msg("error while writing user")
+		if mongo.IsDuplicateKeyError(err) {
+			return &domain.DuplicateKeyError{}
+		}
+		return err
 	}
-	return err
+	log.Info().Msgf("user written: %s", result.InsertedID)
+	return nil
 }
 
 // CheckUser checks the username & password if it matches any user from the array
@@ -70,10 +73,27 @@ func (ur UserRepository) CheckUser(username string, password string) (domain.Use
 	var userDAO dao.UserDAO
 	err := collection.FindOne(ctx, bson.M{"username": username, "password": password}).Decode(&userDAO)
 	if err != nil {
-		log.Error().Err(err).Msgf("Error getting user with username: %s", username)
+		log.Error().Err(err).Msgf("error getting user with username: %s", username)
 		return domain.User{}, err
 	}
 	return mappers.MapUserDAO2User(userDAO), nil
+}
+
+// CheckUserName checks the username if it exists in the database
+func (ur UserRepository) CheckUserName(username string) (bool, error) {
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection")) ///ToDo: Change static string to configuration value
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var userDAO dao.UserDAO
+	err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&userDAO)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return true, nil
+		}
+		log.Error().Err(err).Msgf("error getting user with username: %s", username)
+		return false, err
+	}
+	return false, nil
 }
 
 // UpdateUser updates an existing user on the user array

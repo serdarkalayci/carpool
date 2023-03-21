@@ -44,7 +44,7 @@ var hs = []byte(secretKey)
 func (apiContext *APIContext) Login(w http.ResponseWriter, r *http.Request) {
 	userLogin := r.Context().Value(ValidatedLogin{}).(dto.LoginRequest)
 	userService := application.NewUserService(apiContext.userRepo)
-	user, err := userService.CheckUser(userLogin.UserName, userLogin.Password)
+	user, err := userService.CheckUser(userLogin.Password, userLogin.Password)
 	if err != nil {
 		respondWithError(w, r, 401, "User not found")
 		log.Error().Err(err).Msg("User not found")
@@ -70,7 +70,7 @@ func (apiContext *APIContext) Login(w http.ResponseWriter, r *http.Request) {
 
 	tokenstring, err := token.SignedString(hs)
 	if err != nil {
-		log.Error().Err(err).Msg("Error creating the token")
+		log.Error().Err(err).Msg("error creating the token")
 		respondWithError(w, r, 500, "Token creation failed")
 		return
 	}
@@ -115,7 +115,7 @@ func checkLogin(r *http.Request) (status bool, httpStatusCode int, claims *Claim
 		return hs, nil
 	})
 	if err != nil {
-		log.Error().Err(err).Msg("Error validating the token")
+		log.Error().Err(err).Msg("error validating the token")
 		httpStatusCode = http.StatusUnauthorized
 		return
 	}
@@ -177,7 +177,7 @@ func (apiContext *APIContext) MiddlewareValidateLoginRequest(next http.Handler) 
 		// validate the login
 		errs := apiContext.validation.Validate(login)
 		if errs != nil && len(errs) != 0 {
-			log.Error().Err(errs[0]).Msg("Error validating the login")
+			log.Error().Err(errs[0]).Msg("error validating the login")
 
 			// return the validation messages as an array
 			respondWithJSON(rw, r, http.StatusUnprocessableEntity, errs.Errors())
