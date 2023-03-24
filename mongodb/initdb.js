@@ -11,3 +11,46 @@ db.users.insertMany([
         "password": "��I\u0000+Dܢ�r!:Z�\u000e0\""
     }
 ])
+db.geography.drop();
+db.geography.insertMany([
+    {
+        _id:   ObjectId("666f6f2d6261722d71757578"),
+        name: "United States",
+        cities: [
+            {
+                name:   "New York City",
+                ballot: true
+            },
+            {
+                name:   "Los Angeles",
+                ballot: false
+            },
+            {
+                name:   "Chicago",
+                ballot: true
+            }
+        ]
+    },
+    {
+        _id: ObjectId("0123456789ab0123456789ab"),
+        name: "The Netherlands",
+        cities: [
+            {
+                name:   "Amsterdam",
+                ballot: true
+            },
+            {
+                name: "Haarlem",
+                ballot: false
+            },
+            {
+                name: "Rotterdam",
+                ballot: false
+            },
+            {   
+                name: "Utrecht",
+                ballot: false
+            }
+        ]
+    }
+])

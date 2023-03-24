@@ -18,6 +18,7 @@ func MapUser2UserDAO(u domain.User) (dao.UserDAO, error) {
 	userDAO.Name = u.Name
 	userDAO.Password = u.Password
 	userDAO.Email = u.Email
+	userDAO.Phone = u.Phone
 	return userDAO, err
 }
 
@@ -28,6 +29,7 @@ func MapUser2NewUserDAO(u domain.User) dao.UserDAO {
 	userDAO.Name = u.Name
 	userDAO.Password = u.Password
 	userDAO.Email = u.Email
+	userDAO.Phone = u.Phone
 	return userDAO
 }
 
@@ -38,6 +40,8 @@ func MapUserDAO2User(u dao.UserDAO) domain.User {
 	user.Name = u.Name
 	user.Password = u.Password
 	user.Email = u.Email
+	user.Phone = u.Phone
 	user.Active = u.Active
+	user.Admin = u.Admin
 	return user
 }

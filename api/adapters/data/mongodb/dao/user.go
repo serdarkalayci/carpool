@@ -10,5 +10,13 @@ type UserDAO struct {
 	Name     string             `bson:"name"`
 	Password string             `bson:"password"`
 	Email    string             `bson:"email"`
+	Phone    string             `bson:"phone"`
 	Active   bool               `bson:"active"`
+	Admin    bool               `bson:"admin"`
+}
+
+// ConfirmationDAO represents the struct of Confirmation code and UserID to be stored in mongoDB
+type ConfirmationDAO struct {
+	UserID primitive.ObjectID `bson:"userid"`
+	Code   string             `bson:"code"`
 }

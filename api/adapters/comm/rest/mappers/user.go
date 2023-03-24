@@ -11,6 +11,7 @@ func MapAddUserRequest2User(ur dto.AddUserRequest) domain.User {
 		Name:     ur.Name,
 		Password: ur.Password,
 		Email:    ur.Email,
+		Phone:    ur.Phone,
 	}
 }
 

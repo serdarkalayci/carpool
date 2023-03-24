@@ -30,7 +30,7 @@ func newUserRepository(client *mongo.Client, databaseName string) UserRepository
 
 // GetUser returns one user with the given ID if it exists in the array, returns not found error otherwise
 func (ur UserRepository) GetUser(ID string) (domain.User, error) {
-	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection")) ///ToDo: Change static string to configuration value
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	objID, err := primitive.ObjectIDFromHex(ID)
@@ -48,8 +48,8 @@ func (ur UserRepository) GetUser(ID string) (domain.User, error) {
 }
 
 // AddUser adds a new user to the array in the memory
-func (ur UserRepository) AddUser(u domain.User) error {
-	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection")) ///ToDo: Change static string to configuration value
+func (ur UserRepository) AddUser(u domain.User) (string, error) {
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	userDAO := mappers.MapUser2NewUserDAO(u)
@@ -57,17 +57,39 @@ func (ur UserRepository) AddUser(u domain.User) error {
 	if err != nil {
 		log.Error().Err(err).Msg("error while writing user")
 		if mongo.IsDuplicateKeyError(err) {
+			return "", &domain.DuplicateKeyError{}
+		}
+		return "", err
+	}
+	log.Info().Msgf("user written: %s", result.InsertedID)
+	return fmt.Sprintf("%s", result.InsertedID.(primitive.ObjectID).Hex()), nil
+}
+
+// AddConfirmationCode adds a new confirmation code to the database
+func (ur UserRepository) AddConfirmationCode(userID string, confirmationCode string) error {
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("ConfirmationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	uid, _ := primitive.ObjectIDFromHex(userID)
+	cdao := dao.ConfirmationDAO{
+		UserID: uid,
+		Code:   confirmationCode,
+	}
+	result, err := collection.InsertOne(ctx, cdao)
+	if err != nil {
+		log.Error().Err(err).Msg("error while writing confirmaton code")
+		if mongo.IsDuplicateKeyError(err) {
 			return &domain.DuplicateKeyError{}
 		}
 		return err
 	}
-	log.Info().Msgf("user written: %s", result.InsertedID)
+	log.Info().Msgf("confirmation code written: %s", result.InsertedID)
 	return nil
 }
 
 // CheckUser checks the username & password if it matches any user from the array
 func (ur UserRepository) CheckUser(username string, password string) (domain.User, error) {
-	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection")) ///ToDo: Change static string to configuration value
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	var userDAO dao.UserDAO
@@ -81,7 +103,7 @@ func (ur UserRepository) CheckUser(username string, password string) (domain.Use
 
 // CheckUserName checks the username if it exists in the database
 func (ur UserRepository) CheckUserName(username string) (bool, error) {
-	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection")) ///ToDo: Change static string to configuration value
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	var userDAO dao.UserDAO

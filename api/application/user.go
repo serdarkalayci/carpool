@@ -3,6 +3,7 @@ package application
 import (
 	"crypto/sha1"
 	"fmt"
+	"math/rand"
 	"unicode"
 
 	"github.com/serdarkalayci/carpool/api/domain"
@@ -12,7 +13,8 @@ import (
 type UserRepository interface {
 	GetUser(ID string) (domain.User, error)
 	CheckUser(email string, password string) (domain.User, error)
-	AddUser(u domain.User) error
+	AddUser(u domain.User) (string, error)
+	AddConfirmationCode(userID string, confirmationCode string) error
 	UpdateUser(u domain.User) error
 	DeleteUser(u domain.User) error
 }
@@ -45,7 +47,44 @@ func (us UserService) CheckUser(username string, password string) (domain.User, 
 // AddUser adds a new user to the repository by first hashing its password
 func (us UserService) AddUser(u domain.User) error {
 	u.Password = hashPassword(u.Password)
-	return us.userRepository.AddUser(u)
+	newUID, err := us.userRepository.AddUser(u)
+	if err != nil {
+		return err
+	}
+	// Generate a random string and send an email to the user with the confirmation code
+	u.ID = newUID
+	err = us.addConfirmationCode(u)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (us UserService) addConfirmationCode(u domain.User) error {
+	confirmationCode := randomString(7)
+	err := us.userRepository.AddConfirmationCode(u.ID, confirmationCode)
+	if err == nil {
+		// Send email to user with the confirmation code
+		sendConfirmationEmail(u, confirmationCode)
+	}
+	return nil
+}
+
+func randomString(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	s := make([]rune, n)
+	for i := range s {
+		s[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(s)
+}
+
+func sendConfirmationEmail(u domain.User, confirmationCode string) error {
+	to := u.Email
+	subject := "Carpool Confirmation Code"
+	body := fmt.Sprintf("Merhaba %s,<br>Bi' Dünya Oy'a Hoşgeldiniz. Onay Kodunuz: <font size=\"5\" weight=\"bold\">%s</font><br><a href=\"mailto:info@bidunyaoy.com\">info@bidunyaoy.com</a>", u.Name, confirmationCode)
+	return sendEmail(to, subject, body)
 }
 
 // UpdateUser updates a single user on the repository, returns error if repository returns one

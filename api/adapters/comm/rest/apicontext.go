@@ -33,16 +33,18 @@ import (
 type APIContext struct {
 	validation *middleware.Validation
 	//dbContext  DBContext
-	healthRepo application.HealthRepository
-	userRepo   application.UserRepository
+	healthRepo    application.HealthRepository
+	userRepo      application.UserRepository
+	geographyRepo application.GeographyRepository
 }
 
 // NewAPIContext returns a new APIContext handler with the given logger
 // func NewAPIContext(dc DBContext, bindAddress *string, ur application.UserRepository) *http.Server {
-func NewAPIContext(bindAddress *string, hr application.HealthRepository, ur application.UserRepository) *http.Server {
+func NewAPIContext(bindAddress *string, hr application.HealthRepository, ur application.UserRepository, gr application.GeographyRepository) *http.Server {
 	apiContext := &APIContext{
-		healthRepo: hr,
-		userRepo:   ur,
+		healthRepo:    hr,
+		userRepo:      ur,
+		geographyRepo: gr,
 	}
 	s := apiContext.prepareContext(bindAddress)
 	return s
@@ -107,6 +109,9 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	putLR.HandleFunc("/login", apiContext.Login)
 	putRR := sm.Methods(http.MethodPut).Subrouter() // Refresh subrouter for PUT method
 	putRR.HandleFunc("/login/refresh", apiContext.Refresh)
+	// Geography handlers
+	getR.HandleFunc("/country", apiContext.GetCountries)
+	getR.HandleFunc("/country/{id}", apiContext.GetCountry)
 	// Documentation handler
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := openapimw.Redoc(opts, nil)
