@@ -15,6 +15,8 @@ type UserRepository interface {
 	CheckUser(email string, password string) (domain.User, error)
 	AddUser(u domain.User) (string, error)
 	AddConfirmationCode(userID string, confirmationCode string) error
+	CheckConfirmationCode(userID string, confirmationCode string) error
+	ActivateUser(userID string) error
 	UpdateUser(u domain.User) error
 	DeleteUser(u domain.User) error
 }
@@ -54,6 +56,19 @@ func (us UserService) AddUser(u domain.User) error {
 	// Generate a random string and send an email to the user with the confirmation code
 	u.ID = newUID
 	err = us.addConfirmationCode(u)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// CheckConfirmationCode checks if the confirmation code matches the one in the repository, if so, activates the user
+func (us UserService) CheckConfirmationCode(userID string, confirmationCode string) error {
+	err := us.userRepository.CheckConfirmationCode(userID, confirmationCode)
+	if err != nil {
+		return err
+	}
+	err = us.userRepository.ActivateUser(userID)
 	if err != nil {
 		return err
 	}

@@ -72,8 +72,9 @@ func (ur UserRepository) AddConfirmationCode(userID string, confirmationCode str
 	defer cancel()
 	uid, _ := primitive.ObjectIDFromHex(userID)
 	cdao := dao.ConfirmationDAO{
-		UserID: uid,
-		Code:   confirmationCode,
+		UserID:       uid,
+		Code:         confirmationCode,
+		ValidityDate: primitive.NewDateTimeFromTime(time.Now().Add(time.Hour * 24)),
 	}
 	result, err := collection.InsertOne(ctx, cdao)
 	if err != nil {
@@ -84,6 +85,51 @@ func (ur UserRepository) AddConfirmationCode(userID string, confirmationCode str
 		return err
 	}
 	log.Info().Msgf("confirmation code written: %s", result.InsertedID)
+	return nil
+}
+
+// CheckConfirmationCode checks if the confirmation code is valid for the given user
+func (ur UserRepository) CheckConfirmationCode(userID string, confirmationCode string) error {
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("ConfirmationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	objID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing UserID: %s", userID)
+		return err
+	}
+	result, err := collection.CountDocuments(ctx, bson.M{"userid": objID, "code": confirmationCode, "validitydate": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now())}})
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting user with UserID: %s", userID)
+		return err
+	}
+	if result == 0 {
+		return &domain.ConfirmationCodeError{}
+	}
+	return nil
+}
+
+// ActivateUser activates the user with the given ID
+func (ur UserRepository) ActivateUser(userID string) error {
+	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	objID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing UserID: %s", userID)
+		return err
+	}
+	result, err := collection.UpdateByID(ctx, objID, bson.M{"$set": bson.M{"active": true}})
+	if err != nil {
+		log.Error().Err(err).Msg("error while activating user")
+		return err
+	} else {
+		if result.MatchedCount == 0 {
+			log.Error().Err(err).Msg("user not found while activating")
+			return &domain.UserNotFoundError{}
+		}
+	}
+	log.Info().Msgf("user activated: %s", userID)
 	return nil
 }
 

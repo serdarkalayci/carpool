@@ -58,28 +58,22 @@ func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// // AddUser creates a new user on the system
-// func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
-// 	// Get user data from payload
-// 	userDTO := r.Context().Value(validatedUser{}).(dto.AddUserRequest)
-// 	user := mappers.MapAddUserRequest2User(userDTO)
-// 	userService := application.NewUserService(apiContext.userRepo)
-// 	if available, err := userService.CheckUserName(user.UserName); available == true {
-// 		err := userService.AddUser(user)
-// 		if err == nil {
-// 			respondWithJSON(rw, r, 200, mappers.MapUser2UserResponse(user))
-// 		} else {
-// 			log.Error().Err(err).Msg("error adding user")
-// 			respondWithError(rw, r, 500, "error adding user")
-// 		}
-// 	} else if err != nil {
-// 		log.Error().Err(err).Msg("error adding user")
-// 		respondWithError(rw, r, 500, "error adding user")
-// 	} else {
-// 		log.Error().Err(err).Msg("error adding user")
-// 		respondWithError(rw, r, 500, fmt.Sprintf("username %s is already taken", user.UserName))
-// 	}
-// }
+// ConfirmUser confirms a user if found
+func (apiContext *APIContext) ConfirmUser(rw http.ResponseWriter, r *http.Request) {
+	// parse the Rating id from the url
+	vars := mux.Vars(r)
+
+	// convert the id into an integer and return
+	userid := vars["id"]
+	confirmationCode := vars["code"]
+	userService := application.NewUserService(apiContext.userRepo)
+	err := userService.CheckConfirmationCode(userid, confirmationCode)
+	if err != nil {
+		respondWithError(rw, r, 401, "user not confirmed")
+		return
+	}
+	respondOK(rw, r, 200)
+}
 
 // MiddlewareValidateNewUser Checks the integrity of new user in the request and calls next if ok
 func (apiContext *APIContext) MiddlewareValidateNewUser(next http.Handler) http.Handler {

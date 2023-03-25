@@ -100,9 +100,11 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	getR.HandleFunc("/health/ready", apiContext.Ready)
 	// User handlers
 	getR.HandleFunc("/user/{id}", apiContext.GetUser)
+	getR.HandleFunc("/user/{id}/confirm/{code}", apiContext.ConfirmUser)
 	postUR := sm.Methods(http.MethodPost).Subrouter() // User subrouter for POST method
 	postUR.Use(apiContext.MiddlewareValidateNewUser)
 	postUR.HandleFunc("/user", apiContext.AddUser)
+
 	// Login handlers
 	putLR := sm.Methods(http.MethodPut).Subrouter() // Login subrouter for PUT method
 	putLR.Use(apiContext.MiddlewareValidateLoginRequest)
