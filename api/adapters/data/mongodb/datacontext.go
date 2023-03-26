@@ -57,5 +57,6 @@ func NewDataContext() data.DataContext {
 	dataContext.UserRepository = newUserRepository(client, databaseName)
 	dataContext.HealthRepository = newHealthRepository(client, databaseName)
 	dataContext.GeographyRepository = newGeographyRepository(client, databaseName)
+	dataContext.TripRepository = newTripRepository(client, databaseName)
 	return dataContext
 }

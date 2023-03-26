@@ -36,15 +36,17 @@ type APIContext struct {
 	healthRepo    application.HealthRepository
 	userRepo      application.UserRepository
 	geographyRepo application.GeographyRepository
+	tripRepo      application.TripRepository
 }
 
 // NewAPIContext returns a new APIContext handler with the given logger
 // func NewAPIContext(dc DBContext, bindAddress *string, ur application.UserRepository) *http.Server {
-func NewAPIContext(bindAddress *string, hr application.HealthRepository, ur application.UserRepository, gr application.GeographyRepository) *http.Server {
+func NewAPIContext(bindAddress *string, hr application.HealthRepository, ur application.UserRepository, gr application.GeographyRepository, tr application.TripRepository) *http.Server {
 	apiContext := &APIContext{
 		healthRepo:    hr,
 		userRepo:      ur,
 		geographyRepo: gr,
+		tripRepo:      tr,
 	}
 	s := apiContext.prepareContext(bindAddress)
 	return s
@@ -102,18 +104,21 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	getR.HandleFunc("/user/{id}", apiContext.GetUser)
 	getR.HandleFunc("/user/{id}/confirm/{code}", apiContext.ConfirmUser)
 	postUR := sm.Methods(http.MethodPost).Subrouter() // User subrouter for POST method
-	postUR.Use(apiContext.MiddlewareValidateNewUser)
+	postUR.Use(apiContext.validateNewUser)
 	postUR.HandleFunc("/user", apiContext.AddUser)
-
 	// Login handlers
 	putLR := sm.Methods(http.MethodPut).Subrouter() // Login subrouter for PUT method
-	putLR.Use(apiContext.MiddlewareValidateLoginRequest)
+	putLR.Use(apiContext.validateLoginRequest)
 	putLR.HandleFunc("/login", apiContext.Login)
 	putRR := sm.Methods(http.MethodPut).Subrouter() // Refresh subrouter for PUT method
 	putRR.HandleFunc("/login/refresh", apiContext.Refresh)
 	// Geography handlers
 	getR.HandleFunc("/country", apiContext.GetCountries)
 	getR.HandleFunc("/country/{id}", apiContext.GetCountry)
+	// Trip handlers
+	postTR := sm.Methods(http.MethodPost).Subrouter() // Trip subrouter for POST method
+	postTR.Use(apiContext.validateNewTrip)
+	postTR.HandleFunc("/trip", apiContext.AddTrip)
 	// Documentation handler
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := openapimw.Redoc(opts, nil)

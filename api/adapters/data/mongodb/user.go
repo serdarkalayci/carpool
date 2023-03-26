@@ -139,7 +139,7 @@ func (ur UserRepository) CheckUser(username string, password string) (domain.Use
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	var userDAO dao.UserDAO
-	err := collection.FindOne(ctx, bson.M{"username": username, "password": password}).Decode(&userDAO)
+	err := collection.FindOne(ctx, bson.M{"email": username, "password": password, "active": true}).Decode(&userDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting user with username: %s", username)
 		return domain.User{}, err

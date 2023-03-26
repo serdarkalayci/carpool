@@ -7,4 +7,5 @@ type DataContext struct {
 	UserRepository      application.UserRepository
 	HealthRepository    application.HealthRepository
 	GeographyRepository application.GeographyRepository
+	TripRepository      application.TripRepository
 }
