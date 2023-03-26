@@ -21,6 +21,7 @@ func MapTripDAO2Trip(tripDAO *dao.TripDAO) *domain.Trip {
 		SupplierID:     tripDAO.SupplierID.Hex(),
 		CountryID:      tripDAO.CountryID.Hex(),
 		Origin:         tripDAO.Origin,
+		Stops:          tripDAO.Stops,
 		Destination:    tripDAO.Destination,
 		TripDate:       tripDAO.TripDate.Time(),
 		AvailableSeats: tripDAO.AvailableSeats,

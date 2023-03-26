@@ -17,6 +17,14 @@ func MapTrip2TripListItem(trip domain.Trip) dto.TripListItem {
 	}
 }
 
+func MapTrips2TripListItems(trips []*domain.Trip) []dto.TripListItem {
+	var tripListItems []dto.TripListItem
+	for _, trip := range trips {
+		tripListItems = append(tripListItems, MapTrip2TripListItem(*trip))
+	}
+	return tripListItems
+}
+
 func MapAddTripRequest2Trip(trip dto.AddTripRequest) (domain.Trip, error) {
 	tripDate, err := time.Parse("2006-01-02", trip.TripDate)
 	if err != nil {

@@ -42,3 +42,29 @@ func (apiContext *APIContext) AddTrip(rw http.ResponseWriter, r *http.Request) {
 		respondWithError(rw, r, 401, "Unauthorized")
 	}
 }
+
+// swagger:route GET /trip Trip GetTrips
+// Gets all the trips within the given country and optinally the given origin and destination
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// GetTrips gets all the trips within the given country and optinally the given origin and destination
+func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) {
+	status, _, _ := checkLogin(r)
+	if status {
+		countryID := r.URL.Query().Get("countryid")
+		origin := r.URL.Query().Get("origin")
+		destination := r.URL.Query().Get("destination")
+		tripService := application.NewTripService(apiContext.tripRepo)
+		trips, err := tripService.GetTrips(countryID, origin, destination)
+		if err != nil {
+			log.Error().Err(err).Msg("error getting trips")
+			respondWithError(rw, r, 500, "error getting trips")
+			return
+		}
+		respondWithJSON(rw, r, 200, mappers.MapTrips2TripListItems(trips))
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}

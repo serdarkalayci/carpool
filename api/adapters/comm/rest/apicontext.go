@@ -116,6 +116,7 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	getR.HandleFunc("/country", apiContext.GetCountries)
 	getR.HandleFunc("/country/{id}", apiContext.GetCountry)
 	// Trip handlers
+	getR.HandleFunc("/trip", apiContext.GetTrips)
 	postTR := sm.Methods(http.MethodPost).Subrouter() // Trip subrouter for POST method
 	postTR.Use(apiContext.validateNewTrip)
 	postTR.HandleFunc("/trip", apiContext.AddTrip)
