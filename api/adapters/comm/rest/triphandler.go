@@ -3,6 +3,7 @@ package rest
 import (
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/mappers"
@@ -64,6 +65,31 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 			return
 		}
 		respondWithJSON(rw, r, 200, mappers.MapTrips2TripListItems(trips))
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}
+
+// swagger:route GET /trip/{id} Trip GetTrip
+// Gets a single trip with all the details
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// GetTrip Gets a single trip with all the details
+func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
+	status, _, _ := checkLogin(r)
+	if status {
+		vars := mux.Vars(r)
+		id := vars["id"]
+		tripService := application.NewTripService(apiContext.tripRepo)
+		tripdetail, err := tripService.GetTrip(id)
+		if err != nil {
+			log.Error().Err(err).Msg("error getting trips")
+			respondWithError(rw, r, 500, "error getting trips")
+			return
+		}
+		respondWithJSON(rw, r, 200, mappers.MapTripDetail2TripDetailResponse(*tripdetail))
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
 	}

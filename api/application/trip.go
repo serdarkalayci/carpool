@@ -5,6 +5,7 @@ import "github.com/serdarkalayci/carpool/api/domain"
 type TripRepository interface {
 	AddTrip(trip *domain.Trip) error
 	GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error)
+	GetTripByID(tripID string) (*domain.TripDetail, error)
 }
 
 // TripService is the struct to let outer layers to interact to the Trip Applicatopn
@@ -28,4 +29,8 @@ func (ts TripService) AddTrip(trip domain.Trip) error {
 
 func (ts TripService) GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error) {
 	return ts.tripRepository.GetTrips(countryID, origin, destination)
+}
+
+func (ts TripService) GetTrip(id string) (*domain.TripDetail, error) {
+	return ts.tripRepository.GetTripByID(id)
 }

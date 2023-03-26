@@ -13,3 +13,15 @@ type TripDAO struct {
 	AvailableSeats int                `bson:"availableseats"`
 	Note           string             `bson:"note"`
 }
+
+type TripDetailDAO struct {
+	ID             primitive.ObjectID `bson:"_id"`
+	SupplierName   string             `bson:"username"`
+	Country        string             `bson:"countryname"`
+	Origin         string             `bson:"origin"`
+	Destination    string             `bson:"destination"`
+	Stops          []string           `bson:"stops"`
+	TripDate       primitive.DateTime `bson:"tripdate"`
+	AvailableSeats int                `bson:"availableseats"`
+	Note           string             `bson:"note"`
+}

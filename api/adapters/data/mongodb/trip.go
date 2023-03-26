@@ -75,3 +75,22 @@ func (tr TripRepository) GetTrips(countryID string, origin, destination string) 
 	}
 	return mappers.MapTripDAOs2Trips(tripsDAO), nil
 }
+
+func (tr TripRepository) GetTripByID(tripID string) (*domain.TripDetail, error) {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("TripDetailsView"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	objID, err := primitive.ObjectIDFromHex(tripID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
+		return nil, err
+	}
+	filter := bson.M{"_id": objID}
+	var tripDetailDAO dao.TripDetailDAO
+	err = collection.FindOne(ctx, filter).Decode(&tripDetailDAO)
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
+		return nil, err
+	}
+	return mappers.MapTripDetailDAO2TripDetail(&tripDetailDAO), nil
+}

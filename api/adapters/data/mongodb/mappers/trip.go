@@ -52,3 +52,17 @@ func MapTrip2TripDAO(trip domain.Trip) (dao.TripDAO, error) {
 		Note:           trip.Note,
 	}, nil
 }
+
+func MapTripDetailDAO2TripDetail(tripDetailDAO *dao.TripDetailDAO) *domain.TripDetail {
+	return &domain.TripDetail{
+		ID:             tripDetailDAO.ID.Hex(),
+		SupplierName:   tripDetailDAO.SupplierName,
+		Country:        tripDetailDAO.Country,
+		Origin:         tripDetailDAO.Origin,
+		Stops:          tripDetailDAO.Stops,
+		Destination:    tripDetailDAO.Destination,
+		TripDate:       tripDetailDAO.TripDate.Time(),
+		AvailableSeats: tripDetailDAO.AvailableSeats,
+		Note:           tripDetailDAO.Note,
+	}
+}

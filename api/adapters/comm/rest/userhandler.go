@@ -19,10 +19,7 @@ import (
 
 // GetUser gets a single user if found
 func (apiContext *APIContext) GetUser(rw http.ResponseWriter, r *http.Request) {
-	// parse the Rating id from the url
 	vars := mux.Vars(r)
-
-	// convert the id into an integer and return
 	id := vars["id"]
 	userService := application.NewUserService(apiContext.userRepo)
 	user, err := userService.GetUser(id)

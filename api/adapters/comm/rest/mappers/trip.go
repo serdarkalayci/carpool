@@ -40,3 +40,17 @@ func MapAddTripRequest2Trip(trip dto.AddTripRequest) (domain.Trip, error) {
 		Note:           trip.Note,
 	}, nil
 }
+
+func MapTripDetail2TripDetailResponse(tripDetail domain.TripDetail) dto.TripDetailResponse {
+	return dto.TripDetailResponse{
+		ID:             tripDetail.ID,
+		SupplierName:   tripDetail.SupplierName,
+		Country:        tripDetail.Country,
+		Origin:         tripDetail.Origin,
+		Destination:    tripDetail.Destination,
+		Stops:          tripDetail.Stops,
+		TripDate:       tripDetail.TripDate,
+		AvailableSeats: tripDetail.AvailableSeats,
+		Note:           tripDetail.Note,
+	}
+}

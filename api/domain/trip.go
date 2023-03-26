@@ -13,3 +13,15 @@ type Trip struct {
 	AvailableSeats int
 	Note           string
 }
+
+type TripDetail struct {
+	ID             string
+	SupplierName   string
+	Country        string
+	Origin         string
+	Destination    string
+	Stops          []string
+	TripDate       time.Time
+	AvailableSeats int
+	Note           string
+}

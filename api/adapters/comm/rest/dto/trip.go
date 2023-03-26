@@ -19,3 +19,15 @@ type AddTripRequest struct {
 	AvailableSeats int      `json:"availableseats" validate:"required"`
 	Note           string   `json:"note"`
 }
+
+type TripDetailResponse struct {
+	ID             string    `json:"id"`
+	SupplierName   string    `json:"suppliername"`
+	Country        string    `json:"country"`
+	Origin         string    `json:"origin"`
+	Destination    string    `json:"destination"`
+	Stops          []string  `json:"stops"`
+	TripDate       time.Time `json:"tripdate"`
+	AvailableSeats int       `json:"availableseats"`
+	Note           string    `json:"note"`
+}

@@ -5,15 +5,120 @@ db.users.createIndex( { "phone": 1 }, { unique: true } )
 db.users.insertMany([
     {
         "_id": ObjectId("5fb7b1d521e4f91673dc2293"),
-        "name": "First User",
-        "email": "f@f.f",
+        "name": "Serdar Kalaycı",
+        "email": "s@s.s",
         "phone": "1234567890",
-        "password": "��I\u0000+Dܢ�r!:Z�\u000e0\""
+        "password": "\u0006\u0098á*GŸXwb)Z8¿7\u0087\u0091à*Ë"
     }
 ])
+
+db.trips.drop();
+db.trips.insertMany([
+  {
+    "_id": ObjectId("642064a2657e328de2a7d631"),
+    "supplierid":ObjectId("5fb7b1d521e4f91673dc2293"),
+    "countryid":ObjectId("641f01dfcc0d85792b29d254"),
+    "origin":"The Hague",
+    "destination":"Amsterdam",
+    "stops":["Haarlem","Almere"],
+    "tripdate": ISODate("2023-03-26T00:00:00Z"),
+    "availableseats":3,
+    "note":"not yok bu kez"
+},
+{
+    "_id":ObjectId("642075b89e46e44d46172af2"),
+    "supplierid":ObjectId("5fb7b1d521e4f91673dc2293"),
+    "countryid":ObjectId("641f01dfcc0d85792b29d254"),
+    "origin":"Utrecht",
+    "destination":"Amsterdam",
+    "stops":["Haarlem","Almere","Eindhoven"],
+    "tripdate":ISODate("2023-03-26T00:00:00Z"),
+    "availableseats":3,
+    "note":"not yok bu kez"
+},
+{
+    "_id":ObjectId("642075d59e46e44d46172af3"),
+    "supplierid":ObjectId("5fb7b1d521e4f91673dc2293"),
+    "countryid":ObjectId("641f01dfcc0d85792b29d254"),
+    "origin":"Tilburg",
+    "destination":"Amsterdam",
+    "stops":["Haarlem","Almere","Eindhoven"],
+    "tripdate":ISODate("2023-03-26T00:00:00Z"),
+    "availableseats":3,
+    "note":"not yok bu kez"
+},
+{
+    "_id":ObjectId("642075f49e46e44d46172af4"),
+    "supplierid":ObjectId("5fb7b1d521e4f91673dc2293"),
+    "countryid":ObjectId("641f01dfcc0d85792b29d254"),
+    "origin":"Tilburg",
+    "destination":"Rotterdam",
+    "stops":["Haarlem","Almere","Eindhoven"],
+    "tripdate":ISODate("2023-03-26T00:00:00Z"),
+    "availableseats":3,
+    "note":"not yok bu kez"
+}
+])
+
+db.createView( "tripdetail", "trips", [
+  {
+    $lookup:
+      {
+          from: "users",
+          localField: "supplierid",
+          foreignField: "_id",
+          as: "userDocs"
+      }
+  },
+  {
+    $project:
+      {
+        _id: 1,
+        countryid: 1,
+        origin: 1,
+        destination: 1,
+        stops: 1,
+        tripdate: 1,
+        availableseats: 1,
+        note: 1,
+        username: "$userDocs.name"
+      }
+  },
+  { 
+    $unwind: "$username" 
+  },
+  {
+    $lookup:
+        {
+          from: "geography",
+          localField: "countryid",
+          foreignField: "_id",
+          as: "countryDocs"
+        }
+  },
+  {
+    $project:
+        {
+          _id: 1,
+          origin: 1,
+          destination: 1,
+          stops: 1,
+          tripdate: 1,
+          availableseats: 1,
+          username: 1,
+          note: 1,
+          countryname: "$countryDocs.name"
+        }
+  },
+  { 
+    $unwind: "$countryname" 
+  }
+] )
+
 db.geography.drop();
 db.geography.insertMany([
     {
+        "_id": ObjectId("6420af53150f72f9e1feeb7c"),
         "name": "France",
         "cities": [
           {
@@ -143,6 +248,7 @@ db.geography.insertMany([
         ]
       },
     {
+        "_id":ObjectId("641f01dfcc0d85792b29d254"),
         "name": "The Netherlands",
         "cities": [
           {
