@@ -36,6 +36,7 @@ func SetConstValues() {
 	viper.SetDefault("GeographyCollection", "geography")
 	viper.SetDefault("TripsCollection", "trips")
 	viper.SetDefault("TripDetailsView", "tripdetail")
+	viper.SetDefault("ConversationsCollection", "conversations")
 }
 
 // SetLogLevels gets configuration values from the file and injects them

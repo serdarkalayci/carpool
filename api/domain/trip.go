@@ -24,4 +24,17 @@ type TripDetail struct {
 	TripDate       time.Time
 	AvailableSeats int
 	Note           string
+	Conversations  []Conversation
+}
+
+type Conversation struct {
+	RequesterID string
+	Messages    []Message
+}
+
+type Message struct {
+	Direction string
+	Date      time.Time
+	Text      string
+	Read      bool
 }
