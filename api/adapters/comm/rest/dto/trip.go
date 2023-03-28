@@ -21,13 +21,31 @@ type AddTripRequest struct {
 }
 
 type TripDetailResponse struct {
-	ID             string    `json:"id"`
-	SupplierName   string    `json:"suppliername"`
-	Country        string    `json:"country"`
-	Origin         string    `json:"origin"`
-	Destination    string    `json:"destination"`
-	Stops          []string  `json:"stops"`
-	TripDate       time.Time `json:"tripdate"`
-	AvailableSeats int       `json:"availableseats"`
-	Note           string    `json:"note"`
+	ID             string               `json:"id"`
+	SupplierName   string               `json:"suppliername"`
+	Country        string               `json:"country"`
+	Origin         string               `json:"origin"`
+	Destination    string               `json:"destination"`
+	Stops          []string             `json:"stops"`
+	TripDate       time.Time            `json:"tripdate"`
+	AvailableSeats int                  `json:"availableseats"`
+	Note           string               `json:"note"`
+	Conversation   ConversationResponse `json:"conversation,omitempty"`
+}
+
+type ConversationResponse struct {
+	RequesterID   string            `json:"requesterid"`
+	RequesterName string            `json:"requestername"`
+	Messages      []MessageResponse `json:"messages"`
+}
+
+type MessageResponse struct {
+	Direction string    `json:"direction"`
+	Date      time.Time `json:"date"`
+	Text      string    `json:"text"`
+	Read      bool      `json:"read"`
+}
+
+type AddMessageRequest struct {
+	Text string `json:"text" validate:"required"`
 }

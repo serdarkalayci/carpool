@@ -28,8 +28,9 @@ type TripDetail struct {
 }
 
 type Conversation struct {
-	RequesterID string
-	Messages    []Message
+	RequesterID   string
+	RequesterName string
+	Messages      []Message
 }
 
 type Message struct {

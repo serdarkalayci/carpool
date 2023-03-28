@@ -7,7 +7,7 @@ type TripRepository interface {
 	GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error)
 	GetTripByID(tripID string) (*domain.TripDetail, error)
 	CheckConversation(tripID string, userID string) (string, string, error)
-	InitiateConversation(tripID string, userID string, message string) error
+	InitiateConversation(tripID string, userID string, userName string, message string) error
 	AddMessage(conversationID string, message string, direction string) error
 }
 
@@ -38,7 +38,7 @@ func (ts TripService) GetTrip(id string) (*domain.TripDetail, error) {
 	return ts.tripRepository.GetTripByID(id)
 }
 
-func (ts TripService) AddMessage(tripID string, userID string, message string) error {
+func (ts TripService) AddMessage(tripID string, userID string, userName string, message string) error {
 	// check if there is a conversation for this trip with this user
 	conversationID, requesterID, err := ts.tripRepository.CheckConversation(tripID, userID)
 	if err != nil {
@@ -46,7 +46,8 @@ func (ts TripService) AddMessage(tripID string, userID string, message string) e
 	}
 	// if there is no conversation, create one
 	if conversationID == "" {
-		return ts.tripRepository.InitiateConversation(tripID, userID, message)
+		// first we have to get the user's name, so that we can write it to the conversation
+		return ts.tripRepository.InitiateConversation(tripID, userID, userName, message)
 	}
 	// if there is a conversation, add the message to it
 	direction := "out"

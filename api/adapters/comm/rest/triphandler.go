@@ -94,3 +94,31 @@ func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
 		respondWithError(rw, r, 401, "Unauthorized")
 	}
 }
+
+// swagger:route POST /trip/{id}/message Message AddMessage
+// Adds a new message to the trip
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// AddMessage creates a new message to the trip
+func (apiContext *APIContext) AddMessage(rw http.ResponseWriter, r *http.Request) {
+	status, _, claims := checkLogin(r)
+	if status {
+		vars := mux.Vars(r)
+		tripID := vars["id"]
+		addMessageDTO := r.Context().Value(validatedMessage{}).(dto.AddMessageRequest)
+		tripService := application.NewTripService(apiContext.tripRepo)
+		err := tripService.AddMessage(tripID, claims.UserID, claims.UserName, addMessageDTO.Text)
+		if err == nil {
+			respondOK(rw, r, 200)
+		} else if e, ok := err.(*domain.DuplicateKeyError); ok {
+			respondWithError(rw, r, 400, e.Error())
+		} else {
+			log.Error().Err(err).Msg("error adding message")
+			respondWithError(rw, r, 500, "error adding message")
+		}
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}

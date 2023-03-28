@@ -114,13 +114,16 @@ func (tr TripRepository) CheckConversation(tripID string, userID string) (convoI
 	var conversation dao.Conversation
 	err = collection.FindOne(ctx, filter).Decode(&conversation)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", "", nil
+		}
 		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
 		return "", "", err
 	}
 	return conversation.ID.Hex(), conversation.RequesterID.Hex(), nil
 }
 
-func (tr TripRepository) InitiateConversation(tripID string, userID string, message string) error {
+func (tr TripRepository) InitiateConversation(tripID string, userID string, userName string, message string) error {
 	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -134,11 +137,14 @@ func (tr TripRepository) InitiateConversation(tripID string, userID string, mess
 		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
 		return err
 	}
+	// get user name
+
 	conversationDAO := dao.Conversation{
-		ID:          primitive.NewObjectID(),
-		TripID:      tripObjID,
-		RequesterID: userObjID,
-		Messages:    []dao.Message{{Date: primitive.NewDateTimeFromTime(time.Now()), Text: message, Direction: "in"}},
+		ID:            primitive.NewObjectID(),
+		TripID:        tripObjID,
+		RequesterID:   userObjID,
+		RequesterName: userName,
+		Messages:      []dao.Message{{Date: primitive.NewDateTimeFromTime(time.Now()), Text: message, Direction: "in"}},
 	}
 	_, err = collection.InsertOne(ctx, conversationDAO)
 	if err != nil {

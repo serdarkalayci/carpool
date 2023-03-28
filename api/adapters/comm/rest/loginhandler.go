@@ -15,8 +15,9 @@ import (
 
 // Claims represents the data for a user login
 type Claims struct {
-	UserID  string               `json:"userid"`
-	Payload jwt.RegisteredClaims `json:"payload"`
+	UserID   string               `json:"userid"`
+	UserName string               `json:"username"`
+	Payload  jwt.RegisteredClaims `json:"payload"`
 }
 
 func (c Claims) Valid() error {
@@ -59,8 +60,9 @@ func (apiContext *APIContext) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pl := Claims{
-		Payload: rclaims,
-		UserID:  user.ID,
+		Payload:  rclaims,
+		UserID:   user.ID,
+		UserName: user.Name,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, pl)
 
