@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5f277aa0-edbd-4b91-ba6f-24b14e4ec500",
+		"_postman_id": "61cbd382-e0a6-4156-b61e-2cac1b79055b",
 		"name": "Carpool",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "972959"
@@ -12,12 +12,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5500/metrics",
-					"protocol": "http",
+					"raw": "{{url}}/metrics",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"metrics"
 					]
@@ -31,12 +29,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5500/version",
-					"protocol": "http",
+					"raw": "{{url}}/version",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"version"
 					]
@@ -50,12 +46,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5500",
-					"protocol": "http",
+					"raw": "{{url}}",
 					"host": [
-						"localhost"
-					],
-					"port": "5500"
+						"{{url}}"
+					]
 				}
 			},
 			"response": []
@@ -66,12 +60,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5500/health/live",
-					"protocol": "http",
+					"raw": "{{url}}/health/live",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"health",
 						"live"
@@ -86,12 +78,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5500/health/ready",
-					"protocol": "http",
+					"raw": "{{url}}/health/ready",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"health",
 						"ready"
@@ -106,12 +96,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5500/user/b2bf3967-1991-fbf1-0d3e-93222d2a4050",
-					"protocol": "http",
+					"raw": "{{url}}/user/b2bf3967-1991-fbf1-0d3e-93222d2a4050",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"user",
 						"b2bf3967-1991-fbf1-0d3e-93222d2a4050"
@@ -127,7 +115,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"Name\": \"Second User\",\n    \"UserName\": \"secondu\",\n    \"Password\": \"secondp\"\n}",
+					"raw": "{\n    \"Name\": \"Serdar Kalayci\",\n    \"Password\": \"serdar\",\n    \"Email\": \"serdarkalayci@gmail.com\",\n    \"Phone\": \"+31682884554\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -135,12 +123,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:5500/user",
-					"protocol": "http",
+					"raw": "{{url}}/user",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"user"
 					]
@@ -155,7 +141,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"firstu\",\r\n    \"password\": \"firstp\"\r\n}",
+					"raw": "{\r\n    \"email\": \"supp1@s.com\",\r\n    \"password\": \"serdar\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -163,12 +149,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:5500/login",
-					"protocol": "http",
+					"raw": "{{url}}/login",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"login"
 					]
@@ -182,15 +166,171 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5500/login/refresh",
-					"protocol": "http",
+					"raw": "{{url}}/login/refresh",
 					"host": [
-						"localhost"
+						"{{url}}"
 					],
-					"port": "5500",
 					"path": [
 						"login",
 						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCountries",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/country",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"country"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCountry",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/country/641f01dfcc0d85792b29d254",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"country",
+						"641f01dfcc0d85792b29d254"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfirmUser",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/user/6420b67120ff6915708bdb0e/confirm/SrNTpiG",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"6420b67120ff6915708bdb0e",
+						"confirm",
+						"SrNTpiG"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddTrip",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"countryid\":\"641f01dfcc0d85792b29d254\",\n    \"origin\":\"Tilburg\",\n    \"destination\":\"Rotterdam\",\n    \"stops\":[\"Haarlem\", \"Almere\",\"Eindhoven\"],\n    \"tripdate\": \"2023-03-26\",\n    \"availableseats\":5,\n    \"note\":\"not yok bu kez\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/trip",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"trip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTrips",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/trip?countryid=641f01dfcc0d85792b29d254&destination=Amsterdam&origin=Utrecht",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"trip"
+					],
+					"query": [
+						{
+							"key": "countryid",
+							"value": "641f01dfcc0d85792b29d254"
+						},
+						{
+							"key": "destination",
+							"value": "Amsterdam"
+						},
+						{
+							"key": "origin",
+							"value": "Utrecht"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTripDetail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/trip/642064a2657e328de2a7d631",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"trip",
+						"642064a2657e328de2a7d631"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddMessage",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\": \"Daha fazla bilgi alabilir miyim?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/trip/642064a2657e328de2a7d631/message",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"trip",
+						"642064a2657e328de2a7d631",
+						"message"
 					]
 				}
 			},
