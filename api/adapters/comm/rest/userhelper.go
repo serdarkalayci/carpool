@@ -12,6 +12,7 @@ import (
 )
 
 type validatedUser struct{}
+type validatedConfirmUser struct{}
 
 // ExtractAddUserPayload extracts user data from the request body
 // Returns UserRequest model if found, error otherwise
@@ -48,6 +49,48 @@ func (apiContext *APIContext) validateNewUser(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), validatedUser{}, *user)
+		r = r.WithContext(ctx)
+
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(rw, r)
+	})
+}
+
+// extractConfirmUserPayload extracts user data and confirmation code from the request body
+// Returns UserRequest model if found, error otherwise
+func extractConfirmUserPayload(r *http.Request) (confirmation *dto.ConfirmUserRequest, e error) {
+	payload, e := readPayload(r)
+	if e != nil {
+		return
+	}
+	err := json.Unmarshal(payload, &confirmation)
+	if err != nil {
+		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
+		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		return
+	}
+	return
+}
+
+// validateConfirmUser Checks the integrity of new user in the request and calls next if ok
+func (apiContext *APIContext) validateConfirmUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		confirmation, err := extractConfirmUserPayload(r)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		// validate the user
+		errs := apiContext.validation.Validate(confirmation)
+		if errs != nil && len(errs) != 0 {
+			log.Error().Err(errs[0]).Msg("error validating the confirmation code")
+
+			// return the validation messages as an array
+			respondWithJSON(rw, r, http.StatusUnprocessableEntity, errs.Errors())
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), validatedConfirmUser{}, *confirmation)
 		r = r.WithContext(ctx)
 
 		// Call the next handler, which can be another middleware in the chain, or the final handler.

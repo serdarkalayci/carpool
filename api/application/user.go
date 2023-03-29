@@ -98,7 +98,7 @@ func randomString(n int) string {
 func sendConfirmationEmail(u domain.User, confirmationCode string) error {
 	to := u.Email
 	subject := "Carpool Confirmation Code"
-	body := fmt.Sprintf("Merhaba %s,<br>Bi' Dünya Oy'a Hoşgeldiniz. Onay Kodunuz: <font size=\"5\" weight=\"bold\">%s</font><br><a href=\"mailto:info@bidunyaoy.com\">info@bidunyaoy.com</a>", u.Name, confirmationCode)
+	body := fmt.Sprintf("Merhaba %s,<br>Bi' Dünya Oy'a Hoşgeldiniz. Aşağıdaki butona tıklayarak üyeliğinizi onaylayabilirsiniz.<br> <form method\"put\" action=\"http://localhost:5500/user/%s/confirm\"><input type=\"hidden\" id=\"Code\" value=\"%s\"><input type=\"submit\" value=\"Onayla\"></form><br><a href=\"mailto:info@bidunyaoy.com\">info@bidunyaoy.com</a>", u.Name, u.ID, confirmationCode)
 	return sendEmail(to, subject, body)
 }
 

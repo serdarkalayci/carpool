@@ -11,7 +11,7 @@ import (
 	"github.com/serdarkalayci/carpool/api/domain"
 )
 
-// swagger:route GET /user/{id} User GetUser
+// swagger:route GET /user/{userid} User GetUser
 // Return the user if found
 // responses:
 //	200: OK
@@ -20,15 +20,15 @@ import (
 // GetUser gets a single user if found
 func (apiContext *APIContext) GetUser(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	userid := vars["userid"]
 	userService := application.NewUserService(apiContext.userRepo)
-	user, err := userService.GetUser(id)
+	user, err := userService.GetUser(userid)
 	if err == nil {
 		respondWithJSON(rw, r, 200, mappers.MapUser2SUserResponse(user))
 	}
 }
 
-// swagger:route POST /user/{id} User AddUser
+// swagger:route POST /user User AddUser
 // Adds a new user to the system
 // responses:
 //	200: OK
@@ -51,16 +51,20 @@ func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// swagger:route PUT /user/{userid} User GetUser
+// Return the user if found
+// responses:
+//	200: OK
+//	404: errorResponse
+
 // ConfirmUser confirms a user if found
 func (apiContext *APIContext) ConfirmUser(rw http.ResponseWriter, r *http.Request) {
 	// parse the Rating id from the url
 	vars := mux.Vars(r)
-
-	// convert the id into an integer and return
-	userid := vars["id"]
-	confirmationCode := vars["code"]
+	userid := vars["userid"]
+	confirmation := r.Context().Value(validatedConfirmUser{}).(dto.ConfirmUserRequest)
 	userService := application.NewUserService(apiContext.userRepo)
-	err := userService.CheckConfirmationCode(userid, confirmationCode)
+	err := userService.CheckConfirmationCode(userid, confirmation.Code)
 	if err != nil {
 		respondWithError(rw, r, 401, "user not confirmed")
 		return
