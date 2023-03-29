@@ -23,3 +23,11 @@ func MapCountryDAO2Country(countryDAO dao.CountryDAO) domain.Country {
 		Cities: cities,
 	}
 }
+
+func MapCountryDAOs2Countries(countryDAOs []dao.CountryDAO) []domain.Country {
+	countries := make([]domain.Country, len(countryDAOs))
+	for i, countryDAO := range countryDAOs {
+		countries[i] = MapCountryDAO2Country(countryDAO)
+	}
+	return countries
+}

@@ -33,24 +33,19 @@ func (gr GeographyRepository) GetCountries() ([]domain.Country, error) {
 	collection := gr.dbClient.Database(gr.dbName).Collection(viper.GetString("GeographyCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	var countryDAO dao.CountryDAO
 	opts := options.Find().SetProjection(bson.D{{"cities", 0}})
-	cur, err := collection.Find(ctx, bson.M{}, opts)
+	cursor, err := collection.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting Countries")
 		return nil, err
 	}
-	products := make([]domain.Country, 0)
-	defer cur.Close(ctx)
-	for cur.Next(ctx) {
-		err := cur.Decode(&countryDAO)
-		if err != nil {
-			return nil, err
-		}
-		product := mappers.MapCountryDAO2Country(countryDAO)
-		products = append(products, product)
+	countries := make([]dao.CountryDAO, 0)
+	defer cursor.Close(ctx)
+	if err = cursor.All(ctx, &countries); err != nil {
+
+		return nil, err
 	}
-	return products, nil
+	return mappers.MapCountryDAOs2Countries(countries), nil
 }
 
 // GetCountry returns one country with the given ID and its cities
