@@ -29,9 +29,9 @@ type TripDetail struct {
 }
 
 type Conversation struct {
-	RequesterID   string
-	RequesterName string
-	Messages      []Message
+	ConversationID string
+	RequesterName  string
+	Messages       []Message
 }
 
 type Message struct {
@@ -39,4 +39,15 @@ type Message struct {
 	Date      time.Time
 	Text      string
 	Read      bool
+}
+
+type ErrNotTheOwner struct{}
+type ErrTheOwner struct{}
+
+func (e ErrNotTheOwner) Error() string {
+	return "this user is not the supplier of this trip"
+}
+
+func (e ErrTheOwner) Error() string {
+	return "this user is the supplier of this trip, therefore cannot inititate conversation"
 }

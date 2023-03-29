@@ -71,9 +71,9 @@ func MapTripDetailDAO2TripDetail(tripDetailDAO *dao.TripDetailDAO) *domain.TripD
 func MapConversationDAO2Conversation(conversationDAO *dao.ConversationDAO) *domain.Conversation {
 	messages := MapMessageDAOs2Messages(conversationDAO.Messages)
 	return &domain.Conversation{
-		RequesterID:   conversationDAO.RequesterID.Hex(),
-		RequesterName: conversationDAO.RequesterName,
-		Messages:      messages,
+		ConversationID: conversationDAO.ID.Hex(),
+		RequesterName:  conversationDAO.RequesterName,
+		Messages:       messages,
 	}
 }
 

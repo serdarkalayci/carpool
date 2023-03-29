@@ -34,3 +34,7 @@ type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
+
+type ConfirmUserRequest struct {
+	Code string `json:"code" validate:"required"`
+}

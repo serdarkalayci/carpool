@@ -96,31 +96,54 @@ func (tr TripRepository) GetTripByID(tripID string) (*domain.TripDetail, error) 
 	return mappers.MapTripDetailDAO2TripDetail(&tripDetailDAO), nil
 }
 
-func (tr TripRepository) CheckConversation(tripID string, userID string) (convoID string, requesterID string, err error) {
+func (tr TripRepository) CheckConversation(tripID string, userID string) (convoID string, err error) {
 	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	tripObjID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
-		return "", "", err
+		return "", err
 	}
 	userObjID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
-		return "", "", err
+		return "", err
 	}
 	filter := bson.M{"tripid": tripObjID, "requesterid": userObjID}
 	var conversation dao.ConversationDAO
 	err = collection.FindOne(ctx, filter).Decode(&conversation)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return "", "", nil
+			return "", nil
 		}
 		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
-		return "", "", err
+		return "", err
 	}
-	return conversation.ID.Hex(), conversation.RequesterID.Hex(), nil
+	return conversation.ID.Hex(), nil
+}
+
+func (tr TripRepository) CheckTripOwnership(tripID string, userID string) (bool, error) {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("TripsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	tripObjID, err := primitive.ObjectIDFromHex(tripID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
+		return false, err
+	}
+	userObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
+		return false, err
+	}
+	filter := bson.M{"_id": tripObjID, "supplierid": userObjID}
+	count, err := collection.CountDocuments(ctx, filter)
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
+		return false, err
+	}
+	return count == 1, nil
 }
 
 func (tr TripRepository) InitiateConversation(tripID string, userID string, userName string, message string) error {

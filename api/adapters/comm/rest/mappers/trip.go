@@ -58,9 +58,9 @@ func MapTripDetail2TripDetailResponse(tripDetail domain.TripDetail) dto.TripDeta
 
 func MapConversation2ConversationResponse(conversation domain.Conversation) dto.ConversationResponse {
 	return dto.ConversationResponse{
-		RequesterID:   conversation.RequesterID,
-		RequesterName: conversation.RequesterName,
-		Messages:      MapMessages2MessageResponses(conversation.Messages),
+		ConversationID: conversation.ConversationID,
+		RequesterName:  conversation.RequesterName,
+		Messages:       MapMessages2MessageResponses(conversation.Messages),
 	}
 }
 

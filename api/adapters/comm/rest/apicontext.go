@@ -101,8 +101,10 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	getR.HandleFunc("/health/live", apiContext.Live)
 	getR.HandleFunc("/health/ready", apiContext.Ready)
 	// User handlers
-	getR.HandleFunc("/user/{id}", apiContext.GetUser)
-	getR.HandleFunc("/user/{id}/confirm/{code}", apiContext.ConfirmUser)
+	getR.HandleFunc("/user/{userid}", apiContext.GetUser)
+	putCR := sm.Methods(http.MethodPut).Subrouter() // User subrouter for Confirmation PUT method
+	putCR.Use(apiContext.validateConfirmUser)
+	putCR.HandleFunc("/user/{userid}/confirm", apiContext.ConfirmUser)
 	postUR := sm.Methods(http.MethodPost).Subrouter() // User subrouter for POST method
 	postUR.Use(apiContext.validateNewUser)
 	postUR.HandleFunc("/user", apiContext.AddUser)
@@ -114,16 +116,18 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	putRR.HandleFunc("/login/refresh", apiContext.Refresh)
 	// Geography handlers
 	getR.HandleFunc("/country", apiContext.GetCountries)
-	getR.HandleFunc("/country/{id}", apiContext.GetCountry)
+	getR.HandleFunc("/country/{countryid}", apiContext.GetCountry)
 	// Trip handlers
 	getR.HandleFunc("/trip", apiContext.GetTrips)
 	getR.HandleFunc("/trip/{id}", apiContext.GetTrip)
+	getR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.GetConversation)
 	postTR := sm.Methods(http.MethodPost).Subrouter() // Trip subrouter for POST method
 	postTR.Use(apiContext.validateNewTrip)
 	postTR.HandleFunc("/trip", apiContext.AddTrip)
 	postMR := sm.Methods(http.MethodPost).Subrouter() // Message subrouter for PUT method
 	postMR.Use(apiContext.validateNewMessage)
-	postMR.HandleFunc("/trip/{id}/message", apiContext.AddMessage)
+	postMR.HandleFunc("/trip/{tripid}/conversation", apiContext.AddRequesterMessage)
+	postMR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.AddSupplierMessage)
 	// Documentation handler
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := openapimw.Redoc(opts, nil)

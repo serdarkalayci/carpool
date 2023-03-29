@@ -6,7 +6,8 @@ type TripRepository interface {
 	AddTrip(trip *domain.Trip) error
 	GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error)
 	GetTripByID(tripID string) (*domain.TripDetail, error)
-	CheckConversation(tripID string, userID string) (string, string, error)
+	CheckConversation(tripID string, userID string) (string, error)
+	CheckTripOwnership(tripID string, userID string) (bool, error)
 	InitiateConversation(tripID string, userID string, userName string, message string) error
 	AddMessage(conversationID string, message string, direction string) error
 	GetConversation(tripID string, userID string) (*domain.Conversation, error)
@@ -61,9 +62,17 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 	return tripDetail, nil
 }
 
-func (ts TripService) AddMessage(tripID string, userID string, userName string, message string) error {
+func (ts TripService) AddRequesterMessage(tripID string, userID string, userName string, message string) error {
+	// First check that this user is not the supplier of this trip
+	owner, err := ts.tripRepository.CheckTripOwnership(tripID, userID)
+	if err != nil {
+		return err
+	}
+	if owner {
+		return domain.ErrNotTheOwner{}
+	}
 	// check if there is a conversation for this trip with this user
-	conversationID, requesterID, err := ts.tripRepository.CheckConversation(tripID, userID)
+	conversationID, err := ts.tripRepository.CheckConversation(tripID, userID)
 	if err != nil {
 		return err
 	}
@@ -73,10 +82,23 @@ func (ts TripService) AddMessage(tripID string, userID string, userName string, 
 		return ts.tripRepository.InitiateConversation(tripID, userID, userName, message)
 	}
 	// if there is a conversation, add the message to it
-	direction := "out"
-	// if the user is the requester, the message is incoming
-	if requesterID == userID {
-		direction = "in"
-	}
+	direction := "in"
 	return ts.tripRepository.AddMessage(conversationID, message, direction)
+}
+
+func (ts TripService) AddSupplierMessage(tripID string, userID string, conversationID, message string) error {
+	// First check that this user is the supplier of this trip
+	owner, err := ts.tripRepository.CheckTripOwnership(tripID, userID)
+	if err != nil {
+		return err
+	}
+	if !owner {
+		return domain.ErrNotTheOwner{}
+	}
+	direction := "out"
+	return ts.tripRepository.AddMessage(conversationID, message, direction)
+}
+
+func (ts TripService) GetConversation(tripID string, userID string) (*domain.Conversation, error) {
+	return ts.tripRepository.GetConversation(tripID, userID)
 }

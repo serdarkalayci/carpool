@@ -9,7 +9,7 @@ import (
 	"github.com/serdarkalayci/carpool/api/application"
 )
 
-// swagger:route GET /country/{id} Country GetCountry
+// swagger:route GET /country/{countryid} Country GetCountry
 // Return the country if found
 // responses:
 //	200: OK
@@ -21,9 +21,9 @@ func (apiContext *APIContext) GetCountry(rw http.ResponseWriter, r *http.Request
 	vars := mux.Vars(r)
 
 	// convert the id into an integer and return
-	id := vars["id"]
+	countryID := vars["countryid"]
 	geographyService := application.NewGeographyService(apiContext.geographyRepo)
-	user, err := geographyService.GetCountry(id)
+	user, err := geographyService.GetCountry(countryID)
 	if err == nil {
 		respondWithJSON(rw, r, 200, mappers.MapCountry2CountryDTO(user))
 		return
