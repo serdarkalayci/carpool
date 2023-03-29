@@ -74,6 +74,7 @@ db.createView( "tripdetail", "trips", [
     $project:
       {
         _id: 1,
+        supplierid: 1,
         countryid: 1,
         origin: 1,
         destination: 1,
@@ -100,6 +101,7 @@ db.createView( "tripdetail", "trips", [
     $project:
         {
           _id: 1,
+          supplierid: 1,
           origin: 1,
           destination: 1,
           stops: 1,

@@ -21,16 +21,16 @@ type AddTripRequest struct {
 }
 
 type TripDetailResponse struct {
-	ID             string               `json:"id"`
-	SupplierName   string               `json:"suppliername"`
-	Country        string               `json:"country"`
-	Origin         string               `json:"origin"`
-	Destination    string               `json:"destination"`
-	Stops          []string             `json:"stops"`
-	TripDate       time.Time            `json:"tripdate"`
-	AvailableSeats int                  `json:"availableseats"`
-	Note           string               `json:"note"`
-	Conversation   ConversationResponse `json:"conversation,omitempty"`
+	ID             string                 `json:"id"`
+	SupplierName   string                 `json:"suppliername"`
+	Country        string                 `json:"country"`
+	Origin         string                 `json:"origin"`
+	Destination    string                 `json:"destination"`
+	Stops          []string               `json:"stops"`
+	TripDate       time.Time              `json:"tripdate"`
+	AvailableSeats int                    `json:"availableseats"`
+	Note           string                 `json:"note"`
+	Conversation   []ConversationResponse `json:"conversation,omitempty"`
 }
 
 type ConversationResponse struct {

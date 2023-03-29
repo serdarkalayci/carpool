@@ -78,12 +78,12 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 
 // GetTrip Gets a single trip with all the details
 func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
-	status, _, _ := checkLogin(r)
+	status, _, claims := checkLogin(r)
 	if status {
 		vars := mux.Vars(r)
 		id := vars["id"]
 		tripService := application.NewTripService(apiContext.tripRepo)
-		tripdetail, err := tripService.GetTrip(id)
+		tripdetail, err := tripService.GetTrip(id, claims.UserID)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting trips")
 			respondWithError(rw, r, 500, "error getting trips")

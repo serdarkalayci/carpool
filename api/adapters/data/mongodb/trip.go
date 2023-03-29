@@ -111,7 +111,7 @@ func (tr TripRepository) CheckConversation(tripID string, userID string) (convoI
 		return "", "", err
 	}
 	filter := bson.M{"tripid": tripObjID, "requesterid": userObjID}
-	var conversation dao.Conversation
+	var conversation dao.ConversationDAO
 	err = collection.FindOne(ctx, filter).Decode(&conversation)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -139,12 +139,12 @@ func (tr TripRepository) InitiateConversation(tripID string, userID string, user
 	}
 	// get user name
 
-	conversationDAO := dao.Conversation{
+	conversationDAO := dao.ConversationDAO{
 		ID:            primitive.NewObjectID(),
 		TripID:        tripObjID,
 		RequesterID:   userObjID,
 		RequesterName: userName,
-		Messages:      []dao.Message{{Date: primitive.NewDateTimeFromTime(time.Now()), Text: message, Direction: "in"}},
+		Messages:      []dao.MessageDAO{{Date: primitive.NewDateTimeFromTime(time.Now()), Text: message, Direction: "in"}},
 	}
 	_, err = collection.InsertOne(ctx, conversationDAO)
 	if err != nil {
@@ -163,7 +163,7 @@ func (tr TripRepository) AddMessage(conversationID string, message string, direc
 		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
 		return err
 	}
-	update := bson.M{"$push": bson.M{"messages": dao.Message{Date: primitive.NewDateTimeFromTime(time.Now()), Text: message, Direction: direction}}}
+	update := bson.M{"$push": bson.M{"messages": dao.MessageDAO{Date: primitive.NewDateTimeFromTime(time.Now()), Text: message, Direction: direction}}}
 	result, err := collection.UpdateByID(ctx, convoObjID, update)
 	if err != nil {
 		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
@@ -174,4 +174,59 @@ func (tr TripRepository) AddMessage(conversationID string, message string, direc
 		return errors.New("conversation not found")
 	}
 	return nil
+}
+
+// GetConversation returns the conversation for a trip when the Requester is the user, or when the supplier want to get the details of a single conversation
+// so it returns a single conversation with its messages
+func (tr TripRepository) GetConversation(tripID string, userID string) (*domain.Conversation, error) {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	tripObjID, err := primitive.ObjectIDFromHex(tripID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
+		return nil, err
+	}
+	userObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
+		return nil, err
+	}
+	filter := bson.M{"tripid": tripObjID, "requesterid": userObjID}
+	var conversationDAO dao.ConversationDAO
+	err = collection.FindOne(ctx, filter).Decode(&conversationDAO)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
+		return nil, err
+	}
+	return mappers.MapConversationDAO2Conversation(&conversationDAO), nil
+}
+
+// GetConversations returns the conversation for a trip when the Supplier is the user, so it returns all conversations without their messages
+func (tr TripRepository) GetConversations(tripID string) ([]domain.Conversation, error) {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	tripObjID, err := primitive.ObjectIDFromHex(tripID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
+		return nil, err
+	}
+	filter := bson.M{"tripid": tripObjID}
+	var conversations []dao.ConversationDAO
+	opts := options.Find().SetProjection(bson.M{"messages": 0})
+	cursor, err := collection.Find(ctx, filter, opts)
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	if err = cursor.All(ctx, &conversations); err != nil {
+		log.Error().Err(err).Msgf("error getting conversations with tripID: %s", tripID)
+		return nil, err
+	}
+	return mappers.MapConversationDAOs2Conversations(conversations), nil
 }

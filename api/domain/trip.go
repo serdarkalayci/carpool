@@ -16,6 +16,7 @@ type Trip struct {
 
 type TripDetail struct {
 	ID             string
+	SupplierID     string
 	SupplierName   string
 	Country        string
 	Origin         string

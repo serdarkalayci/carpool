@@ -52,5 +52,39 @@ func MapTripDetail2TripDetailResponse(tripDetail domain.TripDetail) dto.TripDeta
 		TripDate:       tripDetail.TripDate,
 		AvailableSeats: tripDetail.AvailableSeats,
 		Note:           tripDetail.Note,
+		Conversation:   MapConversations2ConversationResponses(tripDetail.Conversations),
 	}
+}
+
+func MapConversation2ConversationResponse(conversation domain.Conversation) dto.ConversationResponse {
+	return dto.ConversationResponse{
+		RequesterID:   conversation.RequesterID,
+		RequesterName: conversation.RequesterName,
+		Messages:      MapMessages2MessageResponses(conversation.Messages),
+	}
+}
+
+func MapConversations2ConversationResponses(conversations []domain.Conversation) []dto.ConversationResponse {
+	var conversationResponses []dto.ConversationResponse
+	for _, conversation := range conversations {
+		conversationResponses = append(conversationResponses, MapConversation2ConversationResponse(conversation))
+	}
+	return conversationResponses
+}
+
+func MapMessage2MessageResponse(message domain.Message) dto.MessageResponse {
+	return dto.MessageResponse{
+		Direction: message.Direction,
+		Date:      message.Date,
+		Text:      message.Text,
+		Read:      message.Read,
+	}
+}
+
+func MapMessages2MessageResponses(messages []domain.Message) []dto.MessageResponse {
+	var messageResponses []dto.MessageResponse
+	for _, message := range messages {
+		messageResponses = append(messageResponses, MapMessage2MessageResponse(message))
+	}
+	return messageResponses
 }

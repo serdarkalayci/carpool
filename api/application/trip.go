@@ -9,6 +9,8 @@ type TripRepository interface {
 	CheckConversation(tripID string, userID string) (string, string, error)
 	InitiateConversation(tripID string, userID string, userName string, message string) error
 	AddMessage(conversationID string, message string, direction string) error
+	GetConversation(tripID string, userID string) (*domain.Conversation, error)
+	GetConversations(tripID string) ([]domain.Conversation, error)
 }
 
 // TripService is the struct to let outer layers to interact to the Trip Applicatopn
@@ -34,8 +36,29 @@ func (ts TripService) GetTrips(countryID string, origin, destination string) ([]
 	return ts.tripRepository.GetTrips(countryID, origin, destination)
 }
 
-func (ts TripService) GetTrip(id string) (*domain.TripDetail, error) {
-	return ts.tripRepository.GetTripByID(id)
+func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail, error) {
+	tripDetail, err := ts.tripRepository.GetTripByID(tripID)
+	if err != nil {
+		return nil, err
+	}
+	// If the user is the requester, we need to get the conversation between them and the supplier
+	if tripDetail.SupplierID != userID {
+		conversation, err := ts.tripRepository.GetConversation(tripID, userID)
+		if err != nil {
+			return nil, err
+		}
+		if conversation != nil {
+			tripDetail.Conversations = append(tripDetail.Conversations, *conversation)
+		}
+	} else {
+		// If the user is the supplier, we need to get the conversations between them and the requesters
+		conversations, err := ts.tripRepository.GetConversations(tripID)
+		if err != nil {
+			return nil, err
+		}
+		tripDetail.Conversations = conversations
+	}
+	return tripDetail, nil
 }
 
 func (ts TripService) AddMessage(tripID string, userID string, userName string, message string) error {

@@ -16,6 +16,7 @@ type TripDAO struct {
 
 type TripDetailDAO struct {
 	ID             primitive.ObjectID `bson:"_id"`
+	SupplierID     primitive.ObjectID `bson:"supplierid"`
 	SupplierName   string             `bson:"username"`
 	Country        string             `bson:"countryname"`
 	Origin         string             `bson:"origin"`
@@ -26,15 +27,15 @@ type TripDetailDAO struct {
 	Note           string             `bson:"note"`
 }
 
-type Conversation struct {
+type ConversationDAO struct {
 	ID            primitive.ObjectID `bson:"_id"`
 	TripID        primitive.ObjectID `bson:"tripid"`
 	RequesterID   primitive.ObjectID `bson:"requesterid"`
 	RequesterName string             `bson:"requestername"`
-	Messages      []Message          `bson:"messages"`
+	Messages      []MessageDAO       `bson:"messages"`
 }
 
-type Message struct {
+type MessageDAO struct {
 	Direction string             `bson:"direction"`
 	Date      primitive.DateTime `bson:"date"`
 	Text      string             `bson:"text"`
