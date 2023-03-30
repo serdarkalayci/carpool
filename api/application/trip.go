@@ -1,6 +1,9 @@
 package application
 
-import "github.com/serdarkalayci/carpool/api/domain"
+import (
+	"github.com/rs/zerolog/log"
+	"github.com/serdarkalayci/carpool/api/domain"
+)
 
 type TripRepository interface {
 	AddTrip(trip *domain.Trip) error
@@ -11,7 +14,9 @@ type TripRepository interface {
 	InitiateConversation(tripID string, userID string, userName string, message string) error
 	AddMessage(conversationID string, message string, direction string) error
 	GetConversation(tripID string, userID string) (*domain.Conversation, error)
+	GetConversationByID(conversationID string) (*domain.Conversation, error)
 	GetConversations(tripID string) ([]domain.Conversation, error)
+	MarkConversationsRead(conversationID string, direction string) error
 }
 
 // TripService is the struct to let outer layers to interact to the Trip Applicatopn
@@ -40,16 +45,24 @@ func (ts TripService) GetTrips(countryID string, origin, destination string) ([]
 func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail, error) {
 	tripDetail, err := ts.tripRepository.GetTripByID(tripID)
 	if err != nil {
+		log.Logger.Error().Err(err).Msg("error getting trip detail")
 		return nil, err
 	}
 	// If the user is the requester, we need to get the conversation between them and the supplier
 	if tripDetail.SupplierID != userID {
 		conversation, err := ts.tripRepository.GetConversation(tripID, userID)
 		if err != nil {
+			log.Logger.Error().Err(err).Msg("error getting conversation")
 			return nil, err
 		}
 		if conversation != nil {
 			tripDetail.Conversations = append(tripDetail.Conversations, *conversation)
+			// Because requester is reading the conversation, we need to mark the messages directed to them as read
+			err = ts.tripRepository.MarkConversationsRead(conversation.ConversationID, "out")
+			if err != nil {
+				log.Logger.Error().Err(err).Msg("error marking outbound messages as read")
+				return nil, err
+			}
 		}
 	} else {
 		// If the user is the supplier, we need to get the conversations between them and the requesters
@@ -99,6 +112,24 @@ func (ts TripService) AddSupplierMessage(tripID string, userID string, conversat
 	return ts.tripRepository.AddMessage(conversationID, message, direction)
 }
 
-func (ts TripService) GetConversation(tripID string, userID string) (*domain.Conversation, error) {
-	return ts.tripRepository.GetConversation(tripID, userID)
+func (ts TripService) GetConversation(tripID string, conversationID string, userID string) (*domain.Conversation, error) {
+	// First check that this user is the supplier of this trip
+	owner, err := ts.tripRepository.CheckTripOwnership(tripID, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !owner {
+		return nil, domain.ErrNotTheOwner{}
+	}
+	conversation, err := ts.tripRepository.GetConversationByID(conversationID)
+	if err != nil {
+		log.Logger.Error().Err(err).Msg("error getting conversation")
+	}
+	// Because supplier is reading the conversation, we need to mark the messages directed to them as read
+	err = ts.tripRepository.MarkConversationsRead(conversation.ConversationID, "in")
+	if err != nil {
+		log.Logger.Error().Err(err).Msg("error marking inbound messages as read")
+		return nil, err
+	}
+	return conversation, nil
 }

@@ -199,7 +199,7 @@ func (tr TripRepository) AddMessage(conversationID string, message string, direc
 	return nil
 }
 
-// GetConversation returns the conversation for a trip when the Requester is the user, or when the supplier want to get the details of a single conversation
+// GetConversation returns the conversation for a trip when the Requester is the user
 // so it returns a single conversation with its messages
 func (tr TripRepository) GetConversation(tripID string, userID string) (*domain.Conversation, error) {
 	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
@@ -223,6 +223,29 @@ func (tr TripRepository) GetConversation(tripID string, userID string) (*domain.
 			return nil, nil
 		}
 		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
+		return nil, err
+	}
+	return mappers.MapConversationDAO2Conversation(&conversationDAO), nil
+}
+
+// GetConversationByID returns the conversation for a trip when the supplier is the user
+// so it returns a single conversation with its messages
+func (tr TripRepository) GetConversationByID(conversationID string) (*domain.Conversation, error) {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	convObjID, err := primitive.ObjectIDFromHex(conversationID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
+		return nil, err
+	}
+	var conversationDAO dao.ConversationDAO
+	err = collection.FindOne(ctx, bson.M{"_id": convObjID}).Decode(&conversationDAO)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		log.Error().Err(err).Msgf("error getting conversation with conversationID: %s", conversationID)
 		return nil, err
 	}
 	return mappers.MapConversationDAO2Conversation(&conversationDAO), nil
@@ -252,4 +275,27 @@ func (tr TripRepository) GetConversations(tripID string) ([]domain.Conversation,
 		return nil, err
 	}
 	return mappers.MapConversationDAOs2Conversations(conversations), nil
+}
+
+func (tr TripRepository) MarkConversationsRead(conversationID string, direction string) error {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	convoObjID, err := primitive.ObjectIDFromHex(conversationID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
+		return err
+	}
+	filter := bson.M{"_id": convoObjID, "messages.direction": direction}
+	update := bson.M{"$set": bson.M{"messages.$.read": true}}
+	result, err := collection.UpdateMany(ctx, filter, update)
+	if err != nil {
+		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
+		return err
+	}
+	if result.MatchedCount == 0 {
+		log.Error().Err(err).Msgf("conversation not found: %v", conversationID)
+		return errors.New("conversation not found")
+	}
+	return nil
 }

@@ -78,13 +78,13 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 
 // GetConversation gets a specific conversation within a trip between the supplier and the requester
 func (apiContext *APIContext) GetConversation(rw http.ResponseWriter, r *http.Request) {
-	status, _, _ := checkLogin(r)
+	status, _, claims := checkLogin(r)
 	if status {
 		vars := mux.Vars(r)
 		tripid := vars["tripid"]
 		conversationid := vars["conversationid"]
 		tripService := application.NewTripService(apiContext.tripRepo)
-		conversation, err := tripService.GetConversation(tripid, conversationid)
+		conversation, err := tripService.GetConversation(tripid, conversationid, claims.UserID)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting conversation")
 			respondWithError(rw, r, 500, "error getting conversation")
