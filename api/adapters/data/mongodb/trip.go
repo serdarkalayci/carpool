@@ -58,7 +58,8 @@ func (tr TripRepository) GetTrips(countryID string, origin, destination string) 
 		log.Error().Err(err).Msgf("error parsing countryID: %s", countryID)
 		return nil, err
 	}
-	filter := bson.M{"countryid": objID}
+	today, _ := time.Parse("2006-01-02", time.Now().Format("2006-01-02"))
+	filter := bson.M{"countryid": objID, "tripdate": bson.M{"$gte": today}}
 	if origin != "" {
 		filter["origin"] = origin
 	}
