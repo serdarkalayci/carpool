@@ -19,22 +19,37 @@ type TripRepository interface {
 	MarkConversationsRead(conversationID string, direction string) error
 }
 
-// TripService is the struct to let outer layers to interact to the Trip Applicatopn
+// TripService is the struct to let outer layers to interact to the Trip Applicaton
 type TripService struct {
-	tripRepository TripRepository
+	tripRepository      TripRepository
+	geographyRepository GeographyRepository
 }
 
 // NewTripService creates a new TripService instance and sets its repository
-func NewTripService(tr TripRepository) TripService {
+func NewTripService(tr TripRepository, gr GeographyRepository) TripService {
 	if tr == nil {
 		panic("missing tripRepository")
 	}
-	return TripService{
+	ts := TripService{
 		tripRepository: tr,
 	}
+	if gr != nil {
+		ts.geographyRepository = gr
+	}
+	return ts
 }
 
 func (ts TripService) AddTrip(trip domain.Trip) error {
+	// Check if the destination is valid
+	correct, err := ts.geographyRepository.CheckBallotCity(trip.CountryID, trip.Destination)
+	if err != nil {
+		log.Logger.Error().Err(err).Msgf("error checking destination city with countryID: %s and cityName: %s", trip.CountryID, trip.Destination)
+		return err
+	}
+	if !correct {
+		log.Logger.Info().Msgf("destination is not a ballot city countryID: %s and cityName: %s", trip.CountryID, trip.Destination)
+		return domain.ErrInvalidDestination{}
+	}
 	return ts.tripRepository.AddTrip(&trip)
 }
 

@@ -61,8 +61,26 @@ func (gr GeographyRepository) GetCountry(ID string) (domain.Country, error) {
 	var countryDAO dao.CountryDAO
 	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&countryDAO)
 	if err != nil {
-		log.Error().Err(err).Msgf("error getting user with UserID: %s", ID)
+		log.Error().Err(err).Msgf("error getting country with CountryID: %s", ID)
 		return domain.Country{}, err
 	}
 	return mappers.MapCountryDAO2Country(countryDAO), nil
+}
+
+// CheckBallotCity checks if the given city is a ballot city
+func (gr GeographyRepository) CheckBallotCity(countryID string, cityName string) (bool, error) {
+	collection := gr.dbClient.Database(gr.dbName).Collection(viper.GetString("GeographyCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	countryObjID, err := primitive.ObjectIDFromHex(countryID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing CountryID: %s", countryID)
+		return false, err
+	}
+	count, err := collection.CountDocuments(ctx, bson.M{"_id": countryObjID, "cities": bson.M{"$elemMatch": bson.M{"name": cityName, "ballot": true}}})
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting country with CountryID: %s", countryID)
+		return false, err
+	}
+	return count == 1, nil
 }

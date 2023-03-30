@@ -7,6 +7,7 @@ import (
 type GeographyRepository interface {
 	GetCountries() ([]domain.Country, error)
 	GetCountry(ID string) (domain.Country, error)
+	CheckBallotCity(countryID string, cityName string) (bool, error)
 }
 
 type GeographyService struct {

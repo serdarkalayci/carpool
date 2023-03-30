@@ -29,15 +29,15 @@ func (apiContext *APIContext) AddTrip(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 		trip.SupplierID = claims.UserID
-		tripService := application.NewTripService(apiContext.tripRepo)
+		tripService := application.NewTripService(apiContext.tripRepo, apiContext.geographyRepo)
 		err = tripService.AddTrip(trip)
 		if err == nil {
 			respondOK(rw, r, 200)
 		} else if e, ok := err.(*domain.DuplicateKeyError); ok {
 			respondWithError(rw, r, 400, e.Error())
 		} else {
-			log.Error().Err(err).Msg("error adding user")
-			respondWithError(rw, r, 500, "error adding user")
+			log.Error().Err(err).Msg("error adding trip")
+			respondWithError(rw, r, 500, "error adding trip")
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
@@ -57,7 +57,7 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 		countryID := r.URL.Query().Get("countryid")
 		origin := r.URL.Query().Get("origin")
 		destination := r.URL.Query().Get("destination")
-		tripService := application.NewTripService(apiContext.tripRepo)
+		tripService := application.NewTripService(apiContext.tripRepo, nil)
 		trips, err := tripService.GetTrips(countryID, origin, destination)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting trips")
@@ -83,7 +83,7 @@ func (apiContext *APIContext) GetConversation(rw http.ResponseWriter, r *http.Re
 		vars := mux.Vars(r)
 		tripid := vars["tripid"]
 		conversationid := vars["conversationid"]
-		tripService := application.NewTripService(apiContext.tripRepo)
+		tripService := application.NewTripService(apiContext.tripRepo, nil)
 		conversation, err := tripService.GetConversation(tripid, conversationid, claims.UserID)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting conversation")
@@ -108,7 +108,7 @@ func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
 	if status {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		tripService := application.NewTripService(apiContext.tripRepo)
+		tripService := application.NewTripService(apiContext.tripRepo, nil)
 		tripdetail, err := tripService.GetTrip(id, claims.UserID)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting trips")
@@ -136,7 +136,7 @@ func (apiContext *APIContext) AddRequesterMessage(rw http.ResponseWriter, r *htt
 		vars := mux.Vars(r)
 		tripID := vars["tripid"]
 		addMessageDTO := r.Context().Value(validatedMessage{}).(dto.AddMessageRequest)
-		tripService := application.NewTripService(apiContext.tripRepo)
+		tripService := application.NewTripService(apiContext.tripRepo, nil)
 		err := tripService.AddRequesterMessage(tripID, claims.UserID, claims.UserName, addMessageDTO.Text)
 		if err == nil {
 			respondOK(rw, r, 200)
@@ -166,7 +166,7 @@ func (apiContext *APIContext) AddSupplierMessage(rw http.ResponseWriter, r *http
 		tripID := vars["tripid"]
 		conversationID := vars["conversationid"]
 		addMessageDTO := r.Context().Value(validatedMessage{}).(dto.AddMessageRequest)
-		tripService := application.NewTripService(apiContext.tripRepo)
+		tripService := application.NewTripService(apiContext.tripRepo, nil)
 		err := tripService.AddSupplierMessage(tripID, claims.UserID, conversationID, addMessageDTO.Text)
 		if err == nil {
 			respondOK(rw, r, 200)
