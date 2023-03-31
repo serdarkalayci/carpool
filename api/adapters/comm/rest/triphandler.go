@@ -29,7 +29,7 @@ func (apiContext *APIContext) AddTrip(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 		trip.SupplierID = claims.UserID
-		tripService := application.NewTripService(apiContext.tripRepo, apiContext.geographyRepo)
+		tripService := application.NewTripService(apiContext.tripRepo, apiContext.geographyRepo, nil)
 		err = tripService.AddTrip(trip)
 		if err == nil {
 			respondOK(rw, r, 200)
@@ -57,7 +57,7 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 		countryID := r.URL.Query().Get("countryid")
 		origin := r.URL.Query().Get("origin")
 		destination := r.URL.Query().Get("destination")
-		tripService := application.NewTripService(apiContext.tripRepo, nil)
+		tripService := application.NewTripService(apiContext.tripRepo, nil, nil)
 		trips, err := tripService.GetTrips(countryID, origin, destination)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting trips")
@@ -65,32 +65,6 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 			return
 		}
 		respondWithJSON(rw, r, 200, mappers.MapTrips2TripListItems(trips))
-	} else {
-		respondWithError(rw, r, 401, "Unauthorized")
-	}
-}
-
-// swagger:route GET /trip/{tripid}/message/{conversationid} Trip GetTrips
-// Gets gets a specific conversation within a trip between the supplier and the requester
-// responses:
-//	200: OK
-//	404: errorResponse
-
-// GetConversation gets a specific conversation within a trip between the supplier and the requester
-func (apiContext *APIContext) GetConversation(rw http.ResponseWriter, r *http.Request) {
-	status, _, claims := checkLogin(r)
-	if status {
-		vars := mux.Vars(r)
-		tripid := vars["tripid"]
-		conversationid := vars["conversationid"]
-		tripService := application.NewTripService(apiContext.tripRepo, nil)
-		conversation, err := tripService.GetConversation(tripid, conversationid, claims.UserID)
-		if err != nil {
-			log.Error().Err(err).Msg("error getting conversation")
-			respondWithError(rw, r, 500, "error getting conversation")
-			return
-		}
-		respondWithJSON(rw, r, 200, mappers.MapConversation2ConversationResponse(*conversation))
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
 	}
@@ -108,7 +82,7 @@ func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
 	if status {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		tripService := application.NewTripService(apiContext.tripRepo, nil)
+		tripService := application.NewTripService(apiContext.tripRepo, nil, apiContext.conversationRepo)
 		tripdetail, err := tripService.GetTrip(id, claims.UserID)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting trips")
@@ -116,66 +90,6 @@ func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 		respondWithJSON(rw, r, 200, mappers.MapTripDetail2TripDetailResponse(*tripdetail))
-	} else {
-		respondWithError(rw, r, 401, "Unauthorized")
-	}
-}
-
-// swagger:route POST /trip/{tripid}/conversation Conversation AddRequesterMessage
-// Adds creates a new message to the trip by the requester.
-// If there are no conversation initiated between the requester and the supplier, a new conversation is created.
-// responses:
-//	200: OK
-//	404: errorResponse
-
-// AddRequesterMessage creates a new message to the trip by the requester.
-// If there are no conversation initiated between the requester and the supplier, a new conversation is created.
-func (apiContext *APIContext) AddRequesterMessage(rw http.ResponseWriter, r *http.Request) {
-	status, _, claims := checkLogin(r)
-	if status {
-		vars := mux.Vars(r)
-		tripID := vars["tripid"]
-		addMessageDTO := r.Context().Value(validatedMessage{}).(dto.AddMessageRequest)
-		tripService := application.NewTripService(apiContext.tripRepo, nil)
-		err := tripService.AddRequesterMessage(tripID, claims.UserID, claims.UserName, addMessageDTO.Text)
-		if err == nil {
-			respondOK(rw, r, 200)
-		} else if e, ok := err.(*domain.DuplicateKeyError); ok {
-			respondWithError(rw, r, 400, e.Error())
-		} else {
-			log.Error().Err(err).Msg("error adding message")
-			respondWithError(rw, r, 500, "error adding message")
-		}
-	} else {
-		respondWithError(rw, r, 401, "Unauthorized")
-	}
-}
-
-// swagger:route POST /trip/{tripid}/conversation/{conversationid} Conversation AddSupplierMessage
-// Adds creates a new message to the trip by the supplier.
-// There should be a conversation initiated by a requester, so this method expects the conversationID.
-// responses:
-//	200: OK
-//	404: errorResponse
-
-// AddSupplierMessage creates a new message to the trip by the supplier.
-func (apiContext *APIContext) AddSupplierMessage(rw http.ResponseWriter, r *http.Request) {
-	status, _, claims := checkLogin(r)
-	if status {
-		vars := mux.Vars(r)
-		tripID := vars["tripid"]
-		conversationID := vars["conversationid"]
-		addMessageDTO := r.Context().Value(validatedMessage{}).(dto.AddMessageRequest)
-		tripService := application.NewTripService(apiContext.tripRepo, nil)
-		err := tripService.AddSupplierMessage(tripID, claims.UserID, conversationID, addMessageDTO.Text)
-		if err == nil {
-			respondOK(rw, r, 200)
-		} else if e, ok := err.(*domain.DuplicateKeyError); ok {
-			respondWithError(rw, r, 400, e.Error())
-		} else {
-			log.Error().Err(err).Msg("error adding message")
-			respondWithError(rw, r, 500, "error adding message")
-		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
 	}

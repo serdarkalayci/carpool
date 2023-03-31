@@ -34,9 +34,11 @@ type TripDetailResponse struct {
 }
 
 type ConversationResponse struct {
-	ConversationID string            `json:"conversationid"`
-	RequesterName  string            `json:"requestername"`
-	Messages       []MessageResponse `json:"messages"`
+	ConversationID    string            `json:"conversationid"`
+	RequesterName     string            `json:"requestername"`
+	RequesterApproved bool              `json:"requesterapproved"`
+	SupplierApproved  bool              `json:"supplierapproved"`
+	Messages          []MessageResponse `json:"messages"`
 }
 
 type MessageResponse struct {

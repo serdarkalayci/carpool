@@ -28,7 +28,7 @@ func main() {
 	var dbContext data.DataContext
 	dbContext = mongodb.NewDataContext()
 
-	s := rest.NewAPIContext(bindAddress, dbContext.HealthRepository, dbContext.UserRepository, dbContext.GeographyRepository, dbContext.TripRepository)
+	s := rest.NewAPIContext(bindAddress, dbContext.HealthRepository, dbContext.UserRepository, dbContext.GeographyRepository, dbContext.TripRepository, dbContext.ConversationRepository)
 
 	// start the http server
 	go func() {

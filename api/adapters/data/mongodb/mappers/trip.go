@@ -67,37 +67,3 @@ func MapTripDetailDAO2TripDetail(tripDetailDAO *dao.TripDetailDAO) *domain.TripD
 		Note:           tripDetailDAO.Note,
 	}
 }
-
-func MapConversationDAO2Conversation(conversationDAO *dao.ConversationDAO) *domain.Conversation {
-	messages := MapMessageDAOs2Messages(conversationDAO.Messages)
-	return &domain.Conversation{
-		ConversationID: conversationDAO.ID.Hex(),
-		RequesterName:  conversationDAO.RequesterName,
-		Messages:       messages,
-	}
-}
-
-func MapConversationDAOs2Conversations(conversationsDAO []dao.ConversationDAO) []domain.Conversation {
-	var conversations []domain.Conversation
-	for _, conversationDAO := range conversationsDAO {
-		conversations = append(conversations, *MapConversationDAO2Conversation(&conversationDAO))
-	}
-	return conversations
-}
-
-func MapMessageDAO2Message(messageDAO *dao.MessageDAO) *domain.Message {
-	return &domain.Message{
-		Direction: messageDAO.Direction,
-		Date:      messageDAO.Date.Time(),
-		Text:      messageDAO.Text,
-		Read:      messageDAO.Read,
-	}
-}
-
-func MapMessageDAOs2Messages(messagesDAO []dao.MessageDAO) []domain.Message {
-	var messages []domain.Message
-	for _, messageDAO := range messagesDAO {
-		messages = append(messages, *MapMessageDAO2Message(&messageDAO))
-	}
-	return messages
-}

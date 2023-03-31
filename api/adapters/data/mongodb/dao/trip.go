@@ -26,18 +26,3 @@ type TripDetailDAO struct {
 	AvailableSeats int                `bson:"availableseats"`
 	Note           string             `bson:"note"`
 }
-
-type ConversationDAO struct {
-	ID            primitive.ObjectID `bson:"_id"`
-	TripID        primitive.ObjectID `bson:"tripid"`
-	RequesterID   primitive.ObjectID `bson:"requesterid"`
-	RequesterName string             `bson:"requestername"`
-	Messages      []MessageDAO       `bson:"messages"`
-}
-
-type MessageDAO struct {
-	Direction string             `bson:"direction"`
-	Date      primitive.DateTime `bson:"date"`
-	Text      string             `bson:"text"`
-	Read      bool               `bson:"read"`
-}

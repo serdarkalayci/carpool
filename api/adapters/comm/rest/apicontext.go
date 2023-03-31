@@ -33,20 +33,22 @@ import (
 type APIContext struct {
 	validation *middleware.Validation
 	//dbContext  DBContext
-	healthRepo    application.HealthRepository
-	userRepo      application.UserRepository
-	geographyRepo application.GeographyRepository
-	tripRepo      application.TripRepository
+	healthRepo       application.HealthRepository
+	userRepo         application.UserRepository
+	geographyRepo    application.GeographyRepository
+	tripRepo         application.TripRepository
+	conversationRepo application.ConversationRepository
 }
 
 // NewAPIContext returns a new APIContext handler with the given logger
 // func NewAPIContext(dc DBContext, bindAddress *string, ur application.UserRepository) *http.Server {
-func NewAPIContext(bindAddress *string, hr application.HealthRepository, ur application.UserRepository, gr application.GeographyRepository, tr application.TripRepository) *http.Server {
+func NewAPIContext(bindAddress *string, hr application.HealthRepository, ur application.UserRepository, gr application.GeographyRepository, tr application.TripRepository, cr application.ConversationRepository) *http.Server {
 	apiContext := &APIContext{
-		healthRepo:    hr,
-		userRepo:      ur,
-		geographyRepo: gr,
-		tripRepo:      tr,
+		healthRepo:       hr,
+		userRepo:         ur,
+		geographyRepo:    gr,
+		tripRepo:         tr,
+		conversationRepo: cr,
 	}
 	s := apiContext.prepareContext(bindAddress)
 	return s
@@ -120,14 +122,14 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	// Trip handlers
 	getR.HandleFunc("/trip", apiContext.GetTrips)
 	getR.HandleFunc("/trip/{id}", apiContext.GetTrip)
-	getR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.GetConversation)
 	postTR := sm.Methods(http.MethodPost).Subrouter() // Trip subrouter for POST method
 	postTR.Use(apiContext.validateNewTrip)
 	postTR.HandleFunc("/trip", apiContext.AddTrip)
-	postMR := sm.Methods(http.MethodPost).Subrouter() // Message subrouter for PUT method
-	postMR.Use(apiContext.validateNewMessage)
-	postMR.HandleFunc("/trip/{tripid}/conversation", apiContext.AddRequesterMessage)
-	postMR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.AddSupplierMessage)
+	// Conversation handlers
+	postCR := sm.Methods(http.MethodPost).Subrouter() // Message subrouter for PUT method
+	postCR.Use(apiContext.validateNewMessage)
+	postCR.HandleFunc("/conversation/{conversationid}", apiContext.AddMessage)
+	getR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.GetConversation)
 	// Documentation handler
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := openapimw.Redoc(opts, nil)
