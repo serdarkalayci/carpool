@@ -8,7 +8,6 @@ import (
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/mappers"
 	"github.com/serdarkalayci/carpool/api/application"
-	"github.com/serdarkalayci/carpool/api/domain"
 )
 
 // swagger:route GET /trip/{tripid}/message/{conversationid} Trip GetTrips
@@ -37,13 +36,37 @@ func (apiContext *APIContext) GetConversation(rw http.ResponseWriter, r *http.Re
 	}
 }
 
-// swagger:route POST /conversation/{conversationid} Conversation AddMessage
+// swagger:route POST /conversation Conversation AddConversation
+// Adds creates a new conversation for a trip.
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// AddConversation creates a new conversation for a trip.
+func (apiContext *APIContext) AddConversation(rw http.ResponseWriter, r *http.Request) {
+	status, _, claims := checkLogin(r)
+	if status {
+		addConversationDTO := r.Context().Value(validatedConversation{}).(dto.AddConversationRequest)
+		conversationService := application.NewConversationService(apiContext.conversationRepo, apiContext.tripRepo, apiContext.userRepo)
+		err := conversationService.InitiateConversation(addConversationDTO.TripID, claims.UserID, addConversationDTO.Message)
+		if err == nil {
+			respondOK(rw, r, 200)
+		} else {
+			log.Error().Err(err).Msg("error adding conversation")
+			respondWithError(rw, r, 500, "error adding conversation")
+		}
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}
+
+// swagger:route PUT /conversation/{conversationid} Conversation AddMessage
 // Adds creates a new message to the conversation.
 // responses:
 //	200: OK
 //	404: errorResponse
 
-// AddSupplierMessage creates a new message to the trip by the supplier.
+// AddMessage creates a new message to the conversation.
 func (apiContext *APIContext) AddMessage(rw http.ResponseWriter, r *http.Request) {
 	status, _, claims := checkLogin(r)
 	if status {
@@ -54,8 +77,6 @@ func (apiContext *APIContext) AddMessage(rw http.ResponseWriter, r *http.Request
 		err := tripService.AddMessage(conversationID, claims.UserID, addMessageDTO.Text)
 		if err == nil {
 			respondOK(rw, r, 200)
-		} else if e, ok := err.(*domain.DuplicateKeyError); ok {
-			respondWithError(rw, r, 400, e.Error())
 		} else {
 			log.Error().Err(err).Msg("error adding message")
 			respondWithError(rw, r, 500, "error adding message")

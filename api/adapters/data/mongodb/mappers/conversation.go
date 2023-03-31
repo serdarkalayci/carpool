@@ -21,12 +21,12 @@ func MapConversationDAO2Conversation(conversationDAO *dao.ConversationDAO) *doma
 }
 func MapConversation2ConversationDAO(conversation *domain.Conversation) *dao.ConversationDAO {
 	messages := MapMessages2MessageDAOs(conversation.Messages)
-	conversationID, _ := primitive.ObjectIDFromHex(conversation.ConversationID)
+	tripID, _ := primitive.ObjectIDFromHex(conversation.TripID)
 	requesterID, _ := primitive.ObjectIDFromHex(conversation.RequesterID)
 	supplierID, _ := primitive.ObjectIDFromHex(conversation.SupplierID)
 
 	return &dao.ConversationDAO{
-		ID:                conversationID,
+		TripID:            tripID,
 		RequesterID:       requesterID,
 		RequesterName:     conversation.RequesterName,
 		SupplierID:        supplierID,

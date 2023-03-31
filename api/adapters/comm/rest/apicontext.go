@@ -104,9 +104,9 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	getR.HandleFunc("/health/ready", apiContext.Ready)
 	// User handlers
 	getR.HandleFunc("/user/{userid}", apiContext.GetUser)
-	putCR := sm.Methods(http.MethodPut).Subrouter() // User subrouter for Confirmation PUT method
-	putCR.Use(apiContext.validateConfirmUser)
-	putCR.HandleFunc("/user/{userid}/confirm", apiContext.ConfirmUser)
+	putUR := sm.Methods(http.MethodPut).Subrouter() // User subrouter for Confirmation PUT method
+	putUR.Use(apiContext.validateConfirmUser)
+	putUR.HandleFunc("/user/{userid}/confirm", apiContext.ConfirmUser)
 	postUR := sm.Methods(http.MethodPost).Subrouter() // User subrouter for POST method
 	postUR.Use(apiContext.validateNewUser)
 	postUR.HandleFunc("/user", apiContext.AddUser)
@@ -127,8 +127,11 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	postTR.HandleFunc("/trip", apiContext.AddTrip)
 	// Conversation handlers
 	postCR := sm.Methods(http.MethodPost).Subrouter() // Message subrouter for PUT method
-	postCR.Use(apiContext.validateNewMessage)
-	postCR.HandleFunc("/conversation/{conversationid}", apiContext.AddMessage)
+	postCR.Use(apiContext.validateNewConversation)
+	postCR.HandleFunc("/conversation", apiContext.AddConversation)
+	putCR := sm.Methods(http.MethodPut).Subrouter() // Message subrouter for PUT method
+	putCR.Use(apiContext.validateNewMessage)
+	putCR.HandleFunc("/conversation/{conversationid}", apiContext.AddMessage)
 	getR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.GetConversation)
 	// Documentation handler
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
