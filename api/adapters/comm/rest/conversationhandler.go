@@ -61,7 +61,7 @@ func (apiContext *APIContext) AddConversation(rw http.ResponseWriter, r *http.Re
 }
 
 // swagger:route PUT /conversation/{conversationid} Conversation AddMessage
-// Adds creates a new message to the conversation.
+// Adds a new message to the conversation.
 // responses:
 //	200: OK
 //	404: errorResponse
@@ -80,6 +80,32 @@ func (apiContext *APIContext) AddMessage(rw http.ResponseWriter, r *http.Request
 		} else {
 			log.Error().Err(err).Msg("error adding message")
 			respondWithError(rw, r, 500, "error adding message")
+		}
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}
+
+// swagger:route PUT /conversation/{conversationid}/approve Conversation UpdateApproval
+// Updates the approval status of the conversation.
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// UpdateApproval updates the approval status of the conversation.
+func (apiContext *APIContext) UpdateApproval(rw http.ResponseWriter, r *http.Request) {
+	status, _, claims := checkLogin(r)
+	if status {
+		vars := mux.Vars(r)
+		conversationID := vars["conversationid"]
+		updateApprovalDTO := r.Context().Value(validatedApproval{}).(dto.UpdateApprovalRequest)
+		tripService := application.NewConversationService(apiContext.conversationRepo, nil, nil)
+		err := tripService.UpdateApproval(conversationID, claims.UserID, *updateApprovalDTO.Approved)
+		if err == nil {
+			respondOK(rw, r, 200)
+		} else {
+			log.Error().Err(err).Msg("error updating approval")
+			respondWithError(rw, r, 500, "error updating approval")
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")

@@ -26,6 +26,7 @@ func MapConversation2ConversationDAO(conversation *domain.Conversation) *dao.Con
 	supplierID, _ := primitive.ObjectIDFromHex(conversation.SupplierID)
 
 	return &dao.ConversationDAO{
+		ID:                primitive.NewObjectID(),
 		TripID:            tripID,
 		RequesterID:       requesterID,
 		RequesterName:     conversation.RequesterName,

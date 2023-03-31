@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -202,6 +203,36 @@ func (cr ConversationRepository) MarkConversationsRead(conversationID string, di
 	filter := bson.M{"_id": convoObjID, "messages.direction": direction}
 	update := bson.M{"$set": bson.M{"messages.$.read": true}}
 	result, err := collection.UpdateMany(ctx, filter, update)
+	if err != nil {
+		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
+		return err
+	}
+	if result.MatchedCount == 0 {
+		log.Error().Err(err).Msgf("conversation not found: %v", conversationID)
+		return errors.New("conversation not found")
+	}
+	return nil
+}
+
+func (cr ConversationRepository) UpdateApproval(conversationID string, supplierApprove string, requesterApprove string) error {
+	collection := cr.dbClient.Database(cr.dbName).Collection(viper.GetString("ConversationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	convoObjID, err := primitive.ObjectIDFromHex(conversationID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
+		return err
+	}
+	filter := bson.M{"_id": convoObjID}
+	upd := bson.M{}
+	if supplierApprove != "" {
+		upd["supplierapprove"], _ = strconv.ParseBool(supplierApprove)
+	}
+	if requesterApprove != "" {
+		upd["requesterapprove"], _ = strconv.ParseBool(requesterApprove)
+	}
+	update := bson.M{"$set": upd}
+	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
 		return err

@@ -126,13 +126,16 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	postTR.Use(apiContext.validateNewTrip)
 	postTR.HandleFunc("/trip", apiContext.AddTrip)
 	// Conversation handlers
-	postCR := sm.Methods(http.MethodPost).Subrouter() // Message subrouter for PUT method
+	postCR := sm.Methods(http.MethodPost).Subrouter() // Conversation subrouter for POST method
 	postCR.Use(apiContext.validateNewConversation)
 	postCR.HandleFunc("/conversation", apiContext.AddConversation)
 	putCR := sm.Methods(http.MethodPut).Subrouter() // Message subrouter for PUT method
 	putCR.Use(apiContext.validateNewMessage)
 	putCR.HandleFunc("/conversation/{conversationid}", apiContext.AddMessage)
 	getR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.GetConversation)
+	putAR := sm.Methods(http.MethodPut).Subrouter() // Approval subrouter for PUT method
+	putAR.Use(apiContext.validateUpdateApproval)
+	putAR.HandleFunc("/conversation/{conversationid}/approval", apiContext.UpdateApproval)
 	// Documentation handler
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := openapimw.Redoc(opts, nil)

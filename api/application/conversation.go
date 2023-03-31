@@ -17,6 +17,7 @@ type ConversationRepository interface {
 	GetConversationByID(conversationID string) (*domain.Conversation, error)
 	GetConversations(tripID string) ([]domain.Conversation, error)
 	MarkConversationsRead(conversationID string, direction string) error
+	UpdateApproval(conversationID string, supplierApprove string, requesterApprove string) error
 }
 
 // ConversationService is the struct to let outer layers to interact to the Conversation Applicaton
@@ -130,4 +131,32 @@ func (cs ConversationService) GetConversation(tripID string, conversationID stri
 		return nil, err
 	}
 	return conversation, nil
+}
+
+func (cs ConversationService) UpdateApproval(conversationID string, userID string, approved bool) error {
+	// First check that this user is the supplier of this trip
+	supplier, err := cs.conversationRepository.CheckConversationOwnership(conversationID, userID)
+	if err != nil {
+		return err
+	}
+	var supplierapproved, requesterapproved string = "", ""
+	switch {
+	case approved && supplier:
+		supplierapproved = "true"
+		// Send mail to requester that the supplier has approved the trip
+	case approved && !supplier:
+		requesterapproved = "true"
+		// Send mail to supplier that the requester has approved the trip
+	case !approved && supplier:
+		supplierapproved = "false"
+		requesterapproved = "false"
+		// Send mail to requester that the supplier has rejected the trip
+	case !approved && !supplier:
+		supplierapproved = "false"
+		requesterapproved = "false"
+		// Send mail to supplier that the requester has rejected the trip
+	}
+	// Now we can update the conversation
+	err = cs.conversationRepository.UpdateApproval(conversationID, supplierapproved, requesterapproved)
+	return nil
 }
