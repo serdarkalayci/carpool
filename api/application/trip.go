@@ -9,6 +9,7 @@ type TripRepository interface {
 	AddTrip(trip *domain.Trip) error
 	GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error)
 	GetTripByID(tripID string) (*domain.TripDetail, error)
+	GetConversationID(tripID string, userID string) (string, error)
 }
 
 // TripService is the struct to let outer layers to interact to the Trip Applicaton
@@ -69,18 +70,26 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 	}
 	// If the user is the requester, we need to get the conversation between them and the supplier
 	if tripDetail.SupplierID != userID {
-		conversation, err := ts.conversationRepository.GetConversation(tripID, userID)
+		conversationID, err := ts.tripRepository.GetConversationID(tripID, userID)
 		if err != nil {
-			log.Logger.Error().Err(err).Msg("error getting conversation")
+			log.Logger.Error().Err(err).Msg("error getting conversationID")
 			return nil, err
 		}
-		if conversation != nil {
-			tripDetail.Conversations = append(tripDetail.Conversations, *conversation)
-			// Because requester is reading the conversation, we need to mark the messages directed to them as read
-			err = ts.conversationRepository.MarkConversationsRead(conversation.ConversationID, "out")
+		if conversationID != "" {
+			cs := NewConversationService(ts.conversationRepository, ts.tripRepository, nil)
+			conversation, err := cs.GetConversation(conversationID, userID)
 			if err != nil {
-				log.Logger.Error().Err(err).Msg("error marking outbound messages as read")
+				log.Logger.Error().Err(err).Msg("error getting conversation")
 				return nil, err
+			}
+			if conversation != nil {
+				tripDetail.Conversations = append(tripDetail.Conversations, *conversation)
+				// Because requester is reading the conversation, we need to mark the messages directed to them as read
+				err = ts.conversationRepository.MarkConversationsRead(conversation.ConversationID, "out")
+				if err != nil {
+					log.Logger.Error().Err(err).Msg("error marking outbound messages as read")
+					return nil, err
+				}
 			}
 		}
 	} else {

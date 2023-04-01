@@ -156,9 +156,6 @@ func (cr ConversationRepository) GetConversationByID(conversationID string) (*do
 	var conversationDAO dao.ConversationDAO
 	err = collection.FindOne(ctx, bson.M{"_id": convObjID}).Decode(&conversationDAO)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, nil
-		}
 		log.Error().Err(err).Msgf("error getting conversation with conversationID: %s", conversationID)
 		return nil, err
 	}

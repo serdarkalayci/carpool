@@ -95,3 +95,32 @@ func (tr TripRepository) GetTripByID(tripID string) (*domain.TripDetail, error) 
 	}
 	return mappers.MapTripDetailDAO2TripDetail(&tripDetailDAO), nil
 }
+
+func (tr TripRepository) GetConversationID(tripID string, userID string) (string, error) {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("ConversationsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	tripObjID, err := primitive.ObjectIDFromHex(tripID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
+		return "", err
+	}
+	userObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
+		return "", err
+	}
+	filter := bson.M{"tripid": tripObjID, "requesterid": userObjID}
+	projection := bson.M{"_id": 1}
+	opts := options.FindOne().SetProjection(projection)
+	conversationDAO := dao.ConversationDAO{}
+	err = collection.FindOne(ctx, filter, opts).Decode(&conversationDAO)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", nil
+		}
+		log.Error().Err(err).Msgf("error getting conversation with tripID: %s", tripID)
+		return "", err
+	}
+	return conversationDAO.ID.Hex(), nil
+}

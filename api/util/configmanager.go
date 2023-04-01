@@ -42,8 +42,8 @@ func SetConstValues() {
 	viper.SetDefault("InvitationMessage", "Değerli üyemiz, %s kullanımız sizin bu yolculukla ilgilenebileceğinizi düşündü")
 	viper.SetDefault("InvitationSubject", "Yolculuk talebiniz var")
 	viper.SetDefault("ApprovalSubject", "Yolculuk talebi onay durumu güncellemesi")
-	viper.SetDefault("ApprovalMessagePositive", "Değerli üyemiz, %s kullanımız görüşmekte olduğunuz yolculuk talebini onayladı")
-	viper.SetDefault("ApprovalMessageNegative", "Değerli üyemiz, %s kullanımız görüşmekte olduğunuz yolculuk talebini reddetti")
+	viper.SetDefault("ApprovalMessagePositive", "Değerli üyemiz, %s kullanıcımız görüşmekte olduğunuz yolculuk talebini onayladı")
+	viper.SetDefault("ApprovalMessageNegative", "Değerli üyemiz, %s kullanıcımız görüşmekte olduğunuz yolculuk talebini reddetti")
 }
 
 // SetLogLevels gets configuration values from the file and injects them

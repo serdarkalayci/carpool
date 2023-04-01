@@ -115,7 +115,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"Name\": \"Serdar Kalayci\",\n    \"Password\": \"serdar\",\n    \"Email\": \"serdarkalayci@gmail.com\",\n    \"Phone\": \"+31682884554\"\n}",
+					"raw": "{\n    \"Name\": \"Requester 2\",\n    \"Password\": \"serdar\",\n    \"Email\": \"req2@s.com\",\n    \"Phone\": \"+31111111114\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -141,7 +141,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"supp1@s.com\",\r\n    \"password\": \"serdar\"\r\n}",
+					"raw": "{\r\n    \"email\": \"req1@s.com\",\r\n    \"password\": \"serdar\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -216,18 +216,26 @@
 		{
 			"name": "ConfirmUser",
 			"request": {
-				"method": "GET",
+				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"code\": \"awxxowq\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "{{url}}/user/6420b67120ff6915708bdb0e/confirm/SrNTpiG",
+					"raw": "{{url}}/user/64281bfa6732dd1c2a8264f4/confirm",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"user",
-						"6420b67120ff6915708bdb0e",
-						"confirm",
-						"SrNTpiG"
+						"64281bfa6732dd1c2a8264f4",
+						"confirm"
 					]
 				}
 			},
@@ -265,7 +273,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/trip?countryid=641f01dfcc0d85792b29d254&destination=Amsterdam&origin=Utrecht",
+					"raw": "{{url}}/trip?countryid=641f01dfcc0d85792b29d254",
 					"host": [
 						"{{url}}"
 					],
@@ -276,14 +284,6 @@
 						{
 							"key": "countryid",
 							"value": "641f01dfcc0d85792b29d254"
-						},
-						{
-							"key": "destination",
-							"value": "Amsterdam"
-						},
-						{
-							"key": "origin",
-							"value": "Utrecht"
 						}
 					]
 				}
@@ -296,26 +296,44 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/trip/642064a2657e328de2a7d631",
+					"raw": "{{url}}/trip/642823e0f5a1ed328039974e",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"trip",
-						"642064a2657e328de2a7d631"
+						"642823e0f5a1ed328039974e"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "AddMessage",
+			"name": "GetConversation",
 			"request": {
-				"method": "POST",
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/conversation/6428245df5a1ed328039974f",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"conversation",
+						"6428245df5a1ed328039974f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Message",
+			"request": {
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"text\": \"Daha fazla bilgi alabilir miyim?\"\n}",
+					"raw": "{\n    \"text\": \"para almiyorum\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -323,14 +341,67 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/trip/642064a2657e328de2a7d631/message",
+					"raw": "{{url}}/conversation/6428245df5a1ed328039974f",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
-						"trip",
-						"642064a2657e328de2a7d631",
-						"message"
+						"conversation",
+						"6428245df5a1ed328039974f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Initiate Conversation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"tripID\": \"642823e0f5a1ed328039974e\",\n    \"message\": \"bize kaca olur?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/conversation",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"conversation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Approval ",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"approved\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/conversation/6428245df5a1ed328039974f/approval",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"conversation",
+						"6428245df5a1ed328039974f",
+						"approval"
 					]
 				}
 			},

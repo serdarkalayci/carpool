@@ -129,6 +129,7 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 	conversation, err := cs.conversationRepository.GetConversationByID(conversationID)
 	if err != nil {
 		log.Logger.Error().Err(err).Msg("error getting conversation")
+		return nil, err
 	}
 	// Lets decide which messages to mark as read by looking who gets the details of the conversation
 	direction := "in"
@@ -154,24 +155,43 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 	if err != nil {
 		return err
 	}
+	conversation, err := cs.conversationRepository.GetConversationByID(conversationID)
+	if err != nil {
+		return err
+	}
+	to := ""
+	message := ""
 	var supplierapproved, requesterapproved string = "", ""
 	switch {
 	case approved && supplier:
 		supplierapproved = "true"
 		// Send mail to requester that the supplier has approved the trip
+		to = conversation.RequesterContact.Email
+		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessagePositive"), conversation.SupplierName)
 	case approved && !supplier:
 		requesterapproved = "true"
 		// Send mail to supplier that the requester has approved the trip
+		to = conversation.SupplierContact.Email
+		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessagePositive"), conversation.RequesterName)
 	case !approved && supplier:
 		supplierapproved = "false"
 		requesterapproved = "false"
 		// Send mail to requester that the supplier has rejected the trip
+		to = conversation.RequesterContact.Email
+		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessageNegative"), conversation.SupplierName)
 	case !approved && !supplier:
 		supplierapproved = "false"
 		requesterapproved = "false"
 		// Send mail to supplier that the requester has rejected the trip
+		to = conversation.SupplierContact.Email
+		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessageNegative"), conversation.RequesterName)
 	}
 	// Now we can update the conversation
 	err = cs.conversationRepository.UpdateApproval(conversationID, supplierapproved, requesterapproved)
+	if err != nil {
+		return err
+	}
+	// Send mail to the other party
+	sendEmail(to, viper.GetString("ApprovalSubject"), message)
 	return nil
 }
