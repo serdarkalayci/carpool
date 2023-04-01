@@ -133,13 +133,13 @@ func (ur UserRepository) ActivateUser(userID string) error {
 	return nil
 }
 
-// CheckUser checks the username & password if it matches any user from the array
-func (ur UserRepository) CheckUser(username string, password string) (domain.User, error) {
+// CheckUser checks the username if it matches any user from the database
+func (ur UserRepository) CheckUser(username string) (domain.User, error) {
 	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	var userDAO dao.UserDAO
-	err := collection.FindOne(ctx, bson.M{"email": username, "password": password, "active": true}).Decode(&userDAO)
+	err := collection.FindOne(ctx, bson.M{"email": username, "active": true}).Decode(&userDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting user with username: %s", username)
 		return domain.User{}, err

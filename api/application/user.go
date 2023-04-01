@@ -13,7 +13,7 @@ import (
 // UserRepository is the interface to interact with User domain object
 type UserRepository interface {
 	GetUser(ID string) (domain.User, error)
-	CheckUser(email string, password string) (domain.User, error)
+	CheckUser(email string) (domain.User, error)
 	AddUser(u domain.User) (string, error)
 	AddConfirmationCode(userID string, confirmationCode string) error
 	CheckConfirmationCode(userID string, confirmationCode string) error
@@ -44,7 +44,14 @@ func (us UserService) GetUser(ID string) (domain.User, error) {
 
 // CheckUser checks if the username and password maches any from the repository by first hashing its password, returns error if none found
 func (us UserService) CheckUser(username string, password string) (domain.User, error) {
-	return us.userRepository.CheckUser(username, hashPassword(password))
+	user, err := us.userRepository.CheckUser(username)
+	if err != nil {
+		return domain.User{}, err
+	}
+	if comparePasswords(password, user.Password) {
+		return user, nil
+	}
+	return domain.User{}, fmt.Errorf("wrong password")
 }
 
 // AddUser adds a new user to the repository by first hashing its password
@@ -117,13 +124,25 @@ func (us UserService) DeleteUser(u domain.User) error {
 func hashPassword(password string) string {
 	// Convert the password to a byte slice
 	passwordBytes := []byte(password)
-
 	// Generate the bcrypt hash of the password
 	hash, _ := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.DefaultCost)
-
 	// Convert the hash to a string and return it
 	hashString := string(hash)
 	return hashString
+}
+
+// comparePasswords compares the plaintext password with the hashed password
+func comparePasswords(plaintextPassword string, hashedPassword string) bool {
+	// Convert the hashed password from string to byte slice
+	hashedPasswordBytes := []byte(hashedPassword)
+
+	// Compare the plaintext password with the hashed password
+	err := bcrypt.CompareHashAndPassword(hashedPasswordBytes, []byte(plaintextPassword))
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func checkPassword(password string) error {
