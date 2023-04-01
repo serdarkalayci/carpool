@@ -202,14 +202,10 @@ func (cr ConversationRepository) MarkConversationsRead(conversationID string, di
 	}
 	filter := bson.M{"_id": convoObjID, "messages.direction": direction}
 	update := bson.M{"$set": bson.M{"messages.$.read": true}}
-	result, err := collection.UpdateMany(ctx, filter, update)
+	_, err = collection.UpdateMany(ctx, filter, update)
 	if err != nil {
 		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
 		return err
-	}
-	if result.MatchedCount == 0 {
-		log.Error().Err(err).Msgf("conversation not found: %v", conversationID)
-		return errors.New("conversation not found")
 	}
 	return nil
 }

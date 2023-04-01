@@ -11,6 +11,8 @@ type ConversationDAO struct {
 	SupplierName      string             `bson:"suppliername"`
 	RequesterApproved bool               `bson:"requesterapprove"`
 	SupplierApproved  bool               `bson:"supplierapprove"`
+	RequesterContact  ContactDetails     `bson:"requestercontact"`
+	SupplierContact   ContactDetails     `bson:"suppliercontact"`
 	Messages          []MessageDAO       `bson:"messages"`
 }
 
@@ -19,4 +21,9 @@ type MessageDAO struct {
 	Date      primitive.DateTime `bson:"date"`
 	Text      string             `bson:"text"`
 	Read      bool               `bson:"read"`
+}
+
+type ContactDetails struct {
+	Email string `bson:"email"`
+	Phone string `bson:"phone"`
 }

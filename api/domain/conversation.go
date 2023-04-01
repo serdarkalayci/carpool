@@ -11,6 +11,8 @@ type Conversation struct {
 	SupplierName      string
 	RequesterApproved bool
 	SupplierApproved  bool
+	RequesterContact  ContactDetails
+	SupplierContact   ContactDetails
 	Messages          []Message
 }
 
@@ -19,6 +21,11 @@ type Message struct {
 	Date      time.Time
 	Text      string
 	Read      bool
+}
+
+type ContactDetails struct {
+	Email string
+	Phone string
 }
 
 type ErrNotTheOwner struct{}

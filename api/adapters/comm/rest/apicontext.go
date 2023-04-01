@@ -132,7 +132,7 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	putCR := sm.Methods(http.MethodPut).Subrouter() // Message subrouter for PUT method
 	putCR.Use(apiContext.validateNewMessage)
 	putCR.HandleFunc("/conversation/{conversationid}", apiContext.AddMessage)
-	getR.HandleFunc("/trip/{tripid}/conversation/{conversationid}", apiContext.GetConversation)
+	getR.HandleFunc("/conversation/{conversationid}", apiContext.GetConversation)
 	putAR := sm.Methods(http.MethodPut).Subrouter() // Approval subrouter for PUT method
 	putAR.Use(apiContext.validateUpdateApproval)
 	putAR.HandleFunc("/conversation/{conversationid}/approval", apiContext.UpdateApproval)

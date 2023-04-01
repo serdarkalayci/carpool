@@ -67,6 +67,12 @@ func (cs ConversationService) InitiateConversation(tripID string, requesterID, m
 		log.Logger.Error().Err(err).Msgf("error getting user with userID: %s", requesterID)
 		return err
 	}
+	// Also let's get the supplier details from user because we need their contact details
+	supplier, err := cs.userRepository.GetUser(trip.SupplierID)
+	if err != nil {
+		log.Logger.Error().Err(err).Msgf("error getting user with userID: %s", requesterID)
+		return err
+	}
 	// Now we can initiate the conversation
 	// if message is empty, then this must be an invitation from the supplier, so we'll autogenerate the message and its direction will be "out"
 	// else it must be the requester's first message, so we'll use the message and its direction will be "in"
@@ -87,6 +93,14 @@ func (cs ConversationService) InitiateConversation(tripID string, requesterID, m
 				Text:      message,
 				Date:      time.Now(),
 			},
+		},
+		RequesterContact: domain.ContactDetails{
+			Email: requester.Email,
+			Phone: requester.Phone,
+		},
+		SupplierContact: domain.ContactDetails{
+			Email: supplier.Email,
+			Phone: supplier.Phone,
 		},
 	}
 	err = cs.conversationRepository.InitiateConversation(conversation)
@@ -111,24 +125,25 @@ func (cs ConversationService) AddMessage(conversationID string, userID string, m
 	return cs.conversationRepository.AddMessage(conversationID, message, direction)
 }
 
-func (cs ConversationService) GetConversation(tripID string, conversationID string, userID string) (*domain.Conversation, error) {
-	// First check that this user is the supplier of this trip
-	owner, err := cs.conversationRepository.CheckConversationOwnership(tripID, userID)
-	if err != nil {
-		return nil, err
-	}
-	if !owner {
-		return nil, domain.ErrNotTheOwner{}
-	}
+func (cs ConversationService) GetConversation(conversationID string, userID string) (*domain.Conversation, error) {
 	conversation, err := cs.conversationRepository.GetConversationByID(conversationID)
 	if err != nil {
 		log.Logger.Error().Err(err).Msg("error getting conversation")
 	}
-	// Because supplier is reading the conversation, we need to mark the messages directed to them as read
-	err = cs.conversationRepository.MarkConversationsRead(conversation.ConversationID, "in")
+	// Lets decide which messages to mark as read by looking who gets the details of the conversation
+	direction := "in"
+	if userID == conversation.RequesterID {
+		direction = "out"
+	}
+	err = cs.conversationRepository.MarkConversationsRead(conversation.ConversationID, direction)
 	if err != nil {
-		log.Logger.Error().Err(err).Msg("error marking inbound messages as read")
+		log.Logger.Error().Err(err).Msg("error marking corresponding messages as read")
 		return nil, err
+	}
+	// We'll hide the contact details until both sides approve the trip
+	if !conversation.SupplierApproved || !conversation.RequesterApproved {
+		conversation.RequesterContact = domain.ContactDetails{}
+		conversation.SupplierContact = domain.ContactDetails{}
 	}
 	return conversation, nil
 }

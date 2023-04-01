@@ -33,21 +33,6 @@ type TripDetailResponse struct {
 	Conversation   []ConversationResponse `json:"conversation,omitempty"`
 }
 
-type ConversationResponse struct {
-	ConversationID    string            `json:"conversationid"`
-	RequesterName     string            `json:"requestername"`
-	RequesterApproved bool              `json:"requesterapproved"`
-	SupplierApproved  bool              `json:"supplierapproved"`
-	Messages          []MessageResponse `json:"messages"`
-}
-
-type MessageResponse struct {
-	Direction string    `json:"direction"`
-	Date      time.Time `json:"date"`
-	Text      string    `json:"text"`
-	Read      bool      `json:"read"`
-}
-
 type AddMessageRequest struct {
 	Text string `json:"text" validate:"required"`
 }

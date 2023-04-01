@@ -16,6 +16,8 @@ func MapConversationDAO2Conversation(conversationDAO *dao.ConversationDAO) *doma
 		SupplierName:      conversationDAO.SupplierName,
 		RequesterApproved: conversationDAO.RequesterApproved,
 		SupplierApproved:  conversationDAO.SupplierApproved,
+		RequesterContact:  domain.ContactDetails{Email: conversationDAO.RequesterContact.Email, Phone: conversationDAO.RequesterContact.Phone},
+		SupplierContact:   domain.ContactDetails{Email: conversationDAO.SupplierContact.Email, Phone: conversationDAO.SupplierContact.Phone},
 		Messages:          messages,
 	}
 }
@@ -34,6 +36,8 @@ func MapConversation2ConversationDAO(conversation *domain.Conversation) *dao.Con
 		SupplierName:      conversation.SupplierName,
 		RequesterApproved: conversation.RequesterApproved,
 		SupplierApproved:  conversation.SupplierApproved,
+		RequesterContact:  dao.ContactDetails{Email: conversation.RequesterContact.Email, Phone: conversation.RequesterContact.Phone},
+		SupplierContact:   dao.ContactDetails{Email: conversation.SupplierContact.Email, Phone: conversation.SupplierContact.Phone},
 		Messages:          messages,
 	}
 }
