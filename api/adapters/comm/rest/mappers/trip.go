@@ -56,16 +56,6 @@ func MapTripDetail2TripDetailResponse(tripDetail domain.TripDetail) dto.TripDeta
 	}
 }
 
-func MapConversation2ConversationResponse(conversation domain.Conversation) dto.ConversationResponse {
-	return dto.ConversationResponse{
-		ConversationID:    conversation.ConversationID,
-		RequesterName:     conversation.RequesterName,
-		RequesterApproved: conversation.RequesterApproved,
-		SupplierApproved:  conversation.SupplierApproved,
-		Messages:          MapMessages2MessageResponses(conversation.Messages),
-	}
-}
-
 func MapConversations2ConversationResponses(conversations []domain.Conversation) []dto.ConversationResponse {
 	var conversationResponses []dto.ConversationResponse
 	for _, conversation := range conversations {
