@@ -1,12 +1,13 @@
 package application
 
 import (
-	"crypto/sha1"
 	"fmt"
 	"math/rand"
 	"unicode"
 
 	"github.com/serdarkalayci/carpool/api/domain"
+	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UserRepository is the interface to interact with User domain object
@@ -97,8 +98,8 @@ func randomString(n int) string {
 
 func sendConfirmationEmail(u domain.User, confirmationCode string) error {
 	to := u.Email
-	subject := "Carpool Confirmation Code"
-	body := fmt.Sprintf("Merhaba %s,<br>Bi' Dünya Oy'a Hoşgeldiniz. Aşağıdaki butona tıklayarak üyeliğinizi onaylayabilirsiniz.<br> <form method\"put\" action=\"http://localhost:5500/user/%s/confirm\"><input type=\"hidden\" id=\"Code\" value=\"%s\"><input type=\"submit\" value=\"Onayla\"></form><br><a href=\"mailto:info@bidunyaoy.com\">info@bidunyaoy.com</a>", u.Name, u.ID, confirmationCode)
+	subject := viper.GetViper().GetString("ConformationCodeSubject")
+	body := fmt.Sprintf(viper.GetString("ConfirmationCodeMessage"), u.Name, confirmationCode, u.ID)
 	return sendEmail(to, subject, body)
 }
 
@@ -114,9 +115,15 @@ func (us UserService) DeleteUser(u domain.User) error {
 
 // HashPassword hashes the password string in order to get ready to store or check if it matches the stored value
 func hashPassword(password string) string {
-	h := sha1.New()
-	h.Write([]byte(password))
-	return string(h.Sum(nil))
+	// Convert the password to a byte slice
+	passwordBytes := []byte(password)
+
+	// Generate the bcrypt hash of the password
+	hash, _ := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.DefaultCost)
+
+	// Convert the hash to a string and return it
+	hashString := string(hash)
+	return hashString
 }
 
 func checkPassword(password string) error {
