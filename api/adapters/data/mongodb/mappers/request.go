@@ -17,14 +17,15 @@ func MapRequest2RequestDAO(request *domain.Request) *dao.RequestDAO {
 		dates = append(dates, primitive.NewDateTimeFromTime(date))
 	}
 	return &dao.RequestDAO{
-		ID:            id,
-		RequesterID:   requesterID,
-		RequesterName: request.RequesterName,
-		CountryID:     countryID,
-		Origin:        request.Origin,
-		Destination:   request.Destination,
-		Dates:         dates,
-		State:         int(request.State),
+		ID:             id,
+		RequesterID:    requesterID,
+		RequesterName:  request.RequesterName,
+		CountryID:      countryID,
+		Origin:         request.Origin,
+		Destination:    request.Destination,
+		Dates:          dates,
+		RequestedSeats: request.RequestedSeats,
+		State:          int(request.State),
 	}
 }
 

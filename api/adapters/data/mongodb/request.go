@@ -10,6 +10,7 @@ import (
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -26,10 +27,11 @@ func newRequestRepository(client *mongo.Client, databaseName string) RequestRepo
 }
 
 func (rr RequestRepository) AddRequest(request domain.Request) error {
-	collection := rr.dbClient.Database(rr.dbName).Collection(viper.GetString("RequestsCollection"))
+	collection := rr.dbClient.Database(rr.dbName).Collection(viper.GetString("RequestCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	requestDAO := mappers.MapRequest2RequestDAO(&request)
+	requestDAO.ID = primitive.NewObjectID()
 	_, err := collection.InsertOne(ctx, requestDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error inserting request: %v", requestDAO)
