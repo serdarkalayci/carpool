@@ -156,7 +156,7 @@ func (tr TripRepository) SetTripCapacity(tripID string, capacity int) error {
 		return err
 	}
 	filter := bson.M{"_id": objID}
-	update := bson.M{"$inc": bson.M{"availableseats": capacity * -1}}
+	update := bson.M{"$inc": bson.M{"availableseats": capacity}}
 	_, err = collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error().Err(err).Msgf("error updating trip with tripID: %s", tripID)

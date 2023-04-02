@@ -190,6 +190,8 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 	message := ""
 	var supplierapproved, requesterapproved string = "", ""
 	bothapproved := false
+	bothrejected := false
+	capacity := conversation.RequestedCapacity
 	switch {
 	case approved && supplier:
 		supplierapproved = "true"
@@ -199,6 +201,7 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 		// If the requester has already approved the trip, then we'll mark the trip as both approved
 		if conversation.RequesterApproved == true {
 			bothapproved = true
+			capacity = capacity * -1
 		}
 	case approved && !supplier:
 		requesterapproved = "true"
@@ -208,25 +211,34 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 		// If the supplier has already approved the trip, then we'll mark the trip as both approved
 		if conversation.SupplierApproved == true {
 			bothapproved = true
+			capacity = capacity * -1
 		}
 	case !approved && supplier:
 		supplierapproved = "false"
-		requesterapproved = "false"
 		// Send mail to requester that the supplier has rejected the trip
 		to = conversation.RequesterContact.Email
 		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessageNegative"), conversation.SupplierName)
+		bothrejected = true
 	case !approved && !supplier:
-		supplierapproved = "false"
 		requesterapproved = "false"
 		// Send mail to supplier that the requester has rejected the trip
 		to = conversation.SupplierContact.Email
 		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessageNegative"), conversation.RequesterName)
+		bothrejected = true
 	}
 	// If both parties have approved the trip, we have to drop the capacity of the trip
 	// If the trip capacity is not enough, we have to return an error and not update the conversation
 	if bothapproved {
 		ts := NewTripService(cs.tripRepository, nil, nil)
-		err = ts.SetTripCapacity(conversation.TripID, conversation.RequestedCapacity)
+		err = ts.SetTripCapacity(conversation.TripID, capacity)
+		if err != nil {
+			return err
+		}
+	}
+	// If the current state of the conversation is both approved, and the new state is both rejected, we have to increase the capacity of the trip
+	if conversation.RequesterApproved && conversation.SupplierApproved && bothrejected {
+		ts := NewTripService(cs.tripRepository, nil, nil)
+		err = ts.SetTripCapacity(conversation.TripID, capacity)
 		if err != nil {
 			return err
 		}

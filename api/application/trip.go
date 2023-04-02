@@ -107,12 +107,12 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 }
 
 func (ts TripService) SetTripCapacity(tripID string, capacity int) error {
-	cap, err := ts.tripRepository.GetTripCapacity(tripID)
+	currentCap, err := ts.tripRepository.GetTripCapacity(tripID)
 	if err != nil {
 		log.Logger.Error().Err(err).Msg("error getting trip capacity")
 		return err
 	}
-	if cap < capacity {
+	if currentCap+capacity < 0 {
 		log.Logger.Info().Msgf("capacity is more than the available capacity for tripID: %s", tripID)
 		return domain.ErrInvalidCapacity{}
 	}
