@@ -22,7 +22,7 @@ func (apiContext *APIContext) GetCountry(rw http.ResponseWriter, r *http.Request
 
 	// convert the id into an integer and return
 	countryID := vars["countryid"]
-	geographyService := application.NewGeographyService(apiContext.geographyRepo)
+	geographyService := application.NewGeographyService(apiContext.dbContext)
 	user, err := geographyService.GetCountry(countryID)
 	if err == nil {
 		respondWithJSON(rw, r, 200, mappers.MapCountry2CountryDTO(user))
@@ -42,7 +42,7 @@ func (apiContext *APIContext) GetCountries(rw http.ResponseWriter, r *http.Reque
 	// span := createSpan("Titanic.ListAll", r)
 	// defer span.Finish()
 
-	geographyService := application.NewGeographyService(apiContext.geographyRepo)
+	geographyService := application.NewGeographyService(apiContext.dbContext)
 	countries, err := geographyService.GetCountries()
 	if err != nil {
 		respondWithError(rw, r, 500, "Cannot get countries from database")

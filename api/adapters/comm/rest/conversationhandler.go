@@ -22,7 +22,7 @@ func (apiContext *APIContext) GetConversation(rw http.ResponseWriter, r *http.Re
 	if status {
 		vars := mux.Vars(r)
 		conversationid := vars["conversationid"]
-		tripService := application.NewConversationService(apiContext.conversationRepo, nil, nil)
+		tripService := application.NewConversationService(apiContext.dbContext)
 		conversation, err := tripService.GetConversation(conversationid, claims.UserID)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting conversation")
@@ -46,7 +46,7 @@ func (apiContext *APIContext) AddConversation(rw http.ResponseWriter, r *http.Re
 	status, _, claims := checkLogin(r)
 	if status {
 		addConversationDTO := r.Context().Value(validatedConversation{}).(dto.AddConversationRequest)
-		conversationService := application.NewConversationService(apiContext.conversationRepo, apiContext.tripRepo, apiContext.userRepo)
+		conversationService := application.NewConversationService(apiContext.dbContext)
 		err := conversationService.InitiateConversation(addConversationDTO.TripID, claims.UserID, addConversationDTO.Capacity, addConversationDTO.Message)
 		if err == nil {
 			respondOK(rw, r, 200)
@@ -72,7 +72,7 @@ func (apiContext *APIContext) AddMessage(rw http.ResponseWriter, r *http.Request
 		vars := mux.Vars(r)
 		conversationID := vars["conversationid"]
 		addMessageDTO := r.Context().Value(validatedMessage{}).(dto.AddMessageRequest)
-		tripService := application.NewConversationService(apiContext.conversationRepo, nil, nil)
+		tripService := application.NewConversationService(apiContext.dbContext)
 		err := tripService.AddMessage(conversationID, claims.UserID, addMessageDTO.Text)
 		if err == nil {
 			respondOK(rw, r, 200)
@@ -98,7 +98,7 @@ func (apiContext *APIContext) UpdateApproval(rw http.ResponseWriter, r *http.Req
 		vars := mux.Vars(r)
 		conversationID := vars["conversationid"]
 		updateApprovalDTO := r.Context().Value(validatedApproval{}).(dto.UpdateApprovalRequest)
-		tripService := application.NewConversationService(apiContext.conversationRepo, apiContext.tripRepo, nil)
+		tripService := application.NewConversationService(apiContext.dbContext)
 		err := tripService.UpdateApproval(conversationID, claims.UserID, *updateApprovalDTO.Approved)
 		if err == nil {
 			respondOK(rw, r, 200)

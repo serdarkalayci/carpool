@@ -37,6 +37,7 @@ func SetConstValues() {
 	viper.SetDefault("TripsCollection", "trips")
 	viper.SetDefault("TripDetailsView", "tripdetail")
 	viper.SetDefault("ConversationsCollection", "conversations")
+	viper.SetDefault("RequestCollection", "requests")
 	viper.SetDefault("ConformationCodeSubject", "Carpool üyeliğiniz için onay kodu")
 	viper.SetDefault("ConfirmationCodeMessage", "Merhaba %s,<br>Bi' Dünya Oy'a Hoşgeldiniz.<br>Üyeliğinizi onaylamak için gerekli onay kodunuz: <font size= \"5\" weight=\"bold\">%s</font><br>Üyeliğinizi onaylamak için <a href=\"http://bidunyaoy.com/user/confirm/%s\">buraya</a> tıklayarak onay kodunuzu girebilirsiniz.<br><a href=\"mailto:info@bidunyaoy.com\">")
 	viper.SetDefault("InvitationMessage", "Değerli üyemiz, %s kullanımız sizin bu yolculukla ilgilenebileceğinizi düşündü")
@@ -44,6 +45,7 @@ func SetConstValues() {
 	viper.SetDefault("ApprovalSubject", "Yolculuk talebi onay durumu güncellemesi")
 	viper.SetDefault("ApprovalMessagePositive", "Değerli üyemiz, %s kullanıcımız görüşmekte olduğunuz yolculuk talebini onayladı")
 	viper.SetDefault("ApprovalMessageNegative", "Değerli üyemiz, %s kullanıcımız görüşmekte olduğunuz yolculuk talebini reddetti")
+	viper.SetDefault("RequestStates", []string{"Aktif", "Görüşmede", "Tamamlandı"})
 }
 
 // SetLogLevels gets configuration values from the file and injects them

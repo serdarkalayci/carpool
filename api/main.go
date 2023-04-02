@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/serdarkalayci/carpool/api/adapters/data"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb"
+	"github.com/serdarkalayci/carpool/api/application"
 
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest"
 
@@ -25,10 +25,10 @@ func main() {
 	util.SetConstValues()
 	util.SetLogLevels()
 
-	var dbContext data.DataContext
+	var dbContext application.DataContext
 	dbContext = mongodb.NewDataContext()
 
-	s := rest.NewAPIContext(bindAddress, dbContext.HealthRepository, dbContext.UserRepository, dbContext.GeographyRepository, dbContext.TripRepository, dbContext.ConversationRepository)
+	s := rest.NewAPIContext(bindAddress, dbContext)
 
 	// start the http server
 	go func() {

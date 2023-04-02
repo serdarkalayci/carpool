@@ -21,7 +21,7 @@ import (
 func (apiContext *APIContext) GetUser(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userid := vars["userid"]
-	userService := application.NewUserService(apiContext.userRepo)
+	userService := application.NewUserService(apiContext.dbContext)
 	user, err := userService.GetUser(userid)
 	if err == nil {
 		respondWithJSON(rw, r, 200, mappers.MapUser2SUserResponse(user))
@@ -39,7 +39,7 @@ func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
 	// Get user data from payload
 	userDTO := r.Context().Value(validatedUser{}).(dto.AddUserRequest)
 	user := mappers.MapAddUserRequest2User(userDTO)
-	userService := application.NewUserService(apiContext.userRepo)
+	userService := application.NewUserService(apiContext.dbContext)
 	err := userService.AddUser(user)
 	if err == nil {
 		respondOK(rw, r, 200)
@@ -63,7 +63,7 @@ func (apiContext *APIContext) ConfirmUser(rw http.ResponseWriter, r *http.Reques
 	vars := mux.Vars(r)
 	userid := vars["userid"]
 	confirmation := r.Context().Value(validatedConfirmUser{}).(dto.ConfirmUserRequest)
-	userService := application.NewUserService(apiContext.userRepo)
+	userService := application.NewUserService(apiContext.dbContext)
 	err := userService.CheckConfirmationCode(userid, confirmation.Code)
 	if err != nil {
 		respondWithError(rw, r, 401, "user not confirmed")

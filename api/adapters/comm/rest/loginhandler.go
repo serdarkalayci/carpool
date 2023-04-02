@@ -40,7 +40,7 @@ var hs = []byte(secretKey)
 //			  500: Internal Server Error
 func (apiContext *APIContext) Login(w http.ResponseWriter, r *http.Request) {
 	userLogin := r.Context().Value(ValidatedLogin{}).(dto.LoginRequest)
-	userService := application.NewUserService(apiContext.userRepo)
+	userService := application.NewUserService(apiContext.dbContext)
 	user, err := userService.CheckUser(userLogin.Email, userLogin.Password)
 	if err != nil {
 		respondWithError(w, r, 401, "User not found")

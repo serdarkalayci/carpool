@@ -29,7 +29,7 @@ func (apiContext *APIContext) AddTrip(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 		trip.SupplierID = claims.UserID
-		tripService := application.NewTripService(apiContext.tripRepo, apiContext.geographyRepo, nil)
+		tripService := application.NewTripService(apiContext.dbContext)
 		err = tripService.AddTrip(trip)
 		if err == nil {
 			respondOK(rw, r, 200)
@@ -57,7 +57,7 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 		countryID := r.URL.Query().Get("countryid")
 		origin := r.URL.Query().Get("origin")
 		destination := r.URL.Query().Get("destination")
-		tripService := application.NewTripService(apiContext.tripRepo, nil, nil)
+		tripService := application.NewTripService(apiContext.dbContext)
 		trips, err := tripService.GetTrips(countryID, origin, destination)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting trips")
@@ -82,7 +82,7 @@ func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
 	if status {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		tripService := application.NewTripService(apiContext.tripRepo, nil, apiContext.conversationRepo)
+		tripService := application.NewTripService(apiContext.dbContext)
 		tripdetail, err := tripService.GetTrip(id, claims.UserID)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting trips")

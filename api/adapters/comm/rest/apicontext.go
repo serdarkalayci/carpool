@@ -32,23 +32,14 @@ import (
 // APIContext handler for getting and updating Ratings
 type APIContext struct {
 	validation *middleware.Validation
-	//dbContext  DBContext
-	healthRepo       application.HealthRepository
-	userRepo         application.UserRepository
-	geographyRepo    application.GeographyRepository
-	tripRepo         application.TripRepository
-	conversationRepo application.ConversationRepository
+	dbContext  application.DataContext
 }
 
 // NewAPIContext returns a new APIContext handler with the given logger
-// func NewAPIContext(dc DBContext, bindAddress *string, ur application.UserRepository) *http.Server {
-func NewAPIContext(bindAddress *string, hr application.HealthRepository, ur application.UserRepository, gr application.GeographyRepository, tr application.TripRepository, cr application.ConversationRepository) *http.Server {
+// func NewAPIContext(dc DBContext, bindAddress *string, ur application.dc.UserRepository) *http.Server {
+func NewAPIContext(bindAddress *string, dataContext application.DataContext) *http.Server {
 	apiContext := &APIContext{
-		healthRepo:       hr,
-		userRepo:         ur,
-		geographyRepo:    gr,
-		tripRepo:         tr,
-		conversationRepo: cr,
+		dbContext: dataContext,
 	}
 	s := apiContext.prepareContext(bindAddress)
 	return s

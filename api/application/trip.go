@@ -16,35 +16,23 @@ type TripRepository interface {
 
 // TripService is the struct to let outer layers to interact to the Trip Applicaton
 type TripService struct {
-	tripRepository         TripRepository
-	geographyRepository    GeographyRepository
-	conversationRepository ConversationRepository
+	dc DataContext
 }
 
 // NewTripService creates a new TripService instance and sets its repository
-func NewTripService(tr TripRepository, gr GeographyRepository, cr ConversationRepository) TripService {
-	if tr == nil {
-		panic("missing tripRepository")
+func NewTripService(dc DataContext) TripService {
+	return TripService{
+		dc: dc,
 	}
-	ts := TripService{
-		tripRepository: tr,
-	}
-	if gr != nil {
-		ts.geographyRepository = gr
-	}
-	if cr != nil {
-		ts.conversationRepository = cr
-	}
-	return ts
 }
 
 func (ts TripService) AddTrip(trip domain.Trip) error {
 	// Check if the destination is valid
-	if ts.geographyRepository == nil {
+	if ts.dc.GeographyRepository == nil {
 		log.Logger.Error().Msg("geographyRepository is not set")
 		panic("missing geographyRepository")
 	}
-	correct, err := ts.geographyRepository.CheckBallotCity(trip.CountryID, trip.Destination)
+	correct, err := ts.dc.GeographyRepository.CheckBallotCity(trip.CountryID, trip.Destination)
 	if err != nil {
 		log.Logger.Error().Err(err).Msgf("error checking destination city with countryID: %s and cityName: %s", trip.CountryID, trip.Destination)
 		return err
@@ -53,32 +41,32 @@ func (ts TripService) AddTrip(trip domain.Trip) error {
 		log.Logger.Info().Msgf("destination is not a ballot city countryID: %s and cityName: %s", trip.CountryID, trip.Destination)
 		return domain.ErrInvalidDestination{}
 	}
-	return ts.tripRepository.AddTrip(&trip)
+	return ts.dc.TripRepository.AddTrip(&trip)
 }
 
 func (ts TripService) GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error) {
-	return ts.tripRepository.GetTrips(countryID, origin, destination)
+	return ts.dc.TripRepository.GetTrips(countryID, origin, destination)
 }
 
 func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail, error) {
-	if ts.conversationRepository == nil {
+	if ts.dc.ConversationRepository == nil {
 		log.Logger.Error().Msg("conversationRepository is not set")
 		panic("missing conversationRepository")
 	}
-	tripDetail, err := ts.tripRepository.GetTripByID(tripID)
+	tripDetail, err := ts.dc.TripRepository.GetTripByID(tripID)
 	if err != nil {
 		log.Logger.Error().Err(err).Msg("error getting trip detail")
 		return nil, err
 	}
 	// If the user is the requester, we need to get the conversation between them and the supplier
 	if tripDetail.SupplierID != userID {
-		conversationID, err := ts.tripRepository.GetConversationID(tripID, userID)
+		conversationID, err := ts.dc.TripRepository.GetConversationID(tripID, userID)
 		if err != nil {
 			log.Logger.Error().Err(err).Msg("error getting conversationID")
 			return nil, err
 		}
 		if conversationID != "" {
-			cs := NewConversationService(ts.conversationRepository, ts.tripRepository, nil)
+			cs := NewConversationService(ts.dc)
 			conversation, err := cs.GetConversation(conversationID, userID)
 			if err != nil {
 				log.Logger.Error().Err(err).Msg("error getting conversation")
@@ -87,7 +75,7 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 			if conversation != nil {
 				tripDetail.Conversations = append(tripDetail.Conversations, *conversation)
 				// Because requester is reading the conversation, we need to mark the messages directed to them as read
-				err = ts.conversationRepository.MarkConversationsRead(conversation.ConversationID, "out")
+				err = ts.dc.ConversationRepository.MarkConversationsRead(conversation.ConversationID, "out")
 				if err != nil {
 					log.Logger.Error().Err(err).Msg("error marking outbound messages as read")
 					return nil, err
@@ -96,7 +84,7 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 		}
 	} else {
 		// If the user is the supplier, we need to get the conversations between them and the requesters
-		cs := NewConversationService(ts.conversationRepository, nil, nil)
+		cs := NewConversationService(ts.dc)
 		conversations, err := cs.GetConversations(tripID)
 		if err != nil {
 			return nil, err
@@ -107,7 +95,7 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 }
 
 func (ts TripService) SetTripCapacity(tripID string, capacity int) error {
-	currentCap, err := ts.tripRepository.GetTripCapacity(tripID)
+	currentCap, err := ts.dc.TripRepository.GetTripCapacity(tripID)
 	if err != nil {
 		log.Logger.Error().Err(err).Msg("error getting trip capacity")
 		return err
@@ -116,5 +104,5 @@ func (ts TripService) SetTripCapacity(tripID string, capacity int) error {
 		log.Logger.Info().Msgf("capacity is more than the available capacity for tripID: %s", tripID)
 		return domain.ErrInvalidCapacity{}
 	}
-	return ts.tripRepository.SetTripCapacity(tripID, capacity)
+	return ts.dc.TripRepository.SetTripCapacity(tripID, capacity)
 }

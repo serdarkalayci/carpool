@@ -27,7 +27,7 @@ func (apiContext *APIContext) Live(rw http.ResponseWriter, r *http.Request) {
 
 // Ready handles GET requests
 func (apiContext *APIContext) Ready(rw http.ResponseWriter, r *http.Request) {
-	hs := application.NewHealthService(apiContext.healthRepo)
+	hs := application.NewHealthService(apiContext.dbContext)
 	status := hs.Ready()
 	if status == false {
 		log.Error().Msg("error connecting to database")

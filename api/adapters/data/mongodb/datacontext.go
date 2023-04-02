@@ -6,15 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/serdarkalayci/carpool/api/adapters/data"
-
 	"github.com/rs/zerolog/log"
+	"github.com/serdarkalayci/carpool/api/application"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // NewDataContext returns a new mongoDB backed DataContext
-func NewDataContext() data.DataContext {
+func NewDataContext() application.DataContext {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// We try to get connectionstring value from the environment variables, if not found it falls back to local database
@@ -53,11 +52,12 @@ func NewDataContext() data.DataContext {
 		}
 		log.Info().Msg("Connected to MongoDB!")
 	}
-	dataContext := data.DataContext{}
+	dataContext := application.DataContext{}
 	dataContext.UserRepository = newUserRepository(client, databaseName)
 	dataContext.HealthRepository = newHealthRepository(client, databaseName)
 	dataContext.GeographyRepository = newGeographyRepository(client, databaseName)
 	dataContext.TripRepository = newTripRepository(client, databaseName)
 	dataContext.ConversationRepository = newConversationRepository(client, databaseName)
+	dataContext.RequestRepository = newRequestRepository(client, databaseName)
 	return dataContext
 }

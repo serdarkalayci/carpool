@@ -11,25 +11,22 @@ type GeographyRepository interface {
 }
 
 type GeographyService struct {
-	geographyRepository GeographyRepository
+	dc DataContext
 }
 
 // NewGeographyService creates a new GeographyService instance and sets its repository
-func NewGeographyService(gr GeographyRepository) GeographyService {
-	if gr == nil {
-		panic("missing geographyRepository")
-	}
+func NewGeographyService(dc DataContext) GeographyService {
 	return GeographyService{
-		geographyRepository: gr,
+		dc: dc,
 	}
 }
 
 func (gs GeographyService) GetCountries() ([]domain.Country, error) {
-	return gs.geographyRepository.GetCountries()
+	return gs.dc.GeographyRepository.GetCountries()
 }
 
 func (gs GeographyService) GetCountry(countryID string) (domain.Country, error) {
-	country, err := gs.geographyRepository.GetCountry(countryID)
+	country, err := gs.dc.GeographyRepository.GetCountry(countryID)
 	if err != nil {
 		return domain.Country{}, err
 	}

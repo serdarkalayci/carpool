@@ -7,20 +7,17 @@ type HealthRepository interface {
 
 // HealthService is the struct to let outer layers to interact to the health applicatopn
 type HealthService struct {
-	HealthRepository HealthRepository
+	dc DataContext
 }
 
 // NewHealthService creates a new HealthService instance and sets its repository
-func NewHealthService(hr HealthRepository) HealthService {
-	if hr == nil {
-		panic("missing HealthRepository")
-	}
+func NewHealthService(dc DataContext) HealthService {
 	return HealthService{
-		HealthRepository: hr,
+		dc: dc,
 	}
 }
 
 // Ready returns true if underlying reposiroty and its connection is up and running, false otherwise
 func (hs HealthService) Ready() bool {
-	return hs.HealthRepository.Ready()
+	return hs.dc.HealthRepository.Ready()
 }
