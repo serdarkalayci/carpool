@@ -132,6 +132,12 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 		log.Logger.Error().Err(err).Msg("error getting conversation")
 		return nil, err
 	}
+	// Check that this user is the supplier or the requester of this conversation so that we can decide if they can see this conversation or not
+	if conversation.RequesterID != userID && conversation.SupplierID != userID {
+		log.Logger.Error().Err(err).Msg("user is not the owner of this conversation")
+		return nil, &domain.ErrNotAuthorizedForConversation{}
+	}
+
 	// Lets decide which messages to mark as read by looking who gets the details of the conversation
 	direction := "in"
 	if userID == conversation.RequesterID {

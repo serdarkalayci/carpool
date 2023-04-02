@@ -31,6 +31,7 @@ type ContactDetails struct {
 
 type ErrNotTheOwner struct{}
 type ErrTheOwner struct{}
+type ErrNotAuthorizedForConversation struct{}
 
 func (e ErrNotTheOwner) Error() string {
 	return "this user is not the supplier of this trip"
@@ -38,4 +39,8 @@ func (e ErrNotTheOwner) Error() string {
 
 func (e ErrTheOwner) Error() string {
 	return "this user is the supplier of this trip, therefore cannot inititate conversation"
+}
+
+func (e ErrNotAuthorizedForConversation) Error() string {
+	return "this user is not authorized to see this conversation"
 }
