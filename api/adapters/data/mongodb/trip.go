@@ -124,3 +124,43 @@ func (tr TripRepository) GetConversationID(tripID string, userID string) (string
 	}
 	return conversationDAO.ID.Hex(), nil
 }
+
+func (tr TripRepository) GetTripCapacity(tripID string) (int, error) {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("TripsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	objID, err := primitive.ObjectIDFromHex(tripID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
+		return 0, err
+	}
+	filter := bson.M{"_id": objID}
+	projection := bson.M{"availableseats": 1}
+	opts := options.FindOne().SetProjection(projection)
+	tripDAO := dao.TripDAO{}
+	err = collection.FindOne(ctx, filter, opts).Decode(&tripDAO)
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
+		return 0, err
+	}
+	return tripDAO.AvailableSeats, nil
+}
+
+func (tr TripRepository) SetTripCapacity(tripID string, capacity int) error {
+	collection := tr.dbClient.Database(tr.dbName).Collection(viper.GetString("TripsCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	objID, err := primitive.ObjectIDFromHex(tripID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
+		return err
+	}
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$inc": bson.M{"availableseats": capacity * -1}}
+	_, err = collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Error().Err(err).Msgf("error updating trip with tripID: %s", tripID)
+		return err
+	}
+	return nil
+}

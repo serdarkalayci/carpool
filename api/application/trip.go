@@ -10,6 +10,8 @@ type TripRepository interface {
 	GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error)
 	GetTripByID(tripID string) (*domain.TripDetail, error)
 	GetConversationID(tripID string, userID string) (string, error)
+	GetTripCapacity(tripID string) (int, error)
+	SetTripCapacity(tripID string, capacity int) error
 }
 
 // TripService is the struct to let outer layers to interact to the Trip Applicaton
@@ -101,4 +103,17 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 		tripDetail.Conversations = conversations
 	}
 	return tripDetail, nil
+}
+
+func (ts TripService) SetTripCapacity(tripID string, capacity int) error {
+	cap, err := ts.tripRepository.GetTripCapacity(tripID)
+	if err != nil {
+		log.Logger.Error().Err(err).Msg("error getting trip capacity")
+		return err
+	}
+	if cap < capacity {
+		log.Logger.Info().Msgf("capacity is more than the available capacity for tripID: %s", tripID)
+		return domain.ErrInvalidCapacity{}
+	}
+	return ts.tripRepository.SetTripCapacity(tripID, capacity)
 }

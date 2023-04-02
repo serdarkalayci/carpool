@@ -151,6 +151,10 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 }
 
 func (cs ConversationService) UpdateApproval(conversationID string, userID string, approved bool) error {
+	if cs.tripRepository == nil {
+		log.Error().Msg("tripRepository is not set")
+		panic("tripRepository is not set")
+	}
 	// First check that this user is the supplier of this trip
 	supplier, err := cs.conversationRepository.CheckConversationOwnership(conversationID, userID)
 	if err != nil {
@@ -163,17 +167,26 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 	to := ""
 	message := ""
 	var supplierapproved, requesterapproved string = "", ""
+	bothapproved := false
 	switch {
 	case approved && supplier:
 		supplierapproved = "true"
 		// Send mail to requester that the supplier has approved the trip
 		to = conversation.RequesterContact.Email
 		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessagePositive"), conversation.SupplierName)
+		// If the requester has already approved the trip, then we'll mark the trip as both approved
+		if conversation.RequesterApproved == true {
+			bothapproved = true
+		}
 	case approved && !supplier:
 		requesterapproved = "true"
 		// Send mail to supplier that the requester has approved the trip
 		to = conversation.SupplierContact.Email
 		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessagePositive"), conversation.RequesterName)
+		// If the supplier has already approved the trip, then we'll mark the trip as both approved
+		if conversation.SupplierApproved == true {
+			bothapproved = true
+		}
 	case !approved && supplier:
 		supplierapproved = "false"
 		requesterapproved = "false"
@@ -187,11 +200,21 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 		to = conversation.SupplierContact.Email
 		message = fmt.Sprintf(viper.GetViper().GetString("ApprovalMessageNegative"), conversation.RequesterName)
 	}
+	// If both parties have approved the trip, we have to drop the capacity of the trip
+	// If the trip capacity is not enough, we have to return an error and not update the conversation
+	if bothapproved {
+		ts := NewTripService(cs.tripRepository, nil, nil)
+		err = ts.SetTripCapacity(conversation.TripID, conversation.RequestedCapacity)
+		if err != nil {
+			return err
+		}
+	}
 	// Now we can update the conversation
 	err = cs.conversationRepository.UpdateApproval(conversationID, supplierapproved, requesterapproved)
 	if err != nil {
 		return err
 	}
+
 	// Send mail to the other party
 	sendEmail(to, viper.GetString("ApprovalSubject"), message)
 	return nil

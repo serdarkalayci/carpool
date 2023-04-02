@@ -9,6 +9,7 @@ import (
 func MapConversationDAO2Conversation(conversationDAO *dao.ConversationDAO) *domain.Conversation {
 	messages := MapMessageDAOs2Messages(conversationDAO.Messages)
 	return &domain.Conversation{
+		TripID:            conversationDAO.TripID.Hex(),
 		ConversationID:    conversationDAO.ID.Hex(),
 		RequesterID:       conversationDAO.RequesterID.Hex(),
 		RequesterName:     conversationDAO.RequesterName,

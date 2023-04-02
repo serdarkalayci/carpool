@@ -27,3 +27,9 @@ type TripDetail struct {
 	Note           string
 	Conversations  []Conversation
 }
+
+type ErrInvalidCapacity struct{}
+
+func (e ErrInvalidCapacity) Error() string {
+	return "requested capacity is greater than available capacity"
+}

@@ -98,7 +98,7 @@ func (apiContext *APIContext) UpdateApproval(rw http.ResponseWriter, r *http.Req
 		vars := mux.Vars(r)
 		conversationID := vars["conversationid"]
 		updateApprovalDTO := r.Context().Value(validatedApproval{}).(dto.UpdateApprovalRequest)
-		tripService := application.NewConversationService(apiContext.conversationRepo, nil, nil)
+		tripService := application.NewConversationService(apiContext.conversationRepo, apiContext.tripRepo, nil)
 		err := tripService.UpdateApproval(conversationID, claims.UserID, *updateApprovalDTO.Approved)
 		if err == nil {
 			respondOK(rw, r, 200)
