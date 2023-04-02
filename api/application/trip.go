@@ -96,7 +96,8 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 		}
 	} else {
 		// If the user is the supplier, we need to get the conversations between them and the requesters
-		conversations, err := ts.conversationRepository.GetConversations(tripID)
+		cs := NewConversationService(ts.conversationRepository, nil, nil)
+		conversations, err := cs.GetConversations(tripID)
 		if err != nil {
 			return nil, err
 		}

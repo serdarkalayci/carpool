@@ -150,6 +150,22 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 	return conversation, nil
 }
 
+func (cs ConversationService) GetConversations(tripID string) ([]domain.Conversation, error) {
+	conversations, err := cs.conversationRepository.GetConversations(tripID)
+	if err != nil {
+		log.Logger.Error().Err(err).Msg("error getting conversations")
+		return nil, err
+	}
+	// We'll hide the contact details until both sides approve the trip
+	for i := range conversations {
+		if !conversations[i].SupplierApproved || !conversations[i].RequesterApproved {
+			conversations[i].RequesterContact = domain.ContactDetails{}
+			conversations[i].SupplierContact = domain.ContactDetails{}
+		}
+	}
+	return conversations, nil
+}
+
 func (cs ConversationService) UpdateApproval(conversationID string, userID string, approved bool) error {
 	if cs.tripRepository == nil {
 		log.Error().Msg("tripRepository is not set")
