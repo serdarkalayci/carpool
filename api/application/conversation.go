@@ -44,7 +44,7 @@ func NewConversationService(cr ConversationRepository, tr TripRepository, ur Use
 	return cs
 }
 
-func (cs ConversationService) InitiateConversation(tripID string, requesterID, message string) error {
+func (cs ConversationService) InitiateConversation(tripID string, requesterID string, capacity int, message string) error {
 	// We need TripRepository to get the supplier's name
 	if cs.tripRepository == nil {
 		log.Error().Msg("tripRepository is not set")
@@ -82,11 +82,12 @@ func (cs ConversationService) InitiateConversation(tripID string, requesterID, m
 		direction = "out"
 	}
 	conversation := domain.Conversation{
-		TripID:        tripID,
-		RequesterID:   requesterID,
-		RequesterName: requester.Name,
-		SupplierID:    trip.SupplierID,
-		SupplierName:  trip.SupplierName,
+		TripID:            tripID,
+		RequesterID:       requesterID,
+		RequesterName:     requester.Name,
+		SupplierID:        trip.SupplierID,
+		SupplierName:      trip.SupplierName,
+		RequestedCapacity: capacity,
 		Messages: []domain.Message{
 			{
 				Direction: direction,

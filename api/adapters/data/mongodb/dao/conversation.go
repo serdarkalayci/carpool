@@ -9,6 +9,7 @@ type ConversationDAO struct {
 	RequesterName     string             `bson:"requestername"`
 	SupplierID        primitive.ObjectID `bson:"supplierid"`
 	SupplierName      string             `bson:"suppliername"`
+	RequestedCapacity int                `bson:"requestedcapacity"`
 	RequesterApproved bool               `bson:"requesterapprove"`
 	SupplierApproved  bool               `bson:"supplierapprove"`
 	RequesterContact  ContactDetails     `bson:"requestercontact"`

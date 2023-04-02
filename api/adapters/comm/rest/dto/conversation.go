@@ -9,6 +9,7 @@ type ConversationResponse struct {
 	RequesterName     string            `json:"requestername"`
 	RequesterApproved bool              `json:"requesterapproved"`
 	SupplierApproved  bool              `json:"supplierapproved"`
+	RequestedCapacity int               `json:"requestedcapacity"`
 	RequesterContact  ContactDetails    `json:"requestercontact,omitempty"`
 	SupplierContact   ContactDetails    `json:"suppliercontact,omitempty"`
 	Messages          []MessageResponse `json:"messages"`
@@ -27,8 +28,9 @@ type ContactDetails struct {
 }
 
 type AddConversationRequest struct {
-	TripID  string `json:"tripId" validate:"required"`
-	Message string `json:"message" validate:"required"`
+	TripID   string `json:"tripId" validate:"required"`
+	Message  string `json:"message" validate:"required"`
+	Capacity int    `json:"capacity" validate:"required"`
 }
 
 type UpdateApprovalRequest struct {

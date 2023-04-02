@@ -47,7 +47,7 @@ func (apiContext *APIContext) AddConversation(rw http.ResponseWriter, r *http.Re
 	if status {
 		addConversationDTO := r.Context().Value(validatedConversation{}).(dto.AddConversationRequest)
 		conversationService := application.NewConversationService(apiContext.conversationRepo, apiContext.tripRepo, apiContext.userRepo)
-		err := conversationService.InitiateConversation(addConversationDTO.TripID, claims.UserID, addConversationDTO.Message)
+		err := conversationService.InitiateConversation(addConversationDTO.TripID, claims.UserID, addConversationDTO.Capacity, addConversationDTO.Message)
 		if err == nil {
 			respondOK(rw, r, 200)
 		} else {

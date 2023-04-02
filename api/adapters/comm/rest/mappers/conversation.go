@@ -9,6 +9,7 @@ func MapConversation2ConversationResponse(conversation domain.Conversation) dto.
 	return dto.ConversationResponse{
 		ConversationID:    conversation.ConversationID,
 		RequesterName:     conversation.RequesterName,
+		RequestedCapacity: conversation.RequestedCapacity,
 		RequesterApproved: conversation.RequesterApproved,
 		SupplierApproved:  conversation.SupplierApproved,
 		SupplierContact: dto.ContactDetails{

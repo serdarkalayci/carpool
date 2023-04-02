@@ -9,6 +9,7 @@ type Conversation struct {
 	RequesterName     string
 	SupplierID        string
 	SupplierName      string
+	RequestedCapacity int
 	RequesterApproved bool
 	SupplierApproved  bool
 	RequesterContact  ContactDetails
