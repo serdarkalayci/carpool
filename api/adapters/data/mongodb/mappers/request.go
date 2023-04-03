@@ -35,21 +35,23 @@ func MapRequestDAO2Request(requestDAO *dao.RequestDAO) *domain.Request {
 		dates = append(dates, date.Time())
 	}
 	return &domain.Request{
-		ID:            requestDAO.ID.Hex(),
-		RequesterID:   requestDAO.RequesterID.Hex(),
-		RequesterName: requestDAO.RequesterName,
-		CountryID:     requestDAO.CountryID.Hex(),
-		Origin:        requestDAO.Origin,
-		Destination:   requestDAO.Destination,
-		Dates:         dates,
-		State:         domain.RequestState(requestDAO.State),
+		ID:             requestDAO.ID.Hex(),
+		RequesterID:    requestDAO.RequesterID.Hex(),
+		RequesterName:  requestDAO.RequesterName,
+		CountryID:      requestDAO.CountryID.Hex(),
+		Origin:         requestDAO.Origin,
+		Destination:    requestDAO.Destination,
+		RequestedSeats: requestDAO.RequestedSeats,
+		Dates:          dates,
+		State:          domain.RequestState(requestDAO.State),
 	}
 }
 
 func MapRequesDAOs2Requests(requestDAOs []dao.RequestDAO) *[]domain.Request {
-	var requests *[]domain.Request
+	var requests []domain.Request
 	for _, requestDAO := range requestDAOs {
-		*requests = append(*requests, *MapRequestDAO2Request(&requestDAO))
+		req := *MapRequestDAO2Request(&requestDAO)
+		requests = append(requests, req)
 	}
-	return requests
+	return &requests
 }

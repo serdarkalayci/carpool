@@ -3,6 +3,7 @@ package rest
 import (
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/mappers"
@@ -35,6 +36,45 @@ func (apiContext *APIContext) AddRequest(rw http.ResponseWriter, r *http.Request
 		} else {
 			log.Error().Err(err).Msg("error adding request")
 			respondWithError(rw, r, 500, "error adding request")
+		}
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}
+
+func (apiContext *APIContext) GetRequests(rw http.ResponseWriter, r *http.Request) {
+	status, _, _ := checkLogin(r)
+	if status {
+		requestService := application.NewRequestService(apiContext.dbContext)
+		countryID := r.URL.Query().Get("countryid")
+		origin := r.URL.Query().Get("origin")
+		destination := r.URL.Query().Get("destination")
+		requests, err := requestService.GetRequests(countryID, origin, destination)
+		if err == nil {
+			requestListResponse := mappers.MapRequests2RequestListResponses(requests)
+			respondWithJSON(rw, r, 200, requestListResponse)
+		} else {
+			log.Error().Err(err).Msg("error getting requests")
+			respondWithError(rw, r, 500, "error getting requests")
+		}
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}
+
+func (apiContext *APIContext) GetRequest(rw http.ResponseWriter, r *http.Request) {
+	status, _, _ := checkLogin(r)
+	if status {
+		requestService := application.NewRequestService(apiContext.dbContext)
+		vars := mux.Vars(r)
+		requestID := vars["requestid"]
+		request, err := requestService.GetRequest(requestID)
+		if err == nil {
+			requestListResponse := mappers.MapRequest2RequestResponse(request)
+			respondWithJSON(rw, r, 200, requestListResponse)
+		} else {
+			log.Error().Err(err).Msg("error getting requests")
+			respondWithError(rw, r, 500, "error getting requests")
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
