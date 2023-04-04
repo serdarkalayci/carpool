@@ -23,7 +23,6 @@ func (apiContext *APIContext) AddRequest(rw http.ResponseWriter, r *http.Request
 		requestDTO := r.Context().Value(validatedRequest{}).(dto.AddRequestRequest)
 		request, err := mappers.MapAddRequestRequest2Request(requestDTO)
 		if err != nil {
-			log.Error().Err(err).Msg("error mapping request")
 			respondWithError(rw, r, 400, err.Error())
 			return
 		}
@@ -34,7 +33,6 @@ func (apiContext *APIContext) AddRequest(rw http.ResponseWriter, r *http.Request
 		if err == nil {
 			respondOK(rw, r, 200)
 		} else {
-			log.Error().Err(err).Msg("error adding request")
 			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
@@ -42,6 +40,13 @@ func (apiContext *APIContext) AddRequest(rw http.ResponseWriter, r *http.Request
 	}
 }
 
+// swagger:route GET /request Request GetRequests
+// Gets all requests based on the query parameters
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// AddRequest creates a new request on the system
 func (apiContext *APIContext) GetRequests(rw http.ResponseWriter, r *http.Request) {
 	status, _, _ := checkLogin(r)
 	if status {
@@ -54,7 +59,6 @@ func (apiContext *APIContext) GetRequests(rw http.ResponseWriter, r *http.Reques
 			requestListResponse := mappers.MapRequests2RequestListResponses(requests)
 			respondWithJSON(rw, r, 200, requestListResponse)
 		} else {
-			log.Error().Err(err).Msg("error getting requests")
 			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
@@ -62,6 +66,15 @@ func (apiContext *APIContext) GetRequests(rw http.ResponseWriter, r *http.Reques
 	}
 }
 
+// swagger:route GET /request/{id} Request GetRequest
+// Gets a single request based on the id
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// AddRequest creates a new request on the system
+
+// GetRequest gets a single request based on the id
 func (apiContext *APIContext) GetRequest(rw http.ResponseWriter, r *http.Request) {
 	status, _, _ := checkLogin(r)
 	if status {

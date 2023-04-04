@@ -2,13 +2,13 @@ package mongodb
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/dao"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/mappers"
+	"github.com/serdarkalayci/carpool/api/application"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,6 +30,7 @@ func newConversationRepository(client *mongo.Client, databaseName string) Conver
 	}
 }
 
+// CheckConversation checks if a conversation exists for current user a user under a trip
 func (cr ConversationRepository) CheckConversation(tripID string, userID string) (convoID string, err error) {
 	collection := cr.dbClient.Database(cr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -37,12 +38,12 @@ func (cr ConversationRepository) CheckConversation(tripID string, userID string)
 	tripObjID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
-		return "", err
+		return "", application.ErrInvalidID{Name: "tripID", Value: tripID}
 	}
 	userObjID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
-		return "", err
+		return "", application.ErrInvalidID{Name: "userID", Value: userID}
 	}
 	filter := bson.M{"tripid": tripObjID, "requesterid": userObjID}
 	var conversation dao.ConversationDAO
@@ -52,11 +53,12 @@ func (cr ConversationRepository) CheckConversation(tripID string, userID string)
 			return "", nil
 		}
 		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
-		return "", err
+		return "", application.ErrConversationNotFound{}
 	}
 	return conversation.ID.Hex(), nil
 }
 
+// CheckConversationOwnership checks if a conversation's supplier is the current user
 func (cr ConversationRepository) CheckConversationOwnership(conversationID string, userID string) (bool, error) {
 	collection := cr.dbClient.Database(cr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -64,22 +66,23 @@ func (cr ConversationRepository) CheckConversationOwnership(conversationID strin
 	convObjID, err := primitive.ObjectIDFromHex(conversationID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing tripID: %s", conversationID)
-		return false, err
+		return false, application.ErrInvalidID{Name: "conversationID", Value: conversationID}
 	}
 	userObjID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
-		return false, err
+		return false, application.ErrInvalidID{Name: "userID", Value: userID}
 	}
 	filter := bson.M{"_id": convObjID, "supplierid": userObjID}
 	count, err := collection.CountDocuments(ctx, filter)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting conversation with conversation: %s", conversationID)
-		return false, err
+		return false, application.ErrConversationNotFound{}
 	}
 	return count == 1, nil
 }
 
+// InitiateConversation creates a new conversation for a trip and a user
 func (cr ConversationRepository) InitiateConversation(conversation domain.Conversation) error {
 	collection := cr.dbClient.Database(cr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -88,11 +91,12 @@ func (cr ConversationRepository) InitiateConversation(conversation domain.Conver
 	_, err := collection.InsertOne(ctx, conversationDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error inserting conversation: %v", conversationDAO)
-		return err
+		return application.ErrConversationNotInserted{}
 	}
 	return nil
 }
 
+// AddMessage adds a message to a conversation
 func (cr ConversationRepository) AddMessage(conversationID string, message string, direction string) error {
 	collection := cr.dbClient.Database(cr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -100,17 +104,17 @@ func (cr ConversationRepository) AddMessage(conversationID string, message strin
 	convoObjID, err := primitive.ObjectIDFromHex(conversationID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
-		return err
+		return application.ErrInvalidID{Name: "conversationID", Value: conversationID}
 	}
 	update := bson.M{"$push": bson.M{"messages": dao.MessageDAO{Date: primitive.NewDateTimeFromTime(time.Now()), Text: message, Direction: direction}}}
 	result, err := collection.UpdateByID(ctx, convoObjID, update)
 	if err != nil {
-		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
-		return err
+		log.Error().Err(err).Msgf("error inserting message to conversation ID: %s", conversationID)
+		return application.ErrMessageNotInserted{}
 	}
 	if result.MatchedCount == 0 {
 		log.Error().Err(err).Msgf("conversation not found: %v", conversationID)
-		return errors.New("conversation not found")
+		return application.ErrConversationNotFound{}
 	}
 	return nil
 }
@@ -123,12 +127,12 @@ func (cr ConversationRepository) GetConversation(tripID string, userID string) (
 	tripObjID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
-		return nil, err
+		return nil, application.ErrInvalidID{Name: "tripID", Value: tripID}
 	}
 	userObjID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing userID: %s", userID)
-		return nil, err
+		return nil, application.ErrInvalidID{Name: "userID", Value: userID}
 	}
 	filter := bson.M{"tripid": tripObjID, "requesterid": userObjID}
 	var conversationDAO dao.ConversationDAO
@@ -138,7 +142,7 @@ func (cr ConversationRepository) GetConversation(tripID string, userID string) (
 			return nil, nil
 		}
 		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
-		return nil, err
+		return nil, application.ErrConversationNotFound{}
 	}
 	return mappers.MapConversationDAO2Conversation(&conversationDAO), nil
 }
@@ -151,13 +155,13 @@ func (cr ConversationRepository) GetConversationByID(conversationID string) (*do
 	convObjID, err := primitive.ObjectIDFromHex(conversationID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
-		return nil, err
+		return nil, application.ErrInvalidID{Name: "conversationID", Value: conversationID}
 	}
 	var conversationDAO dao.ConversationDAO
 	err = collection.FindOne(ctx, bson.M{"_id": convObjID}).Decode(&conversationDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting conversation with conversationID: %s", conversationID)
-		return nil, err
+		return nil, application.ErrConversationNotFound{}
 	}
 	return mappers.MapConversationDAO2Conversation(&conversationDAO), nil
 }
@@ -170,7 +174,7 @@ func (cr ConversationRepository) GetConversations(tripID string) ([]domain.Conve
 	tripObjID, err := primitive.ObjectIDFromHex(tripID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing tripID: %s", tripID)
-		return nil, err
+		return nil, application.ErrInvalidID{Name: "tripID", Value: tripID}
 	}
 	filter := bson.M{"tripid": tripObjID}
 	var conversations []dao.ConversationDAO
@@ -178,16 +182,17 @@ func (cr ConversationRepository) GetConversations(tripID string) ([]domain.Conve
 	cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
-		return nil, err
+		return nil, application.ErrTripNotFound{}
 	}
 	defer cursor.Close(ctx)
 	if err = cursor.All(ctx, &conversations); err != nil {
 		log.Error().Err(err).Msgf("error getting conversations with tripID: %s", tripID)
-		return nil, err
+		return nil, application.ErrConversationNotFound{}
 	}
 	return mappers.MapConversationDAOs2Conversations(conversations), nil
 }
 
+// MarkConversationsRead marks all the messages of a conversation as read depending on the direction
 func (cr ConversationRepository) MarkConversationsRead(conversationID string, direction string) error {
 	collection := cr.dbClient.Database(cr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -195,18 +200,19 @@ func (cr ConversationRepository) MarkConversationsRead(conversationID string, di
 	convoObjID, err := primitive.ObjectIDFromHex(conversationID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
-		return err
+		return application.ErrInvalidID{Name: "conversationID", Value: conversationID}
 	}
 	filter := bson.M{"_id": convoObjID, "messages.direction": direction}
 	update := bson.M{"$set": bson.M{"messages.$.read": true}}
 	_, err = collection.UpdateMany(ctx, filter, update)
 	if err != nil {
-		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
-		return err
+		log.Error().Err(err).Msgf("error updating conversation: %v", conversationID)
+		return application.ErrMessageNotUpdated{}
 	}
 	return nil
 }
 
+// UpdateApproval updates the approval of a conversation
 func (cr ConversationRepository) UpdateApproval(conversationID string, supplierApprove string, requesterApprove string) error {
 	collection := cr.dbClient.Database(cr.dbName).Collection(viper.GetString("ConversationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -214,7 +220,7 @@ func (cr ConversationRepository) UpdateApproval(conversationID string, supplierA
 	convoObjID, err := primitive.ObjectIDFromHex(conversationID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing conversationID: %s", conversationID)
-		return err
+		return application.ErrInvalidID{Name: "conversationID", Value: conversationID}
 	}
 	filter := bson.M{"_id": convoObjID}
 	upd := bson.M{}
@@ -227,12 +233,12 @@ func (cr ConversationRepository) UpdateApproval(conversationID string, supplierA
 	update := bson.M{"$set": upd}
 	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		log.Error().Err(err).Msgf("error updating conversatopn: %v", conversationID)
-		return err
+		log.Error().Err(err).Msgf("error updating conversation: %v", conversationID)
+		return application.ErrConversationNotUpdated{}
 	}
 	if result.MatchedCount == 0 {
 		log.Error().Err(err).Msgf("conversation not found: %v", conversationID)
-		return errors.New("conversation not found")
+		return application.ErrConversationNotFound{}
 	}
 	return nil
 }

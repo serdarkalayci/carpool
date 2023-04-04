@@ -3,10 +3,10 @@ package application
 import "fmt"
 
 type ErrInvalidID struct {
-	Name string
-	ID   string
+	Name  string
+	Value string
 }
 
 func (e ErrInvalidID) Error() string {
-	return fmt.Sprintf("invalid %s ID: %s", e.Name, e.ID)
+	return fmt.Sprintf("invalid %s ID: %s", e.Name, e.Value)
 }

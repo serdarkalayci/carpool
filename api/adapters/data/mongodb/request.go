@@ -52,7 +52,7 @@ func (rr RequestRepository) GetRequests(countryID string, origin string, destina
 	countryObjID, err := primitive.ObjectIDFromHex(countryID)
 	if err != nil {
 		log.Error().Err(err).Msgf("invalid countryID: %s", countryID)
-		return nil, application.ErrInvalidID{Name: "countryID", ID: countryID}
+		return nil, application.ErrInvalidID{Name: "countryID", Value: countryID}
 	}
 	filter := bson.M{"countryid": countryObjID}
 	if origin != "" {
@@ -88,7 +88,7 @@ func (rr RequestRepository) GetRequest(requestID string) (*domain.Request, error
 	requestObjID, err := primitive.ObjectIDFromHex(requestID)
 	if err != nil {
 		log.Error().Err(err).Msgf("invalid requestID: %s", requestID)
-		return nil, application.ErrInvalidID{Name: "requestID", ID: requestID}
+		return nil, application.ErrInvalidID{Name: "requestID", Value: requestID}
 	}
 	filter := bson.M{"_id": requestObjID}
 	var request dao.RequestDAO

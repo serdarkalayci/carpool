@@ -1,6 +1,7 @@
 package mappers
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
@@ -12,7 +13,7 @@ func MapAddRequestRequest2Request(request dto.AddRequestRequest) (domain.Request
 	for _, date := range request.Dates {
 		t, err := time.Parse("2006-01-02", date)
 		if err != nil {
-			return domain.Request{}, err
+			return domain.Request{}, errInvalidDateFormat{date: date}
 		}
 		dates = append(dates, t)
 	}
@@ -66,4 +67,12 @@ func MapRequest2RequestResponse(request *domain.Request) *dto.RequestResponse {
 		Dates:          dates,
 		State:          request.State.String(),
 	}
+}
+
+type errInvalidDateFormat struct {
+	date string
+}
+
+func (e errInvalidDateFormat) Error() string {
+	return fmt.Sprintf("invalid date %s for the format: yyyy-MM-dd", e.date)
 }

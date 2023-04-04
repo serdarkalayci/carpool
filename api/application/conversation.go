@@ -113,7 +113,7 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 	// Check that this user is the supplier or the requester of this conversation so that we can decide if they can see this conversation or not
 	if conversation.RequesterID != userID && conversation.SupplierID != userID {
 		log.Logger.Error().Err(err).Msg("user is not the owner of this conversation")
-		return nil, &domain.ErrNotAuthorizedForConversation{}
+		return nil, ErrNotAuthorizedForConversation{}
 	}
 
 	// Lets decide which messages to mark as read by looking who gets the details of the conversation
@@ -230,4 +230,52 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 	// Send mail to the other party
 	sendEmail(to, viper.GetString("ApprovalSubject"), message)
 	return nil
+}
+
+type ErrNotTheOwner struct{}
+
+func (e ErrNotTheOwner) Error() string {
+	return "this user is not the supplier of this trip"
+}
+
+type ErrTheOwner struct{}
+
+func (e ErrTheOwner) Error() string {
+	return "this user is the supplier of this trip, therefore cannot inititate conversation"
+}
+
+type ErrNotAuthorizedForConversation struct{}
+
+func (e ErrNotAuthorizedForConversation) Error() string {
+	return "this user is not authorized to see this conversation"
+}
+
+type ErrConversationNotFound struct{}
+
+func (e ErrConversationNotFound) Error() string {
+	return "conversation not found"
+}
+
+type ErrConversationNotInserted struct{}
+
+func (e ErrConversationNotInserted) Error() string {
+	return "conversation not inserted"
+}
+
+type ErrConversationNotUpdated struct{}
+
+func (e ErrConversationNotUpdated) Error() string {
+	return "conversation not updated"
+}
+
+type ErrMessageNotInserted struct{}
+
+func (e ErrMessageNotInserted) Error() string {
+	return "message not inserted"
+}
+
+type ErrMessageNotUpdated struct{}
+
+func (e ErrMessageNotUpdated) Error() string {
+	return "message not updated"
 }
