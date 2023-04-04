@@ -24,7 +24,7 @@ func (apiContext *APIContext) AddRequest(rw http.ResponseWriter, r *http.Request
 		request, err := mappers.MapAddRequestRequest2Request(requestDTO)
 		if err != nil {
 			log.Error().Err(err).Msg("error mapping request")
-			respondWithError(rw, r, 400, "error mapping request")
+			respondWithError(rw, r, 400, err.Error())
 			return
 		}
 		request.RequesterID = claims.UserID
@@ -35,7 +35,7 @@ func (apiContext *APIContext) AddRequest(rw http.ResponseWriter, r *http.Request
 			respondOK(rw, r, 200)
 		} else {
 			log.Error().Err(err).Msg("error adding request")
-			respondWithError(rw, r, 500, "error adding request")
+			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
@@ -55,7 +55,7 @@ func (apiContext *APIContext) GetRequests(rw http.ResponseWriter, r *http.Reques
 			respondWithJSON(rw, r, 200, requestListResponse)
 		} else {
 			log.Error().Err(err).Msg("error getting requests")
-			respondWithError(rw, r, 500, "error getting requests")
+			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
@@ -74,7 +74,7 @@ func (apiContext *APIContext) GetRequest(rw http.ResponseWriter, r *http.Request
 			respondWithJSON(rw, r, 200, requestListResponse)
 		} else {
 			log.Error().Err(err).Msg("error getting requests")
-			respondWithError(rw, r, 500, "error getting requests")
+			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")

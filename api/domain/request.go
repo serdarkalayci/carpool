@@ -29,9 +29,3 @@ const (
 func (r RequestState) String() string {
 	return viper.GetStringSlice("RequestStates")[r]
 }
-
-type ErrRequestNotFound struct{}
-
-func (e ErrRequestNotFound) Error() string {
-	return "request not found"
-}

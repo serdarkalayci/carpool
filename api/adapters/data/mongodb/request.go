@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/dao"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/mappers"
+	"github.com/serdarkalayci/carpool/api/application"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,6 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// RequestRepository is the repository for requests
 type RequestRepository struct {
 	dbClient *mongo.Client
 	dbName   string
@@ -27,6 +29,7 @@ func newRequestRepository(client *mongo.Client, databaseName string) RequestRepo
 	}
 }
 
+// AddRequest adds a request to the database
 func (rr RequestRepository) AddRequest(request domain.Request) error {
 	collection := rr.dbClient.Database(rr.dbName).Collection(viper.GetString("RequestCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -36,11 +39,12 @@ func (rr RequestRepository) AddRequest(request domain.Request) error {
 	_, err := collection.InsertOne(ctx, requestDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error inserting request: %v", requestDAO)
-		return err
+		return application.ErrRequestNotInserted{}
 	}
 	return nil
 }
 
+// GetRequests returns all requests for a country, and if supplied filters by origin and destination
 func (rr RequestRepository) GetRequests(countryID string, origin string, destination string) (*[]domain.Request, error) {
 	collection := rr.dbClient.Database(rr.dbName).Collection(viper.GetString("RequestCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -48,7 +52,7 @@ func (rr RequestRepository) GetRequests(countryID string, origin string, destina
 	countryObjID, err := primitive.ObjectIDFromHex(countryID)
 	if err != nil {
 		log.Error().Err(err).Msgf("invalid countryID: %s", countryID)
-		return nil, err
+		return nil, application.ErrInvalidID{Name: "countryID", ID: countryID}
 	}
 	filter := bson.M{"countryid": countryObjID}
 	if origin != "" {
@@ -62,20 +66,21 @@ func (rr RequestRepository) GetRequests(countryID string, origin string, destina
 	cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting requests for country: %s", countryID)
-		return nil, err
+		return nil, application.ErrRequestNotFound{}
 	}
 	defer cursor.Close(ctx)
 	var requests []dao.RequestDAO
 	if err = cursor.All(ctx, &requests); err != nil {
 		log.Error().Err(err).Msgf("error getting requests with countryID: %s", countryID)
-		return nil, err
+		return nil, application.ErrRequestNotFound{}
 	}
 	if requests == nil {
-		return nil, domain.ErrRequestNotFound{}
+		return nil, application.ErrRequestNotFound{}
 	}
 	return mappers.MapRequesDAOs2Requests(requests), nil
 }
 
+// GetRequest returns a request by its ID
 func (rr RequestRepository) GetRequest(requestID string) (*domain.Request, error) {
 	collection := rr.dbClient.Database(rr.dbName).Collection(viper.GetString("RequestCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -83,17 +88,17 @@ func (rr RequestRepository) GetRequest(requestID string) (*domain.Request, error
 	requestObjID, err := primitive.ObjectIDFromHex(requestID)
 	if err != nil {
 		log.Error().Err(err).Msgf("invalid requestID: %s", requestID)
-		return nil, err
+		return nil, application.ErrInvalidID{Name: "requestID", ID: requestID}
 	}
 	filter := bson.M{"_id": requestObjID}
 	var request dao.RequestDAO
 	err = collection.FindOne(ctx, filter).Decode(&request)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, domain.ErrRequestNotFound{}
+			return nil, application.ErrRequestNotFound{}
 		}
 		log.Error().Err(err).Msgf("error getting request with ID: %s", requestID)
-		return nil, err
+		return nil, application.ErrRequestNotFound{}
 	}
 	return mappers.MapRequestDAO2Request(&request), nil
 }
