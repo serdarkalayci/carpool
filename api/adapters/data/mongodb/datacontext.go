@@ -52,7 +52,7 @@ func NewDataContext() application.DataContext {
 		err = client.Ping(ctx, nil)
 
 		if err != nil {
-			log.Error().Err(err).Msg("an error occured while connecting to tha database")
+			log.Error().Err(err).Msg("an error occurred while connecting to tha database")
 		}
 		log.Info().Msg("Connected to MongoDB!")
 	}
