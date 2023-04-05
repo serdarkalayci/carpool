@@ -26,7 +26,7 @@ func main() {
 	util.SetConstValues()
 	util.SetLogLevels()
 
-	var dbContext application.DataContext
+	var dbContext *application.DataContext
 	dbContext = mongodb.NewDataContext()
 
 	s := rest.NewAPIContext(bindAddress, dbContext)

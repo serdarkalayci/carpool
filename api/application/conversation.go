@@ -25,11 +25,11 @@ type ConversationRepository interface {
 
 // ConversationService is the struct to let outer layers to interact to the Conversation Application
 type ConversationService struct {
-	dc DataContext
+	dc DataContextCarrier
 }
 
 // NewConversationService creates a new ConversationService instance and sets its repository
-func NewConversationService(dc DataContext) ConversationService {
+func NewConversationService(dc DataContextCarrier) ConversationService {
 	return ConversationService{
 		dc: dc,
 	}
@@ -38,17 +38,17 @@ func NewConversationService(dc DataContext) ConversationService {
 // InitiateConversation initiates a conversation between a supplier and a requester
 func (cs ConversationService) InitiateConversation(tripID string, requesterID string, capacity int, message string) error {
 	// First let's get Supplier details from trip
-	trip, err := cs.dc.TripRepository.GetTripByID(tripID)
+	trip, err := cs.dc.GetTripRepository().GetTripByID(tripID)
 	if err != nil {
 		return err
 	}
 	// Then let's get Requester details from user
-	requester, err := cs.dc.UserRepository.GetUser(requesterID)
+	requester, err := cs.dc.GetUserRepository().GetUser(requesterID)
 	if err != nil {
 		return err
 	}
 	// Also let's get the supplier details from user because we need their contact details
-	supplier, err := cs.dc.UserRepository.GetUser(trip.SupplierID)
+	supplier, err := cs.dc.GetUserRepository().GetUser(trip.SupplierID)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (cs ConversationService) InitiateConversation(tripID string, requesterID st
 			Phone: supplier.Phone,
 		},
 	}
-	err = cs.dc.ConversationRepository.InitiateConversation(conversation)
+	err = cs.dc.GetConversationRepository().InitiateConversation(conversation)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (cs ConversationService) InitiateConversation(tripID string, requesterID st
 // AddMessage adds a message to a conversation
 func (cs ConversationService) AddMessage(conversationID string, userID string, message string) error {
 	// First check that this user is the supplier or the requester of this trip, so that we can decide the direction of the message
-	owner, err := cs.dc.ConversationRepository.CheckConversationOwnership(conversationID, userID)
+	owner, err := cs.dc.GetConversationRepository().CheckConversationOwnership(conversationID, userID)
 	if err != nil {
 		return err
 	}
@@ -101,12 +101,12 @@ func (cs ConversationService) AddMessage(conversationID string, userID string, m
 	if owner {
 		direction = "out"
 	}
-	return cs.dc.ConversationRepository.AddMessage(conversationID, message, direction)
+	return cs.dc.GetConversationRepository().AddMessage(conversationID, message, direction)
 }
 
 // GetConversation gets a conversation by its ID
 func (cs ConversationService) GetConversation(conversationID string, userID string) (*domain.Conversation, error) {
-	conversation, err := cs.dc.ConversationRepository.GetConversationByID(conversationID)
+	conversation, err := cs.dc.GetConversationRepository().GetConversationByID(conversationID)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 	if userID == conversation.RequesterID {
 		direction = "out"
 	}
-	err = cs.dc.ConversationRepository.MarkConversationsRead(conversation.ConversationID, direction)
+	err = cs.dc.GetConversationRepository().MarkConversationsRead(conversation.ConversationID, direction)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 
 // GetConversations gets all conversations for a trip
 func (cs ConversationService) GetConversations(tripID string) ([]domain.Conversation, error) {
-	conversations, err := cs.dc.ConversationRepository.GetConversations(tripID)
+	conversations, err := cs.dc.GetConversationRepository().GetConversations(tripID)
 	if err != nil {
 		return nil, err
 	}
@@ -151,15 +151,15 @@ func (cs ConversationService) GetConversations(tripID string) ([]domain.Conversa
 
 // UpdateApproval updates the approval status of a conversation
 func (cs ConversationService) UpdateApproval(conversationID string, userID string, approved bool) error {
-	if cs.dc.TripRepository == nil {
+	if cs.dc.GetTripRepository() == nil {
 		log.Fatal().Msg("tripRepository is not set")
 	}
 	// First check that this user is the supplier of this trip
-	supplier, err := cs.dc.ConversationRepository.CheckConversationOwnership(conversationID, userID)
+	supplier, err := cs.dc.GetConversationRepository().CheckConversationOwnership(conversationID, userID)
 	if err != nil {
 		return err
 	}
-	conversation, err := cs.dc.ConversationRepository.GetConversationByID(conversationID)
+	conversation, err := cs.dc.GetConversationRepository().GetConversationByID(conversationID)
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 		}
 	}
 	// Now we can update the conversation
-	err = cs.dc.ConversationRepository.UpdateApproval(conversationID, supplierapproved, requesterapproved)
+	err = cs.dc.GetConversationRepository().UpdateApproval(conversationID, supplierapproved, requesterapproved)
 	if err != nil {
 		return err
 	}

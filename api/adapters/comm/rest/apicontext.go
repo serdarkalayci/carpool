@@ -27,11 +27,11 @@ import (
 // APIContext struct gathers necessary information for the APIContext
 type APIContext struct {
 	validation *middleware.Validation
-	dbContext  application.DataContext
+	dbContext  *application.DataContext
 }
 
 // NewAPIContext returns a new APIContext handler with the given logger
-func NewAPIContext(bindAddress *string, dataContext application.DataContext) *http.Server {
+func NewAPIContext(bindAddress *string, dataContext *application.DataContext) *http.Server {
 	apiContext := &APIContext{
 		dbContext: dataContext,
 	}

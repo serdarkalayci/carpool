@@ -14,11 +14,11 @@ type GeographyRepository interface {
 
 // GeographyService is the struct that wraps the basic GetCountries and GetCountry methods.
 type GeographyService struct {
-	dc DataContext
+	dc DataContextCarrier
 }
 
 // NewGeographyService creates a new GeographyService instance and sets its repository
-func NewGeographyService(dc DataContext) GeographyService {
+func NewGeographyService(dc DataContextCarrier) GeographyService {
 	return GeographyService{
 		dc: dc,
 	}
@@ -26,12 +26,12 @@ func NewGeographyService(dc DataContext) GeographyService {
 
 // GetCountries returns all countries
 func (gs GeographyService) GetCountries() ([]domain.Country, error) {
-	return gs.dc.GeographyRepository.GetCountries()
+	return gs.dc.GetGeographyRepository().GetCountries()
 }
 
 // GetCountry returns a country by ID
 func (gs GeographyService) GetCountry(countryID string) (domain.Country, error) {
-	country, err := gs.dc.GeographyRepository.GetCountry(countryID)
+	country, err := gs.dc.GetGeographyRepository().GetCountry(countryID)
 	if err != nil {
 		return domain.Country{}, err
 	}

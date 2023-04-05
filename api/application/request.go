@@ -14,11 +14,11 @@ type RequestRepository interface {
 
 // RequestService is the struct that holds the methods for request service. RequestHandler depends on this interface.
 type RequestService struct {
-	dc DataContext
+	dc DataContextCarrier
 }
 
 // NewRequestService is the constructor for RequestService. It sets its underlying data context.
-func NewRequestService(dc DataContext) RequestService {
+func NewRequestService(dc DataContextCarrier) RequestService {
 	return RequestService{
 		dc: dc,
 	}
@@ -26,15 +26,15 @@ func NewRequestService(dc DataContext) RequestService {
 
 // GetRequests is the method that gets requests from the repository using its countryID, and filters using .
 func (rs RequestService) GetRequests(countryID string, origin string, destination string) (*[]domain.Request, error) {
-	return rs.dc.RequestRepository.GetRequests(countryID, origin, destination)
+	return rs.dc.GetRequestRepository().GetRequests(countryID, origin, destination)
 }
 
 // AddRequest is the method that adds a request to the repository.
 func (rs RequestService) AddRequest(request domain.Request) error {
-	return rs.dc.RequestRepository.AddRequest(request)
+	return rs.dc.GetRequestRepository().AddRequest(request)
 }
 
 // GetRequest is the method that gets a request from the repository bu its ID.
 func (rs RequestService) GetRequest(requestID string) (*domain.Request, error) {
-	return rs.dc.RequestRepository.GetRequest(requestID)
+	return rs.dc.GetRequestRepository().GetRequest(requestID)
 }

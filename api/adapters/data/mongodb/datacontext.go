@@ -14,7 +14,7 @@ import (
 )
 
 // NewDataContext returns a new mongoDB backed DataContext
-func NewDataContext() application.DataContext {
+func NewDataContext() *application.DataContext {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// We try to get connectionstring value from the environment variables, if not found it falls back to local database
@@ -57,11 +57,12 @@ func NewDataContext() application.DataContext {
 		log.Info().Msg("Connected to MongoDB!")
 	}
 	dataContext := application.DataContext{}
-	dataContext.UserRepository = newUserRepository(client, databaseName)
-	dataContext.HealthRepository = newHealthRepository(client, databaseName)
-	dataContext.GeographyRepository = newGeographyRepository(client, databaseName)
-	dataContext.TripRepository = newTripRepository(client, databaseName)
-	dataContext.ConversationRepository = newConversationRepository(client, databaseName)
-	dataContext.RequestRepository = newRequestRepository(client, databaseName)
-	return dataContext
+	uRepo := newUserRepository(client, databaseName)
+	hRepo := newHealthRepository(client, databaseName)
+	gRepo := newGeographyRepository(client, databaseName)
+	tRepo := newTripRepository(client, databaseName)
+	cRepo := newConversationRepository(client, databaseName)
+	rRepo := newRequestRepository(client, databaseName)
+	dataContext.SetRepositories(uRepo, hRepo, gRepo, tRepo, cRepo, rRepo)
+	return &dataContext
 }

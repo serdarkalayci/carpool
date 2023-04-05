@@ -23,11 +23,11 @@ type UserRepository interface {
 
 // UserService is the struct to let outer layers to interact to the User Applicatopn
 type UserService struct {
-	dc DataContext
+	dc DataContextCarrier
 }
 
 // NewUserService creates a new UserService instance and sets its repository
-func NewUserService(dc DataContext) UserService {
+func NewUserService(dc DataContextCarrier) UserService {
 	return UserService{
 		dc: dc,
 	}
@@ -35,12 +35,12 @@ func NewUserService(dc DataContext) UserService {
 
 // GetUser simply returns a single user or an error that is returned from the repository
 func (us UserService) GetUser(ID string) (domain.User, error) {
-	return us.dc.UserRepository.GetUser(ID)
+	return us.dc.GetUserRepository().GetUser(ID)
 }
 
 // CheckUser checks if the username and password maches any from the repository by first hashing its password, returns error if none found
 func (us UserService) CheckUser(username string, password string) (domain.User, error) {
-	user, err := us.dc.UserRepository.CheckUser(username)
+	user, err := us.dc.GetUserRepository().CheckUser(username)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -53,7 +53,7 @@ func (us UserService) CheckUser(username string, password string) (domain.User, 
 // AddUser adds a new user to the repository by first hashing its password
 func (us UserService) AddUser(u domain.User) error {
 	u.Password = hashPassword(u.Password)
-	newUID, err := us.dc.UserRepository.AddUser(u)
+	newUID, err := us.dc.GetUserRepository().AddUser(u)
 	if err != nil {
 		return err
 	}
@@ -68,11 +68,11 @@ func (us UserService) AddUser(u domain.User) error {
 
 // CheckConfirmationCode checks if the confirmation code matches the one in the repository, if so, activates the user
 func (us UserService) CheckConfirmationCode(userID string, confirmationCode string) error {
-	err := us.dc.UserRepository.CheckConfirmationCode(userID, confirmationCode)
+	err := us.dc.GetUserRepository().CheckConfirmationCode(userID, confirmationCode)
 	if err != nil {
 		return err
 	}
-	err = us.dc.UserRepository.ActivateUser(userID)
+	err = us.dc.GetUserRepository().ActivateUser(userID)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (us UserService) CheckConfirmationCode(userID string, confirmationCode stri
 
 func (us UserService) addConfirmationCode(u domain.User) error {
 	confirmationCode := randomString(7)
-	err := us.dc.UserRepository.AddConfirmationCode(u.ID, confirmationCode)
+	err := us.dc.GetUserRepository().AddConfirmationCode(u.ID, confirmationCode)
 	if err == nil {
 		// Send email to user with the confirmation code
 		sendConfirmationEmail(u, confirmationCode)

@@ -19,11 +19,11 @@ type TripRepository interface {
 
 // TripService is the struct to let outer layers to interact to the Trip Application
 type TripService struct {
-	dc DataContext
+	dc DataContextCarrier
 }
 
 // NewTripService creates a new TripService instance and sets its repository
-func NewTripService(dc DataContext) TripService {
+func NewTripService(dc DataContextCarrier) TripService {
 	return TripService{
 		dc: dc,
 	}
@@ -32,10 +32,10 @@ func NewTripService(dc DataContext) TripService {
 // AddTrip adds a new trip to the repository
 func (ts TripService) AddTrip(trip domain.Trip) error {
 	// Check if the destination is valid
-	if ts.dc.GeographyRepository == nil {
+	if ts.dc.GetGeographyRepository() == nil {
 		log.Fatal().Msg("geographyRepository is not set")
 	}
-	correct, err := ts.dc.GeographyRepository.CheckBallotCity(trip.CountryID, trip.Destination)
+	correct, err := ts.dc.GetGeographyRepository().CheckBallotCity(trip.CountryID, trip.Destination)
 	if err != nil {
 		return err
 	}
@@ -43,26 +43,26 @@ func (ts TripService) AddTrip(trip domain.Trip) error {
 		log.Logger.Info().Msgf("destination is not a ballot city countryID: %s and cityName: %s", trip.CountryID, trip.Destination)
 		return apperr.ErrInvalidDestination{}
 	}
-	return ts.dc.TripRepository.AddTrip(&trip)
+	return ts.dc.GetTripRepository().AddTrip(&trip)
 }
 
 // GetTrips gets the trips from the repository based on the countryID, origin and destination
 func (ts TripService) GetTrips(countryID string, origin, destination string) ([]*domain.Trip, error) {
-	return ts.dc.TripRepository.GetTrips(countryID, origin, destination)
+	return ts.dc.GetTripRepository().GetTrips(countryID, origin, destination)
 }
 
 // GetTrip gets the trip from the repository based on the tripID and userID
 func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail, error) {
-	if ts.dc.ConversationRepository == nil {
+	if ts.dc.GetConversationRepository() == nil {
 		log.Fatal().Msg("conversationRepository is not set")
 	}
-	tripDetail, err := ts.dc.TripRepository.GetTripByID(tripID)
+	tripDetail, err := ts.dc.GetTripRepository().GetTripByID(tripID)
 	if err != nil {
 		return nil, err
 	}
 	// If the user is the requester, we need to get the conversation between them and the supplier
 	if tripDetail.SupplierID != userID {
-		conversationID, err := ts.dc.TripRepository.GetConversationID(tripID, userID)
+		conversationID, err := ts.dc.GetTripRepository().GetConversationID(tripID, userID)
 		if err != nil {
 			return nil, err
 		}
@@ -75,7 +75,7 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 			if conversation != nil {
 				tripDetail.Conversations = append(tripDetail.Conversations, *conversation)
 				// Because requester is reading the conversation, we need to mark the messages directed to them as read
-				err = ts.dc.ConversationRepository.MarkConversationsRead(conversation.ConversationID, "out")
+				err = ts.dc.GetConversationRepository().MarkConversationsRead(conversation.ConversationID, "out")
 				if err != nil {
 					return nil, err
 				}
@@ -95,7 +95,7 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 
 // SetTripCapacity sets the trip capacity to the repository
 func (ts TripService) SetTripCapacity(tripID string, demand int) error {
-	currentCap, err := ts.dc.TripRepository.GetTripCapacity(tripID)
+	currentCap, err := ts.dc.GetTripRepository().GetTripCapacity(tripID)
 	if err != nil {
 		return err
 	}
@@ -103,5 +103,5 @@ func (ts TripService) SetTripCapacity(tripID string, demand int) error {
 		log.Logger.Info().Msgf("demand %d is more than the capacity %d for tripID: %s", demand, currentCap, tripID)
 		return apperr.ErrInvalidCapacity{}
 	}
-	return ts.dc.TripRepository.SetTripCapacity(tripID, demand)
+	return ts.dc.GetTripRepository().SetTripCapacity(tripID, demand)
 }
