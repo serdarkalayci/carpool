@@ -1,3 +1,4 @@
+// Package: main
 package main
 
 import (
@@ -41,7 +42,7 @@ func main() {
 		}
 	}()
 
-	// trap sigterm or interupt and gracefully shutdown the server
+	// trap sigterm or interrupt and gracefully shutdown the server
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, os.Kill)

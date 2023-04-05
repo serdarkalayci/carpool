@@ -1,14 +1,14 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
-	"github.com/spf13/viper"
+	apierr "github.com/serdarkalayci/carpool/api/adapters/comm/rest/errors"
 )
 
 type validatedConversation struct{}
@@ -20,8 +20,8 @@ func extractAddConversationPayload(r *http.Request) (conversation *dto.AddConver
 	}
 	err := json.Unmarshal(payload, &conversation)
 	if err != nil {
-		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		e = &apierr.ErrCannotParsePayload{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	return
@@ -62,8 +62,8 @@ func extractAddMessagePayload(r *http.Request) (message *dto.AddMessageRequest, 
 	}
 	err := json.Unmarshal(payload, &message)
 	if err != nil {
-		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		e = &apierr.ErrCannotParsePayload{}
+		log.Error().Err(e).Msg(e.Error())
 		return
 	}
 	return
@@ -104,8 +104,8 @@ func extractUpdateApprovalPayload(r *http.Request) (approval *dto.UpdateApproval
 	}
 	err := json.Unmarshal(payload, &approval)
 	if err != nil {
-		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		e = &apierr.ErrCannotParsePayload{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	return

@@ -1,7 +1,9 @@
+// Package dao is the package that holds the database access objects
 package dao
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
+// RequestDAO is the data access object for the request entity
 type RequestDAO struct {
 	ID             primitive.ObjectID   `bson:"_id"`
 	RequesterID    primitive.ObjectID   `bson:"requesterid"`

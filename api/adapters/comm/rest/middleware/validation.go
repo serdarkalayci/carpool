@@ -1,3 +1,4 @@
+// Package middleware is the package that holds the middleware logict for rest layer
 package middleware
 
 import (
@@ -12,6 +13,7 @@ type ValidationError struct {
 	validator.FieldError
 }
 
+// Error returns the error message for validation
 func (v ValidationError) Error() string {
 	return fmt.Sprintf(
 		"Key: '%s' Error: Field validation for '%s' failed on the '%s' tag",
@@ -34,7 +36,7 @@ func (v ValidationErrors) Errors() []string {
 	return errs
 }
 
-// Validation contains
+// Validation contains the *validator.Validate instance
 type Validation struct {
 	validate *validator.Validate
 }

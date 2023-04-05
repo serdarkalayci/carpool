@@ -1,16 +1,17 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
-	"github.com/spf13/viper"
+	apierr "github.com/serdarkalayci/carpool/api/adapters/comm/rest/errors"
 )
 
+// validatedRequest is a context key for the validated request data
 type validatedRequest struct{}
 
 // extractAddRequestPayload extracts user data from the request body
@@ -22,8 +23,8 @@ func extractAddRequestPayload(r *http.Request) (request *dto.AddRequestRequest, 
 	}
 	err := json.Unmarshal(payload, &request)
 	if err != nil {
-		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		e = &apierr.ErrCannotParsePayload{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	return

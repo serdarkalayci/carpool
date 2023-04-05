@@ -1,5 +1,7 @@
+// Package domain is the package that holds the very basic domain objects
 package domain
 
+// Country is the domain object for a country
 type Country struct {
 	ID           string
 	Name         string
@@ -7,13 +9,8 @@ type Country struct {
 	BallotCities []City
 }
 
+// City is the domain object for a city
 type City struct {
 	Name   string
 	Ballot bool
-}
-
-type ErrInvalidDestination struct{}
-
-func (e ErrInvalidDestination) Error() string {
-	return "destination is not a ballot city"
 }

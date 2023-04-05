@@ -1,3 +1,4 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
@@ -15,7 +16,7 @@ import (
 //	404: errorResponse
 
 // Live handles GET requests
-func (apiContext *APIContext) Live(rw http.ResponseWriter, r *http.Request) {
+func (apiContext *APIContext) Live(rw http.ResponseWriter, _ *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 }
 
@@ -26,7 +27,7 @@ func (apiContext *APIContext) Live(rw http.ResponseWriter, r *http.Request) {
 //	404: errorResponse
 
 // Ready handles GET requests
-func (apiContext *APIContext) Ready(rw http.ResponseWriter, r *http.Request) {
+func (apiContext *APIContext) Ready(rw http.ResponseWriter, _ *http.Request) {
 	hs := application.NewHealthService(apiContext.dbContext)
 	status := hs.Ready()
 	if status == false {

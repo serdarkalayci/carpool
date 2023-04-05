@@ -1,3 +1,4 @@
+// Package middleware is the package that holds the middleware logict for rest layer
 package middleware
 
 import (
@@ -9,7 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-//RequestCounterVec counts total request per endpoint and method
+// RequestCounterVec counts total request per endpoint and method
 var (
 	RequestCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
@@ -22,7 +23,7 @@ var (
 	)
 )
 
-//RequestDurationGauge calculates avg time per endpoint and method
+// RequestDurationGauge calculates avg time per endpoint and method
 var (
 	RequestDurationGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -35,7 +36,7 @@ var (
 	)
 )
 
-//MetricsMiddleware writes increments request count and calculates request duration and writes to Prometheus metrics
+// MetricsMiddleware writes increments request count and calculates request duration and writes to Prometheus metrics
 func MetricsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := strings.TrimRight(r.URL.Path, "/")

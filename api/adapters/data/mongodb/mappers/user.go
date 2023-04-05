@@ -1,26 +1,11 @@
+// Package mappers is the package that maps objects back and fort between dao and domain
 package mappers
 
 import (
-	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/dao"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// MapUser2UserDAO maps domain User to DAO UserDAO
-func MapUser2UserDAO(u domain.User) (dao.UserDAO, error) {
-	userDAO := dao.UserDAO{}
-	id, err := primitive.ObjectIDFromHex(u.ID)
-	if err != nil {
-		log.Error().Err(err).Msgf("Cannot parse ObjectID of UserID: %s", u.ID)
-	}
-	userDAO.ID = id
-	userDAO.Name = u.Name
-	userDAO.Password = u.Password
-	userDAO.Email = u.Email
-	userDAO.Phone = u.Phone
-	return userDAO, err
-}
 
 // MapUser2NewUserDAO maps domain User to dao User
 func MapUser2NewUserDAO(u domain.User) dao.UserDAO {

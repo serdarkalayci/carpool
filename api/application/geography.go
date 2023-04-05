@@ -1,15 +1,18 @@
+// Package application is the package that holds the application logic between database and communication layers
 package application
 
 import (
 	"github.com/serdarkalayci/carpool/api/domain"
 )
 
+// GeographyRepository is the interface that wraps the basic GetCountries and GetCountry methods.
 type GeographyRepository interface {
 	GetCountries() ([]domain.Country, error)
 	GetCountry(ID string) (domain.Country, error)
 	CheckBallotCity(countryID string, cityName string) (bool, error)
 }
 
+// GeographyService is the struct that wraps the basic GetCountries and GetCountry methods.
 type GeographyService struct {
 	dc DataContext
 }
@@ -21,10 +24,12 @@ func NewGeographyService(dc DataContext) GeographyService {
 	}
 }
 
+// GetCountries returns all countries
 func (gs GeographyService) GetCountries() ([]domain.Country, error) {
 	return gs.dc.GeographyRepository.GetCountries()
 }
 
+// GetCountry returns a country by ID
 func (gs GeographyService) GetCountry(countryID string) (domain.Country, error) {
 	country, err := gs.dc.GeographyRepository.GetCountry(countryID)
 	if err != nil {

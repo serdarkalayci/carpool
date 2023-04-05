@@ -1,3 +1,4 @@
+// Package mongodb is the package that holds the database logic for mongodb database
 package mongodb
 
 import (
@@ -29,10 +30,10 @@ func (hr HealthRepository) Ready() bool {
 	// Check the connection
 	err := hr.dbClient.Ping(ctx, nil)
 	if err != nil {
-		log.Error().Err(err).Msg("An error occured while connecting to tha database")
+		log.Error().Err(err).Msg("an error occurred while connecting to tha database")
 		return false
 	}
-	log.Info().Msg("Connection to MongoDB checked successfuly!")
+	log.Info().Msg("Connection to MongoDB checked successfully!")
 	return true
 
 }

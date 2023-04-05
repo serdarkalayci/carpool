@@ -1,3 +1,4 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
@@ -20,6 +21,7 @@ type Claims struct {
 	Payload  jwt.RegisteredClaims `json:"payload"`
 }
 
+// Valid checks the validity of the claims
 func (c Claims) Valid() error {
 	return c.Payload.Valid()
 }
@@ -38,13 +40,15 @@ var hs = []byte(secretKey)
 //	       200: OK
 //			  400: Bad Request
 //			  500: Internal Server Error
+
+// Login handles the login request
 func (apiContext *APIContext) Login(w http.ResponseWriter, r *http.Request) {
-	userLogin := r.Context().Value(ValidatedLogin{}).(dto.LoginRequest)
+	userLogin := r.Context().Value(validatedLogin{}).(dto.LoginRequest)
 	userService := application.NewUserService(apiContext.dbContext)
 	user, err := userService.CheckUser(userLogin.Email, userLogin.Password)
 	if err != nil {
 		respondWithError(w, r, 401, "User not found")
-		log.Error().Err(err).Msg("User not found")
+		log.Error().Err(err).Msg("user not found")
 		return
 	}
 	// Create the JWT claims, which includes the username and expiry time
@@ -131,6 +135,8 @@ func checkLogin(r *http.Request) (status bool, httpStatusCode int, claims *Claim
 //	       200: OK
 //			  400: Bad Request
 //			  500: Internal Server Error
+
+// Refresh handles the refresh request, and refreshes the validity period of the token
 func (apiContext *APIContext) Refresh(w http.ResponseWriter, r *http.Request) {
 	status, _, claims := checkLogin(r)
 	if status {

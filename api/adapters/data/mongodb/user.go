@@ -1,3 +1,4 @@
+// Package mongodb is the package that holds the database logic for mongodb database
 package mongodb
 
 import (
@@ -8,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/dao"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/mappers"
+	apperr "github.com/serdarkalayci/carpool/api/application/errors"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -36,13 +38,12 @@ func (ur UserRepository) GetUser(ID string) (domain.User, error) {
 	objID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing UserID: %s", ID)
-		return domain.User{}, err
+		return domain.User{}, apperr.ErrInvalidID{Name: "UserID", Value: ID}
 	}
 	var userDAO dao.UserDAO
 	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&userDAO)
 	if err != nil {
-		log.Error().Err(err).Msgf("error getting user with UserID: %s", ID)
-		return domain.User{}, err
+		return domain.User{}, apperr.ErrUserNotFound{}
 	}
 	return mappers.MapUserDAO2User(userDAO), nil
 }
@@ -55,11 +56,10 @@ func (ur UserRepository) AddUser(u domain.User) (string, error) {
 	userDAO := mappers.MapUser2NewUserDAO(u)
 	result, err := collection.InsertOne(ctx, userDAO)
 	if err != nil {
-		log.Error().Err(err).Msg("error while writing user")
 		if mongo.IsDuplicateKeyError(err) {
-			return "", &domain.DuplicateKeyError{}
+			return "", apperr.DuplicateKeyError{}
 		}
-		return "", err
+		return "", apperr.ErrUserNotInserted{}
 	}
 	log.Info().Msgf("user written: %s", result.InsertedID)
 	return fmt.Sprintf("%s", result.InsertedID.(primitive.ObjectID).Hex()), nil
@@ -70,7 +70,11 @@ func (ur UserRepository) AddConfirmationCode(userID string, confirmationCode str
 	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("ConfirmationsCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	uid, _ := primitive.ObjectIDFromHex(userID)
+	uid, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing UserID: %s", userID)
+		return apperr.ErrInvalidID{Name: "UserID", Value: userID}
+	}
 	cdao := dao.ConfirmationDAO{
 		UserID:       uid,
 		Code:         confirmationCode,
@@ -78,11 +82,7 @@ func (ur UserRepository) AddConfirmationCode(userID string, confirmationCode str
 	}
 	result, err := collection.InsertOne(ctx, cdao)
 	if err != nil {
-		log.Error().Err(err).Msg("error while writing confirmaton code")
-		if mongo.IsDuplicateKeyError(err) {
-			return &domain.DuplicateKeyError{}
-		}
-		return err
+		return apperr.ErrCodeNotInserted{}
 	}
 	log.Info().Msgf("confirmation code written: %s", result.InsertedID)
 	return nil
@@ -96,15 +96,14 @@ func (ur UserRepository) CheckConfirmationCode(userID string, confirmationCode s
 	objID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing UserID: %s", userID)
-		return err
+		return apperr.ErrInvalidID{Name: "UserID", Value: userID}
 	}
 	result, err := collection.CountDocuments(ctx, bson.M{"userid": objID, "code": confirmationCode, "validitydate": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now())}})
 	if err != nil {
-		log.Error().Err(err).Msgf("error getting user with UserID: %s", userID)
-		return err
+		return apperr.ErrUserNotFound{}
 	}
 	if result == 0 {
-		return &domain.ConfirmationCodeError{}
+		return apperr.ConfirmationCodeError{}
 	}
 	return nil
 }
@@ -117,18 +116,18 @@ func (ur UserRepository) ActivateUser(userID string) error {
 	objID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing UserID: %s", userID)
-		return err
+		return apperr.ErrInvalidID{Name: "UserID", Value: userID}
 	}
 	result, err := collection.UpdateByID(ctx, objID, bson.M{"$set": bson.M{"active": true}})
 	if err != nil {
 		log.Error().Err(err).Msg("error while activating user")
 		return err
-	} else {
-		if result.MatchedCount == 0 {
-			log.Error().Err(err).Msg("user not found while activating")
-			return &domain.UserNotFoundError{}
-		}
 	}
+	if result.MatchedCount == 0 {
+		log.Error().Err(err).Msg("user not found while activating")
+		return apperr.ErrUserNotFound{}
+	}
+
 	log.Info().Msgf("user activated: %s", userID)
 	return nil
 }
@@ -141,8 +140,7 @@ func (ur UserRepository) CheckUser(username string) (domain.User, error) {
 	var userDAO dao.UserDAO
 	err := collection.FindOne(ctx, bson.M{"email": username, "active": true}).Decode(&userDAO)
 	if err != nil {
-		log.Error().Err(err).Msgf("error getting user with username: %s", username)
-		return domain.User{}, err
+		return domain.User{}, apperr.ErrUserNotFound{}
 	}
 	return mappers.MapUserDAO2User(userDAO), nil
 }
@@ -158,18 +156,7 @@ func (ur UserRepository) CheckUserName(username string) (bool, error) {
 		if err == mongo.ErrNoDocuments {
 			return true, nil
 		}
-		log.Error().Err(err).Msgf("error getting user with username: %s", username)
-		return false, err
+		return false, apperr.ErrUserNotFound{}
 	}
 	return false, nil
-}
-
-// UpdateUser updates an existing user on the user array
-func (ur UserRepository) UpdateUser(u domain.User) error {
-	return fmt.Errorf("not impelemented")
-}
-
-// DeleteUser deletes a user from the user array
-func (ur UserRepository) DeleteUser(u domain.User) error {
-	return fmt.Errorf("not impelemented")
 }

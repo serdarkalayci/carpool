@@ -1,3 +1,4 @@
+// Package mappers is the package that maps objects back and fort between dto and domain
 package mappers
 
 import (
@@ -5,6 +6,7 @@ import (
 	"github.com/serdarkalayci/carpool/api/domain"
 )
 
+// MapCountry2CountryDTO maps domain.Country to dto.CountryDTO
 func MapCountry2CountryDTO(country domain.Country) dto.CountryDTO {
 	return dto.CountryDTO{
 		ID:           country.ID,
@@ -14,6 +16,7 @@ func MapCountry2CountryDTO(country domain.Country) dto.CountryDTO {
 	}
 }
 
+// MapCities2CitiesDTO maps []domain.City to []dto.CityDTO
 func MapCities2CitiesDTO(cities []domain.City) []dto.CityDTO {
 	citiesDTO := make([]dto.CityDTO, 0)
 	for _, city := range cities {
@@ -22,6 +25,7 @@ func MapCities2CitiesDTO(cities []domain.City) []dto.CityDTO {
 	return citiesDTO
 }
 
+// MapCity2CityDTO maps domain.City to dto.CityDTO
 func MapCity2CityDTO(city domain.City) dto.CityDTO {
 	return dto.CityDTO{
 		Name: city.Name,

@@ -1,3 +1,4 @@
+// Package mappers is the package that maps objects back and fort between dto and domain
 package mappers
 
 import (
@@ -5,6 +6,7 @@ import (
 	"github.com/serdarkalayci/carpool/api/domain"
 )
 
+// MapConversation2ConversationResponse maps a domain.Conversation to a dto.ConversationResponse
 func MapConversation2ConversationResponse(conversation domain.Conversation) dto.ConversationResponse {
 	return dto.ConversationResponse{
 		ConversationID:    conversation.ConversationID,

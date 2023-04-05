@@ -1,3 +1,4 @@
+// Package application is the package that holds the application logic between database and communication layers
 package application
 
 import (
@@ -18,8 +19,6 @@ type UserRepository interface {
 	AddConfirmationCode(userID string, confirmationCode string) error
 	CheckConfirmationCode(userID string, confirmationCode string) error
 	ActivateUser(userID string) error
-	UpdateUser(u domain.User) error
-	DeleteUser(u domain.User) error
 }
 
 // UserService is the struct to let outer layers to interact to the User Applicatopn
@@ -105,16 +104,6 @@ func sendConfirmationEmail(u domain.User, confirmationCode string) error {
 	subject := viper.GetViper().GetString("ConformationCodeSubject")
 	body := fmt.Sprintf(viper.GetString("ConfirmationCodeMessage"), u.Name, confirmationCode, u.ID)
 	return sendEmail(to, subject, body)
-}
-
-// UpdateUser updates a single user on the repository, returns error if repository returns one
-func (us UserService) UpdateUser(u domain.User) error {
-	return us.dc.UserRepository.UpdateUser(u)
-}
-
-// DeleteUser deletes a single user from the repository, returns error if repository returns one
-func (us UserService) DeleteUser(u domain.User) error {
-	return us.dc.UserRepository.DeleteUser(u)
 }
 
 // HashPassword hashes the password string in order to get ready to store or check if it matches the stored value

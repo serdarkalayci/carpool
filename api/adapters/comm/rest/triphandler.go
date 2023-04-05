@@ -1,14 +1,14 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/mappers"
 	"github.com/serdarkalayci/carpool/api/application"
-	"github.com/serdarkalayci/carpool/api/domain"
+	apperr "github.com/serdarkalayci/carpool/api/application/errors"
 )
 
 // swagger:route POST /trip Trip AddTrip
@@ -24,8 +24,7 @@ func (apiContext *APIContext) AddTrip(rw http.ResponseWriter, r *http.Request) {
 		tripDTO := r.Context().Value(validatedTrip{}).(dto.AddTripRequest)
 		trip, err := mappers.MapAddTripRequest2Trip(tripDTO)
 		if err != nil {
-			log.Error().Err(err).Msg("error mapping trip")
-			respondWithError(rw, r, 400, "error mapping trip")
+			respondWithError(rw, r, 400, err.Error())
 			return
 		}
 		trip.SupplierID = claims.UserID
@@ -33,11 +32,10 @@ func (apiContext *APIContext) AddTrip(rw http.ResponseWriter, r *http.Request) {
 		err = tripService.AddTrip(trip)
 		if err == nil {
 			respondOK(rw, r, 200)
-		} else if e, ok := err.(*domain.DuplicateKeyError); ok {
+		} else if e, ok := err.(apperr.DuplicateKeyError); ok {
 			respondWithError(rw, r, 400, e.Error())
 		} else {
-			log.Error().Err(err).Msg("error adding trip")
-			respondWithError(rw, r, 500, "error adding trip")
+			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
@@ -45,12 +43,12 @@ func (apiContext *APIContext) AddTrip(rw http.ResponseWriter, r *http.Request) {
 }
 
 // swagger:route GET /trip Trip GetTrips
-// Gets all the trips within the given country and optinally the given origin and destination
+// Gets all the trips within the given country and optionally the given origin and destination
 // responses:
 //	200: OK
 //	404: errorResponse
 
-// GetTrips gets all the trips within the given country and optinally the given origin and destination
+// GetTrips gets all the trips within the given country and optionally the given origin and destination
 func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) {
 	status, _, _ := checkLogin(r)
 	if status {
@@ -60,8 +58,7 @@ func (apiContext *APIContext) GetTrips(rw http.ResponseWriter, r *http.Request) 
 		tripService := application.NewTripService(apiContext.dbContext)
 		trips, err := tripService.GetTrips(countryID, origin, destination)
 		if err != nil {
-			log.Error().Err(err).Msg("error getting trips")
-			respondWithError(rw, r, 500, "error getting trips")
+			respondWithError(rw, r, 500, err.Error())
 			return
 		}
 		respondWithJSON(rw, r, 200, mappers.MapTrips2TripListItems(trips))
@@ -85,8 +82,7 @@ func (apiContext *APIContext) GetTrip(rw http.ResponseWriter, r *http.Request) {
 		tripService := application.NewTripService(apiContext.dbContext)
 		tripdetail, err := tripService.GetTrip(id, claims.UserID)
 		if err != nil {
-			log.Error().Err(err).Msg("error getting trips")
-			respondWithError(rw, r, 500, "error getting trips")
+			respondWithError(rw, r, 500, err.Error())
 			return
 		}
 		respondWithJSON(rw, r, 200, mappers.MapTripDetail2TripDetailResponse(*tripdetail))

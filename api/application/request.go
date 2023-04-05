@@ -1,3 +1,4 @@
+// Package application is the package that holds the application logic between database and communication layers
 package application
 
 import (
@@ -36,21 +37,4 @@ func (rs RequestService) AddRequest(request domain.Request) error {
 // GetRequest is the method that gets a request from the repository bu its ID.
 func (rs RequestService) GetRequest(requestID string) (*domain.Request, error) {
 	return rs.dc.RequestRepository.GetRequest(requestID)
-}
-
-// Request related errors
-type ErrRequestNotFound struct{}
-
-func (e ErrRequestNotFound) Error() string {
-	return "request not found"
-}
-
-type ErrRequestNotInserted struct{}
-
-func (e ErrRequestNotInserted) Error() string {
-	return "cannot add request"
-}
-
-type ErrInvalidRequestID struct {
-	RequestID string
 }

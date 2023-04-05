@@ -1,3 +1,4 @@
+// Package application is the package that holds the application logic between database and communication layers
 package application
 
 // HealthRepository is the interface to interact with database

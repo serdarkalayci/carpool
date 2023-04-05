@@ -1,3 +1,4 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
@@ -28,7 +29,7 @@ func (apiContext *APIContext) GetCountry(rw http.ResponseWriter, r *http.Request
 		respondWithJSON(rw, r, 200, mappers.MapCountry2CountryDTO(user))
 		return
 	}
-	respondWithError(rw, r, 404, "country not found")
+	respondWithError(rw, r, 404, err.Error())
 }
 
 // swagger:route GET /country Country GetCountries
@@ -39,13 +40,13 @@ func (apiContext *APIContext) GetCountry(rw http.ResponseWriter, r *http.Request
 
 // GetCountries gets country list
 func (apiContext *APIContext) GetCountries(rw http.ResponseWriter, r *http.Request) {
-	// span := createSpan("Titanic.ListAll", r)
+	// span := createSpan("Carpool.GetCountries", r)
 	// defer span.Finish()
 
 	geographyService := application.NewGeographyService(apiContext.dbContext)
 	countries, err := geographyService.GetCountries()
 	if err != nil {
-		respondWithError(rw, r, 500, "Cannot get countries from database")
+		respondWithError(rw, r, 500, err.Error())
 	} else {
 		countryDTOs := make([]dto.CountryDTO, 0)
 		for _, p := range countries {

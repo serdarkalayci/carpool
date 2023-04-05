@@ -1,7 +1,9 @@
+// Package domain is the package that holds the very basic domain objects
 package domain
 
 import "time"
 
+// Conversation is the domain object for a conversation
 type Conversation struct {
 	TripID            string
 	ConversationID    string
@@ -17,6 +19,7 @@ type Conversation struct {
 	Messages          []Message
 }
 
+// Message is the domain object for a message
 type Message struct {
 	Direction string
 	Date      time.Time
@@ -24,6 +27,7 @@ type Message struct {
 	Read      bool
 }
 
+// ContactDetails is the domain object for contact details
 type ContactDetails struct {
 	Email string
 	Phone string

@@ -1,3 +1,4 @@
+// Package mappers is the package that maps objects back and fort between dto and domain
 package mappers
 
 import (

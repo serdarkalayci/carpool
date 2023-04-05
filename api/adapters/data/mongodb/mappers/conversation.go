@@ -1,3 +1,4 @@
+// Package mappers is the package that maps objects back and fort between dao and domain
 package mappers
 
 import (
@@ -6,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// MapConversationDAO2Conversation maps a ConversationDAO to a Conversation
 func MapConversationDAO2Conversation(conversationDAO *dao.ConversationDAO) *domain.Conversation {
 	messages := MapMessageDAOs2Messages(conversationDAO.Messages)
 	return &domain.Conversation{
@@ -23,6 +25,8 @@ func MapConversationDAO2Conversation(conversationDAO *dao.ConversationDAO) *doma
 		Messages:          messages,
 	}
 }
+
+// MapConversation2ConversationDAO maps a Conversation to a ConversationDAO
 func MapConversation2ConversationDAO(conversation *domain.Conversation) *dao.ConversationDAO {
 	messages := MapMessages2MessageDAOs(conversation.Messages)
 	tripID, _ := primitive.ObjectIDFromHex(conversation.TripID)
@@ -45,6 +49,7 @@ func MapConversation2ConversationDAO(conversation *domain.Conversation) *dao.Con
 	}
 }
 
+// MapConversationDAOs2Conversations maps a slice of ConversationDAO to a slice of Conversation
 func MapConversationDAOs2Conversations(conversationsDAO []dao.ConversationDAO) []domain.Conversation {
 	var conversations []domain.Conversation
 	for _, conversationDAO := range conversationsDAO {
@@ -53,6 +58,7 @@ func MapConversationDAOs2Conversations(conversationsDAO []dao.ConversationDAO) [
 	return conversations
 }
 
+// MapMessageDAO2Message maps a MessageDAO to a Message
 func MapMessageDAO2Message(messageDAO *dao.MessageDAO) *domain.Message {
 	return &domain.Message{
 		Direction: messageDAO.Direction,
@@ -62,6 +68,7 @@ func MapMessageDAO2Message(messageDAO *dao.MessageDAO) *domain.Message {
 	}
 }
 
+// MapMessageDAOs2Messages maps a slice of MessageDAO to a slice of Message
 func MapMessageDAOs2Messages(messagesDAO []dao.MessageDAO) []domain.Message {
 	var messages []domain.Message
 	for _, messageDAO := range messagesDAO {
@@ -70,6 +77,7 @@ func MapMessageDAOs2Messages(messagesDAO []dao.MessageDAO) []domain.Message {
 	return messages
 }
 
+// MapMessage2MessageDAO maps a Message to a MessageDAO
 func MapMessage2MessageDAO(message *domain.Message) *dao.MessageDAO {
 	return &dao.MessageDAO{
 		Direction: message.Direction,
@@ -79,6 +87,7 @@ func MapMessage2MessageDAO(message *domain.Message) *dao.MessageDAO {
 	}
 }
 
+// MapMessages2MessageDAOs maps a slice of Message to a slice of MessageDAO
 func MapMessages2MessageDAOs(messages []domain.Message) []dao.MessageDAO {
 	var messagesDAO []dao.MessageDAO
 	for _, message := range messages {

@@ -1,3 +1,4 @@
+// Package mappers is the package that maps objects back and fort between dao and domain
 package mappers
 
 import (
@@ -8,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// MapRequest2RequestDAO maps a domain.Request to a dao.RequestDAO
 func MapRequest2RequestDAO(request *domain.Request) *dao.RequestDAO {
 	id, _ := primitive.ObjectIDFromHex(request.ID)
 	requesterID, _ := primitive.ObjectIDFromHex(request.RequesterID)
@@ -29,6 +31,7 @@ func MapRequest2RequestDAO(request *domain.Request) *dao.RequestDAO {
 	}
 }
 
+// MapRequestDAO2Request maps a dao.RequestDAO to a domain.Request
 func MapRequestDAO2Request(requestDAO *dao.RequestDAO) *domain.Request {
 	var dates []time.Time
 	for _, date := range requestDAO.Dates {
@@ -47,6 +50,7 @@ func MapRequestDAO2Request(requestDAO *dao.RequestDAO) *domain.Request {
 	}
 }
 
+// MapRequesDAOs2Requests maps a slice of dao.RequestDAO to a slice of domain.Request
 func MapRequesDAOs2Requests(requestDAOs []dao.RequestDAO) *[]domain.Request {
 	var requests []domain.Request
 	for _, requestDAO := range requestDAOs {

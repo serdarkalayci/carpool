@@ -1,15 +1,15 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/spf13/viper"
+	apierr "github.com/serdarkalayci/carpool/api/adapters/comm/rest/errors"
 )
 
 // ToJSON serializes the given interface into a string based JSON format
@@ -29,13 +29,13 @@ func readPayload(r *http.Request) (payload []byte, e error) {
 	payload, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		e = errors.New(viper.GetString("CannotReadPayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotReadPayloadMsg"))
+		e = &apierr.ErrCannotReadPayload{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	if len(payload) == 0 {
-		e = errors.New(viper.GetString("PayloadMissingMsg"))
-		log.Error().Err(err).Msg(viper.GetString("PayloadMissingMsg"))
+		e = &apierr.ErrPayloadMissing{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	return

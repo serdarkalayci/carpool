@@ -1,3 +1,4 @@
+// Package mongodb is the package that holds the database logic for mongodb database
 package mongodb
 
 import (
@@ -7,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/dao"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/mappers"
-	"github.com/serdarkalayci/carpool/api/application"
+	apperr "github.com/serdarkalayci/carpool/api/application/errors"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -39,7 +40,7 @@ func (rr RequestRepository) AddRequest(request domain.Request) error {
 	_, err := collection.InsertOne(ctx, requestDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error inserting request: %v", requestDAO)
-		return application.ErrRequestNotInserted{}
+		return apperr.ErrRequestNotInserted{}
 	}
 	return nil
 }
@@ -52,7 +53,7 @@ func (rr RequestRepository) GetRequests(countryID string, origin string, destina
 	countryObjID, err := primitive.ObjectIDFromHex(countryID)
 	if err != nil {
 		log.Error().Err(err).Msgf("invalid countryID: %s", countryID)
-		return nil, application.ErrInvalidID{Name: "countryID", Value: countryID}
+		return nil, apperr.ErrInvalidID{Name: "countryID", Value: countryID}
 	}
 	filter := bson.M{"countryid": countryObjID}
 	if origin != "" {
@@ -66,16 +67,16 @@ func (rr RequestRepository) GetRequests(countryID string, origin string, destina
 	cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting requests for country: %s", countryID)
-		return nil, application.ErrRequestNotFound{}
+		return nil, apperr.ErrRequestNotFound{}
 	}
 	defer cursor.Close(ctx)
 	var requests []dao.RequestDAO
 	if err = cursor.All(ctx, &requests); err != nil {
 		log.Error().Err(err).Msgf("error getting requests with countryID: %s", countryID)
-		return nil, application.ErrRequestNotFound{}
+		return nil, apperr.ErrRequestNotFound{}
 	}
 	if requests == nil {
-		return nil, application.ErrRequestNotFound{}
+		return nil, apperr.ErrRequestNotFound{}
 	}
 	return mappers.MapRequesDAOs2Requests(requests), nil
 }
@@ -88,17 +89,17 @@ func (rr RequestRepository) GetRequest(requestID string) (*domain.Request, error
 	requestObjID, err := primitive.ObjectIDFromHex(requestID)
 	if err != nil {
 		log.Error().Err(err).Msgf("invalid requestID: %s", requestID)
-		return nil, application.ErrInvalidID{Name: "requestID", Value: requestID}
+		return nil, apperr.ErrInvalidID{Name: "requestID", Value: requestID}
 	}
 	filter := bson.M{"_id": requestObjID}
 	var request dao.RequestDAO
 	err = collection.FindOne(ctx, filter).Decode(&request)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, application.ErrRequestNotFound{}
+			return nil, apperr.ErrRequestNotFound{}
 		}
 		log.Error().Err(err).Msgf("error getting request with ID: %s", requestID)
-		return nil, application.ErrRequestNotFound{}
+		return nil, apperr.ErrRequestNotFound{}
 	}
 	return mappers.MapRequestDAO2Request(&request), nil
 }

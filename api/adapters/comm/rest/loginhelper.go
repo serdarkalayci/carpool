@@ -1,17 +1,18 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
-	"github.com/spf13/viper"
+	apierr "github.com/serdarkalayci/carpool/api/adapters/comm/rest/errors"
 )
 
-type ValidatedLogin struct{}
+// validatedLogin is a context key for the validated login data
+type validatedLogin struct{}
 
 // extractLoginPayload extracts login data from the request body
 // Returns LoginRequest model if found, error otherwise
@@ -22,8 +23,8 @@ func extractLoginPayload(r *http.Request) (login *dto.LoginRequest, e error) {
 	}
 	err := json.Unmarshal(payload, &login)
 	if err != nil {
-		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		e = &apierr.ErrCannotParsePayload{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	return
@@ -48,7 +49,7 @@ func (apiContext *APIContext) validateLoginRequest(next http.Handler) http.Handl
 		}
 
 		// add the rating to the context
-		ctx := context.WithValue(r.Context(), ValidatedLogin{}, *login)
+		ctx := context.WithValue(r.Context(), validatedLogin{}, *login)
 		r = r.WithContext(ctx)
 
 		// Call the next handler, which can be another middleware in the chain, or the final handler.

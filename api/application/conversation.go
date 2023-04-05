@@ -1,3 +1,4 @@
+// Package application is the package that holds the application logic between database and communication layers
 package application
 
 import (
@@ -5,10 +6,12 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	apperr "github.com/serdarkalayci/carpool/api/application/errors"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 )
 
+// ConversationRepository is the interface that wraps the basic conversation repository methods
 type ConversationRepository interface {
 	CheckConversationOwnership(conversationID string, userID string) (bool, error)
 	InitiateConversation(domain.Conversation) error
@@ -20,7 +23,7 @@ type ConversationRepository interface {
 	UpdateApproval(conversationID string, supplierApprove string, requesterApprove string) error
 }
 
-// ConversationService is the struct to let outer layers to interact to the Conversation Applicaton
+// ConversationService is the struct to let outer layers to interact to the Conversation Application
 type ConversationService struct {
 	dc DataContext
 }
@@ -32,23 +35,21 @@ func NewConversationService(dc DataContext) ConversationService {
 	}
 }
 
+// InitiateConversation initiates a conversation between a supplier and a requester
 func (cs ConversationService) InitiateConversation(tripID string, requesterID string, capacity int, message string) error {
 	// First let's get Supplier details from trip
 	trip, err := cs.dc.TripRepository.GetTripByID(tripID)
 	if err != nil {
-		log.Logger.Error().Err(err).Msgf("error getting trip with tripID: %s", tripID)
 		return err
 	}
 	// Then let's get Requester details from user
 	requester, err := cs.dc.UserRepository.GetUser(requesterID)
 	if err != nil {
-		log.Logger.Error().Err(err).Msgf("error getting user with userID: %s", requesterID)
 		return err
 	}
 	// Also let's get the supplier details from user because we need their contact details
 	supplier, err := cs.dc.UserRepository.GetUser(trip.SupplierID)
 	if err != nil {
-		log.Logger.Error().Err(err).Msgf("error getting user with userID: %s", requesterID)
 		return err
 	}
 	// Now we can initiate the conversation
@@ -84,17 +85,16 @@ func (cs ConversationService) InitiateConversation(tripID string, requesterID st
 	}
 	err = cs.dc.ConversationRepository.InitiateConversation(conversation)
 	if err != nil {
-		log.Logger.Error().Err(err).Msgf("error initiating conversation for tripID: %s", tripID)
 		return err
 	}
 	return nil
 }
 
+// AddMessage adds a message to a conversation
 func (cs ConversationService) AddMessage(conversationID string, userID string, message string) error {
 	// First check that this user is the supplier or the requester of this trip, so that we can decide the direction of the message
 	owner, err := cs.dc.ConversationRepository.CheckConversationOwnership(conversationID, userID)
 	if err != nil {
-		log.Logger.Error().Err(err).Msgf("error checking ownership of conversationID: %s", conversationID)
 		return err
 	}
 	direction := "in"
@@ -104,16 +104,16 @@ func (cs ConversationService) AddMessage(conversationID string, userID string, m
 	return cs.dc.ConversationRepository.AddMessage(conversationID, message, direction)
 }
 
+// GetConversation gets a conversation by its ID
 func (cs ConversationService) GetConversation(conversationID string, userID string) (*domain.Conversation, error) {
 	conversation, err := cs.dc.ConversationRepository.GetConversationByID(conversationID)
 	if err != nil {
-		log.Logger.Error().Err(err).Msg("error getting conversation")
 		return nil, err
 	}
 	// Check that this user is the supplier or the requester of this conversation so that we can decide if they can see this conversation or not
 	if conversation.RequesterID != userID && conversation.SupplierID != userID {
-		log.Logger.Error().Err(err).Msg("user is not the owner of this conversation")
-		return nil, ErrNotAuthorizedForConversation{}
+		log.Logger.Error().Err(err).Msgf("user %s is neither the requester or the supplier of this conversation %s", userID, conversationID)
+		return nil, apperr.ErrNotAuthorizedForConversation{}
 	}
 
 	// Lets decide which messages to mark as read by looking who gets the details of the conversation
@@ -123,7 +123,6 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 	}
 	err = cs.dc.ConversationRepository.MarkConversationsRead(conversation.ConversationID, direction)
 	if err != nil {
-		log.Logger.Error().Err(err).Msg("error marking corresponding messages as read")
 		return nil, err
 	}
 	// We'll hide the contact details until both sides approve the trip
@@ -134,10 +133,10 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 	return conversation, nil
 }
 
+// GetConversations gets all conversations for a trip
 func (cs ConversationService) GetConversations(tripID string) ([]domain.Conversation, error) {
 	conversations, err := cs.dc.ConversationRepository.GetConversations(tripID)
 	if err != nil {
-		log.Logger.Error().Err(err).Msg("error getting conversations")
 		return nil, err
 	}
 	// We'll hide the contact details until both sides approve the trip
@@ -150,10 +149,10 @@ func (cs ConversationService) GetConversations(tripID string) ([]domain.Conversa
 	return conversations, nil
 }
 
+// UpdateApproval updates the approval status of a conversation
 func (cs ConversationService) UpdateApproval(conversationID string, userID string, approved bool) error {
 	if cs.dc.TripRepository == nil {
-		log.Error().Msg("tripRepository is not set")
-		panic("tripRepository is not set")
+		log.Fatal().Msg("tripRepository is not set")
 	}
 	// First check that this user is the supplier of this trip
 	supplier, err := cs.dc.ConversationRepository.CheckConversationOwnership(conversationID, userID)
@@ -230,52 +229,4 @@ func (cs ConversationService) UpdateApproval(conversationID string, userID strin
 	// Send mail to the other party
 	sendEmail(to, viper.GetString("ApprovalSubject"), message)
 	return nil
-}
-
-type ErrNotTheOwner struct{}
-
-func (e ErrNotTheOwner) Error() string {
-	return "this user is not the supplier of this trip"
-}
-
-type ErrTheOwner struct{}
-
-func (e ErrTheOwner) Error() string {
-	return "this user is the supplier of this trip, therefore cannot inititate conversation"
-}
-
-type ErrNotAuthorizedForConversation struct{}
-
-func (e ErrNotAuthorizedForConversation) Error() string {
-	return "this user is not authorized to see this conversation"
-}
-
-type ErrConversationNotFound struct{}
-
-func (e ErrConversationNotFound) Error() string {
-	return "conversation not found"
-}
-
-type ErrConversationNotInserted struct{}
-
-func (e ErrConversationNotInserted) Error() string {
-	return "conversation not inserted"
-}
-
-type ErrConversationNotUpdated struct{}
-
-func (e ErrConversationNotUpdated) Error() string {
-	return "conversation not updated"
-}
-
-type ErrMessageNotInserted struct{}
-
-func (e ErrMessageNotInserted) Error() string {
-	return "message not inserted"
-}
-
-type ErrMessageNotUpdated struct{}
-
-func (e ErrMessageNotUpdated) Error() string {
-	return "message not updated"
 }

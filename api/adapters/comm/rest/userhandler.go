@@ -1,14 +1,14 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/mappers"
 	"github.com/serdarkalayci/carpool/api/application"
-	"github.com/serdarkalayci/carpool/api/domain"
+	apperr "github.com/serdarkalayci/carpool/api/application/errors"
 )
 
 // swagger:route GET /user/{userid} User GetUser
@@ -43,11 +43,10 @@ func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
 	err := userService.AddUser(user)
 	if err == nil {
 		respondOK(rw, r, 200)
-	} else if e, ok := err.(*domain.DuplicateKeyError); ok {
+	} else if e, ok := err.(apperr.DuplicateKeyError); ok {
 		respondWithError(rw, r, 400, e.Error())
 	} else {
-		log.Error().Err(err).Msg("error adding user")
-		respondWithError(rw, r, 500, "error adding user")
+		respondWithError(rw, r, 500, e.Error())
 	}
 }
 
@@ -66,7 +65,7 @@ func (apiContext *APIContext) ConfirmUser(rw http.ResponseWriter, r *http.Reques
 	userService := application.NewUserService(apiContext.dbContext)
 	err := userService.CheckConfirmationCode(userid, confirmation.Code)
 	if err != nil {
-		respondWithError(rw, r, 401, "user not confirmed")
+		respondWithError(rw, r, 401, err.Error())
 		return
 	}
 	respondOK(rw, r, 200)

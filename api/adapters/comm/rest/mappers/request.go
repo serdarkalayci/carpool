@@ -1,19 +1,21 @@
+// Package mappers is the package that maps objects back and fort between dto and domain
 package mappers
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
+	apierr "github.com/serdarkalayci/carpool/api/adapters/comm/rest/errors"
 	"github.com/serdarkalayci/carpool/api/domain"
 )
 
+// MapAddRequestRequest2Request maps the request dto to the domain request
 func MapAddRequestRequest2Request(request dto.AddRequestRequest) (domain.Request, error) {
 	var dates []time.Time
 	for _, date := range request.Dates {
 		t, err := time.Parse("2006-01-02", date)
 		if err != nil {
-			return domain.Request{}, errInvalidDateFormat{date: date}
+			return domain.Request{}, apierr.ErrInvalidDateFormat{Date: date}
 		}
 		dates = append(dates, t)
 	}
@@ -27,6 +29,7 @@ func MapAddRequestRequest2Request(request dto.AddRequestRequest) (domain.Request
 	}, nil
 }
 
+// MapRequest2RequestListResponse maps the domain request to the request list response dto
 func MapRequest2RequestListResponse(request *domain.Request) *dto.RequestListResponse {
 	var dates []string
 	for _, date := range request.Dates {
@@ -42,6 +45,7 @@ func MapRequest2RequestListResponse(request *domain.Request) *dto.RequestListRes
 	}
 }
 
+// MapRequests2RequestListResponses maps the domain requests to the request list response dtos
 func MapRequests2RequestListResponses(requests *[]domain.Request) *[]dto.RequestListResponse {
 	var responses []dto.RequestListResponse
 	for _, request := range *requests {
@@ -51,6 +55,7 @@ func MapRequests2RequestListResponses(requests *[]domain.Request) *[]dto.Request
 	return &responses
 }
 
+// MapRequest2RequestResponse maps the domain request to the request response dto
 func MapRequest2RequestResponse(request *domain.Request) *dto.RequestResponse {
 	var dates []string
 	for _, date := range request.Dates {
@@ -67,12 +72,4 @@ func MapRequest2RequestResponse(request *domain.Request) *dto.RequestResponse {
 		Dates:          dates,
 		State:          request.State.String(),
 	}
-}
-
-type errInvalidDateFormat struct {
-	date string
-}
-
-func (e errInvalidDateFormat) Error() string {
-	return fmt.Sprintf("invalid date %s for the format: yyyy-MM-dd", e.date)
 }

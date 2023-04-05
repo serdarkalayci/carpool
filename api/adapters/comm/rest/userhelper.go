@@ -1,14 +1,14 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
-	"github.com/spf13/viper"
+	apierr "github.com/serdarkalayci/carpool/api/adapters/comm/rest/errors"
 )
 
 type validatedUser struct{}
@@ -23,8 +23,8 @@ func extractAddUserPayload(r *http.Request) (user *dto.AddUserRequest, e error) 
 	}
 	err := json.Unmarshal(payload, &user)
 	if err != nil {
-		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		e = &apierr.ErrCannotParsePayload{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	return
@@ -65,8 +65,8 @@ func extractConfirmUserPayload(r *http.Request) (confirmation *dto.ConfirmUserRe
 	}
 	err := json.Unmarshal(payload, &confirmation)
 	if err != nil {
-		e = errors.New(viper.GetString("CannotParsePayloadMsg"))
-		log.Error().Err(err).Msg(viper.GetString("CannotParsePayloadMsg"))
+		e = &apierr.ErrCannotParsePayload{}
+		log.Error().Err(err).Msg(e.Error())
 		return
 	}
 	return

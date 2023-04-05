@@ -1,3 +1,4 @@
+// Package mongodb is the package that holds the database logic for mongodb database
 package mongodb
 
 import (
@@ -40,15 +41,18 @@ func NewDataContext() application.DataContext {
 		log.Info().Msgf("DatabaseName from Env is used: '%s'", databaseName)
 	}
 	client, err := mongo.NewClient(options.Client().ApplyURI(connectionString))
+	if err != nil {
+		log.Error().Err(err).Msgf("an error occurred while creating the client for tha database")
+	}
 	err = client.Connect(ctx)
 	if err != nil {
-		log.Error().Err(err).Msgf("An error occured while connecting to tha database")
+		log.Error().Err(err).Msgf("an error occurred while connecting to tha database")
 	} else {
 		// Check the connection
 		err = client.Ping(ctx, nil)
 
 		if err != nil {
-			log.Error().Err(err).Msg("An error occured while connecting to tha database")
+			log.Error().Err(err).Msg("an error occured while connecting to tha database")
 		}
 		log.Info().Msg("Connected to MongoDB!")
 	}

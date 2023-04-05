@@ -1,3 +1,4 @@
+// Package dao is the package that holds the database access objects
 package dao
 
 import (

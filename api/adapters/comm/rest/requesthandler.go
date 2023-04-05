@@ -1,3 +1,4 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
@@ -46,7 +47,7 @@ func (apiContext *APIContext) AddRequest(rw http.ResponseWriter, r *http.Request
 //	200: OK
 //	404: errorResponse
 
-// AddRequest creates a new request on the system
+// GetRequests gets all requests based on the query parameters
 func (apiContext *APIContext) GetRequests(rw http.ResponseWriter, r *http.Request) {
 	status, _, _ := checkLogin(r)
 	if status {

@@ -1,3 +1,4 @@
+// Package mongodb is the package that holds the database logic for mongodb database
 package mongodb
 
 import (
@@ -7,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/dao"
 	"github.com/serdarkalayci/carpool/api/adapters/data/mongodb/mappers"
+	apperr "github.com/serdarkalayci/carpool/api/application/errors"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// UserRepository represent a structure that will communicate to MongoDB to accomplish user related transactions
+// GeographyRepository represent a structure that will communicate to MongoDB to accomplish geography related transactions
 type GeographyRepository struct {
 	dbClient *mongo.Client
 	dbName   string
@@ -37,13 +39,12 @@ func (gr GeographyRepository) GetCountries() ([]domain.Country, error) {
 	cursor, err := collection.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting Countries")
-		return nil, err
+		return nil, apperr.ErrCountriesNotFound{}
 	}
 	countries := make([]dao.CountryDAO, 0)
 	defer cursor.Close(ctx)
 	if err = cursor.All(ctx, &countries); err != nil {
-
-		return nil, err
+		return nil, apperr.ErrCountriesNotFound{}
 	}
 	return mappers.MapCountryDAOs2Countries(countries), nil
 }
@@ -56,13 +57,13 @@ func (gr GeographyRepository) GetCountry(ID string) (domain.Country, error) {
 	objID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing CountryID: %s", ID)
-		return domain.Country{}, err
+		return domain.Country{}, apperr.ErrInvalidID{Name: "CountryID", Value: ID}
 	}
 	var countryDAO dao.CountryDAO
 	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&countryDAO)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting country with CountryID: %s", ID)
-		return domain.Country{}, err
+		return domain.Country{}, apperr.ErrCountryNotFound{}
 	}
 	return mappers.MapCountryDAO2Country(countryDAO), nil
 }
@@ -75,12 +76,12 @@ func (gr GeographyRepository) CheckBallotCity(countryID string, cityName string)
 	countryObjID, err := primitive.ObjectIDFromHex(countryID)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing CountryID: %s", countryID)
-		return false, err
+		return false, apperr.ErrInvalidID{Name: "CountryID", Value: countryID}
 	}
 	count, err := collection.CountDocuments(ctx, bson.M{"_id": countryObjID, "cities": bson.M{"$elemMatch": bson.M{"name": cityName, "ballot": true}}})
 	if err != nil {
-		log.Error().Err(err).Msgf("error getting country with CountryID: %s", countryID)
-		return false, err
+		log.Error().Err(err).Msgf("error checking ballot city with CountryID: %s and CityName: %s", countryID, cityName)
+		return false, apperr.ErrCountryNotFound{}
 	}
 	return count == 1, nil
 }

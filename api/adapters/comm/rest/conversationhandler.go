@@ -1,16 +1,16 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/rs/zerolog/log"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/dto"
 	"github.com/serdarkalayci/carpool/api/adapters/comm/rest/mappers"
 	"github.com/serdarkalayci/carpool/api/application"
 )
 
-// swagger:route GET /conversation/{conversationid} Conversation GetConmversation
+// swagger:route GET /conversation/{conversationid} Conversation GetConversation
 // Gets gets a specific conversation within a trip between the supplier and the requester
 // responses:
 //	200: OK
@@ -25,8 +25,7 @@ func (apiContext *APIContext) GetConversation(rw http.ResponseWriter, r *http.Re
 		tripService := application.NewConversationService(apiContext.dbContext)
 		conversation, err := tripService.GetConversation(conversationid, claims.UserID)
 		if err != nil {
-			log.Error().Err(err).Msg("error getting conversation")
-			respondWithError(rw, r, 500, "error getting conversation")
+			respondWithError(rw, r, 500, err.Error())
 			return
 		}
 		respondWithJSON(rw, r, 200, mappers.MapConversation2ConversationResponse(*conversation))
@@ -51,8 +50,7 @@ func (apiContext *APIContext) AddConversation(rw http.ResponseWriter, r *http.Re
 		if err == nil {
 			respondOK(rw, r, 200)
 		} else {
-			log.Error().Err(err).Msg("error adding conversation")
-			respondWithError(rw, r, 500, "error adding conversation")
+			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
@@ -77,8 +75,7 @@ func (apiContext *APIContext) AddMessage(rw http.ResponseWriter, r *http.Request
 		if err == nil {
 			respondOK(rw, r, 200)
 		} else {
-			log.Error().Err(err).Msg("error adding message")
-			respondWithError(rw, r, 500, "error adding message")
+			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
@@ -103,8 +100,7 @@ func (apiContext *APIContext) UpdateApproval(rw http.ResponseWriter, r *http.Req
 		if err == nil {
 			respondOK(rw, r, 200)
 		} else {
-			log.Error().Err(err).Msg("error updating approval")
-			respondWithError(rw, r, 500, "error updating approval")
+			respondWithError(rw, r, 500, err.Error())
 		}
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")

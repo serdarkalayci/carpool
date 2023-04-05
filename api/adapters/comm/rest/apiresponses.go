@@ -1,3 +1,4 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (

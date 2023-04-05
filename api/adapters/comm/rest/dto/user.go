@@ -1,3 +1,4 @@
+// Package dto is the package that defines types for data transfer
 package dto
 
 // AddUserRequest type defines a model for adding an user
@@ -35,6 +36,7 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
+// ConfirmUserRequest type defines a model for accepting a confirmation code for a user
 type ConfirmUserRequest struct {
 	Code string `json:"code" validate:"required"`
 }

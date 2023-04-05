@@ -1,7 +1,7 @@
+// Package rest is responsible for rest communication layer
 package rest
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -24,19 +24,13 @@ import (
 	jaegerlog "github.com/uber/jaeger-client-go/log"
 )
 
-// DBContext is the interface that APIContext expects to be fulfilled by Database code
-// type DBContext interface {
-// 	CheckConnection() bool
-// }
-
-// APIContext handler for getting and updating Ratings
+// APIContext struct gathers necessary information for the APIContext
 type APIContext struct {
 	validation *middleware.Validation
 	dbContext  application.DataContext
 }
 
 // NewAPIContext returns a new APIContext handler with the given logger
-// func NewAPIContext(dc DBContext, bindAddress *string, ur application.dc.UserRepository) *http.Server {
 func NewAPIContext(bindAddress *string, dataContext application.DataContext) *http.Server {
 	apiContext := &APIContext{
 		dbContext: dataContext,
@@ -46,18 +40,14 @@ func NewAPIContext(bindAddress *string, dataContext application.DataContext) *ht
 }
 
 func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
-	// Example logger and metrics factory. Use github.com/uber/jaeger-client-go/log
-	// and github.com/uber/jaeger-lib/metrics respectively to bind to real logging and metrics
-	// frameworks.
+	// Create logger and metrics factory.
 	jLogger := jaegerlog.StdLogger
 	jMetricsFactory := jprom.New()
 
-	// Sample configuration for testing. Use constant sampling to sample every trace
-	// and enable LogSpan to log every span via configured Logger.
 	cfg, err := jaegercfg.FromEnv()
 	if err != nil || cfg.ServiceName == "" {
 		cfg = &jaegercfg.Configuration{
-			ServiceName: "GoBoiler.WebApi",
+			ServiceName: "CarpoolAPI",
 			Sampler: &jaegercfg.SamplerConfig{
 				Type:  jaeger.SamplerTypeConst,
 				Param: 1,
@@ -176,9 +166,6 @@ func createSpan(spanName string, r *http.Request) (span opentracing.Span) {
 	ext.HTTPMethod.Set(span, r.Method)
 	return span
 }
-
-// ErrInvalidRatingPath is an error message when the Rating path is not valid
-var ErrInvalidRatingPath = fmt.Errorf("invalid Path, path should be /Details/[id]")
 
 // GenericError is a generic error message returned by a server
 type GenericError struct {

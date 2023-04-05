@@ -1,7 +1,9 @@
+// Package domain is the package that holds the very basic domain objects
 package domain
 
 import "time"
 
+// Trip is the domain object for a trip
 type Trip struct {
 	ID             string
 	SupplierID     string
@@ -14,6 +16,7 @@ type Trip struct {
 	Note           string
 }
 
+// TripDetail is the domain object for a trip with conversations
 type TripDetail struct {
 	ID             string
 	SupplierID     string
@@ -26,10 +29,4 @@ type TripDetail struct {
 	AvailableSeats int
 	Note           string
 	Conversations  []Conversation
-}
-
-type ErrInvalidCapacity struct{}
-
-func (e ErrInvalidCapacity) Error() string {
-	return "requested capacity is greater than available capacity"
 }

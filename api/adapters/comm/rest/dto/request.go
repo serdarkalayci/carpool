@@ -1,5 +1,7 @@
+// Package dto is the package that defines types for data transfer
 package dto
 
+// AddRequestRequest is the request object for adding a request
 type AddRequestRequest struct {
 	CountryID      string   `json:"countryid" validate:"required"`
 	Origin         string   `json:"origin" validate:"required"`
@@ -8,6 +10,7 @@ type AddRequestRequest struct {
 	Dates          []string `json:"dates" validate:"required"`
 }
 
+// RequestListResponse is the response object for a list of requests, which lacks some fields
 type RequestListResponse struct {
 	ID             string   `json:"id"`
 	Origin         string   `json:"origin"`
@@ -17,6 +20,7 @@ type RequestListResponse struct {
 	State          string
 }
 
+// RequestResponse is the response object for a request in full
 type RequestResponse struct {
 	ID             string   `json:"id"`
 	RequesterID    string   `json:"requesterid"`
