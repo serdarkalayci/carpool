@@ -33,7 +33,9 @@ func NewTripService(dc DataContextCarrier) TripService {
 func (ts TripService) AddTrip(trip domain.Trip) error {
 	// Check if the destination is valid
 	if ts.dc.GetGeographyRepository() == nil {
-		log.Fatal().Msg("geographyRepository is not set")
+		err := apperr.ErrMissingRepository{}
+		log.Error().Msg("geographyRepository is missing")
+		return err
 	}
 	correct, err := ts.dc.GetGeographyRepository().CheckBallotCity(trip.CountryID, trip.Destination)
 	if err != nil {
@@ -54,7 +56,9 @@ func (ts TripService) GetTrips(countryID string, origin, destination string) ([]
 // GetTrip gets the trip from the repository based on the tripID and userID
 func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail, error) {
 	if ts.dc.GetConversationRepository() == nil {
-		log.Fatal().Msg("conversationRepository is not set")
+		err := apperr.ErrMissingRepository{}
+		log.Error().Msg("conversationRepository is missing")
+		return nil, err
 	}
 	tripDetail, err := ts.dc.GetTripRepository().GetTripByID(tripID)
 	if err != nil {
