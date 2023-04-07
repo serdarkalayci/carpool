@@ -78,11 +78,11 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 			}
 			if conversation != nil {
 				tripDetail.Conversations = append(tripDetail.Conversations, *conversation)
-				// Because requester is reading the conversation, we need to mark the messages directed to them as read
-				err = ts.dc.GetConversationRepository().MarkConversationsRead(conversation.ConversationID, "out")
-				if err != nil {
-					return nil, err
-				}
+				// // Because requester is reading the conversation, we need to mark the messages directed to them as read
+				// err = ts.dc.GetConversationRepository().MarkConversationsRead(conversation.ConversationID, "out")
+				// if err != nil {
+				// 	return nil, err
+				// }
 			}
 		}
 	} else {
