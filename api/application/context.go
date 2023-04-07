@@ -34,7 +34,7 @@ func (dc *DataContext) SetRepositories(ur UserRepository, hr HealthRepository, g
 
 // GetUserRepository returns the user repository
 func (dc *DataContext) GetUserRepository() UserRepository {
-	return dc.GetUserRepository()
+	return dc.userRepository
 }
 
 // GetHealthRepository returns the health repository
@@ -44,20 +44,20 @@ func (dc *DataContext) GetHealthRepository() HealthRepository {
 
 // GetGeographyRepository returns the geography repository
 func (dc *DataContext) GetGeographyRepository() GeographyRepository {
-	return dc.GetGeographyRepository()
+	return dc.geographyRepository
 }
 
 // GetTripRepository returns the trip repository
 func (dc *DataContext) GetTripRepository() TripRepository {
-	return dc.GetTripRepository()
+	return dc.tripRepository
 }
 
 // GetConversationRepository returns the conversation repository
 func (dc *DataContext) GetConversationRepository() ConversationRepository {
-	return dc.GetConversationRepository()
+	return dc.conversationRepository
 }
 
 // GetRequestRepository returns the request repository
 func (dc *DataContext) GetRequestRepository() RequestRepository {
-	return dc.GetRequestRepository()
+	return dc.requestRepository
 }
