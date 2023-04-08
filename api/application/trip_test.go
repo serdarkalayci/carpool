@@ -239,6 +239,29 @@ func TestGetTripAsSupplier(t *testing.T) {
 	assert.Equal(t, 2, len(trip.Conversations))
 }
 
+func TestGetTripByID(t *testing.T) {
+	mc := &MockContext{}
+	mc.SetRepositories(nil, nil, nil, &mockTripRepository{}, nil, nil)
+	ts := NewTripService(mc)
+	// Check the case when GetTripCapacity returns an error
+	getTripByIDFunc = func(tripID string) (*domain.TripDetail, error) {
+		return nil, apperr.ErrTripNotFound{}
+	}
+	trip, err := ts.GetTripByID("trip1")
+	assert.ErrorAs(t, err, &apperr.ErrTripNotFound{})
+	assert.Nil(t, trip)
+	// Check the case when GetTripCapacity returns a trip detail
+	getTripByIDFunc = func(tripID string) (*domain.TripDetail, error) {
+		return &domain.TripDetail{
+			ID: "trip1",
+		}, nil
+	}
+	trip, err = ts.GetTripByID("trip1")
+	assert.Nil(t, err)
+	assert.NotNil(t, trip)
+	assert.Equal(t, "trip1", trip.ID)
+}
+
 func TestSetTripCapacity(t *testing.T) {
 	mc := &MockContext{}
 	mc.SetRepositories(nil, nil, nil, &mockTripRepository{}, nil, nil)

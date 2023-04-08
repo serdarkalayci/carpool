@@ -30,7 +30,7 @@ func newUserRepository(client *mongo.Client, databaseName string) UserRepository
 	}
 }
 
-// GetUser returns one user with the given ID if it exists in the array, returns not found error otherwise
+// GetUser returns one user with the given ID if it exists in the database, returns not found error otherwise
 func (ur UserRepository) GetUser(ID string) (domain.User, error) {
 	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -48,7 +48,7 @@ func (ur UserRepository) GetUser(ID string) (domain.User, error) {
 	return mappers.MapUserDAO2User(userDAO), nil
 }
 
-// AddUser adds a new user to the array in the memory
+// AddUser adds a new user to the database
 func (ur UserRepository) AddUser(u domain.User) (string, error) {
 	collection := ur.dbClient.Database(ur.dbName).Collection(viper.GetString("UsersCollection"))
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

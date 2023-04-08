@@ -37,18 +37,20 @@ func NewConversationService(dc DataContextCarrier) ConversationService {
 
 // InitiateConversation initiates a conversation between a supplier and a requester
 func (cs ConversationService) InitiateConversation(tripID string, requesterID string, capacity int, message string) error {
-	// First let's get Supplier details from trip
-	trip, err := cs.dc.GetTripRepository().GetTripByID(tripID)
+	// First let's get Supplier details from trip. For this we need to set up the trip service
+	ts := NewTripService(cs.dc)
+	trip, err := ts.GetTripByID(tripID)
 	if err != nil {
 		return err
 	}
 	// Then let's get Requester details from user
-	requester, err := cs.dc.GetUserRepository().GetUser(requesterID)
+	us := NewUserService(cs.dc)
+	requester, err := us.GetUser(requesterID)
 	if err != nil {
 		return err
 	}
 	// Also let's get the supplier details from user because we need their contact details
-	supplier, err := cs.dc.GetUserRepository().GetUser(trip.SupplierID)
+	supplier, err := us.GetUser(trip.SupplierID)
 	if err != nil {
 		return err
 	}
@@ -152,7 +154,7 @@ func (cs ConversationService) GetConversations(tripID string) ([]domain.Conversa
 // UpdateApproval updates the approval status of a conversation
 func (cs ConversationService) UpdateApproval(conversationID string, userID string, approved bool) error {
 	if cs.dc.GetTripRepository() == nil {
-		log.Fatal().Msg("tripRepository is not set")
+		return apperr.ErrMissingRepository{}
 	}
 	// First check that this user is the supplier of this trip
 	supplier, err := cs.dc.GetConversationRepository().CheckConversationOwnership(conversationID, userID)

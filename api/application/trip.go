@@ -97,6 +97,11 @@ func (ts TripService) GetTrip(tripID string, userID string) (*domain.TripDetail,
 	return tripDetail, nil
 }
 
+// GetTripByID gets the trip from the repository based on the tripID and returns it without any logic added
+func (ts TripService) GetTripByID(tripID string) (*domain.TripDetail, error) {
+	return ts.dc.GetTripRepository().GetTripByID(tripID)
+}
+
 // SetTripCapacity sets the trip capacity to the repository
 func (ts TripService) SetTripCapacity(tripID string, demand int) error {
 	currentCap, err := ts.dc.GetTripRepository().GetTripCapacity(tripID)

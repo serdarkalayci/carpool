@@ -13,9 +13,9 @@ func (e ErrInvalidID) Error() string {
 	return fmt.Sprintf("invalid %s ID: %s", e.Name, e.Value)
 }
 
-// ErrInvalidDestination is an error that is returned when a required respository is not set.
+// ErrMissingRepository is an error that is returned when a required respository is not set.
 type ErrMissingRepository struct{}
 
 func (e ErrMissingRepository) Error() string {
-	return "an internal problem occured"
+	return "an internal problem occurred"
 }
