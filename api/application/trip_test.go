@@ -68,7 +68,7 @@ func TestAddTrip(t *testing.T) {
 		return apperr.ErrInvalidDestination{}
 	}
 	err := ts.AddTrip(trip)
-	assert.EqualError(t, err, "an internal problem occured")
+	assert.EqualError(t, err, "an internal problem occurred")
 	// Set the GeographyRepository
 	mc.SetRepositories(nil, nil, &mockGeographyRepository{}, &mockTripRepository{}, nil, nil)
 	// First check if CheckBallotCity returns an error
@@ -122,7 +122,7 @@ func TestGetTrip(t *testing.T) {
 		return apperr.ErrInvalidDestination{}
 	}
 	trip, err := ts.GetTrip("trip1", "user1")
-	assert.EqualError(t, err, "an internal problem occured")
+	assert.EqualError(t, err, "an internal problem occurred")
 	assert.Nil(t, trip)
 	// Set the ConversationRepository
 	mc.SetRepositories(nil, nil, nil, &mockTripRepository{}, &mockConversationRepository{}, nil)
