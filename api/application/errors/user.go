@@ -8,6 +8,22 @@ func (e ErrUserNotFound) Error() string {
 	return "user not found"
 }
 
+// ErrWrongCredentials is returned when a user tries to login with wrong credentials.
+type ErrWrongCredentials struct{}
+
+func (e ErrWrongCredentials) Error() string {
+	return "wrong credentials"
+}
+
+// ErrPasswordNotStrong is returned when a user tries to register with a password that is not strong enough.
+type ErrPasswordNotStrong struct {
+	Reason string
+}
+
+func (e ErrPasswordNotStrong) Error() string {
+	return "password is not strong enough. " + e.Reason
+}
+
 // DuplicateKeyError is returned when a user tries to register with an email or phone number that already exists.
 type DuplicateKeyError struct{}
 

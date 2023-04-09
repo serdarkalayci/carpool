@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"unicode"
 
+	apperr "github.com/serdarkalayci/carpool/api/application/errors"
 	"github.com/serdarkalayci/carpool/api/domain"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
@@ -47,11 +48,14 @@ func (us UserService) CheckUser(username string, password string) (domain.User, 
 	if comparePasswords(password, user.Password) {
 		return user, nil
 	}
-	return domain.User{}, fmt.Errorf("wrong password")
+	return domain.User{}, apperr.ErrWrongCredentials{}
 }
 
 // AddUser adds a new user to the repository by first hashing its password
 func (us UserService) AddUser(u domain.User) error {
+	if err := checkPassword(u.Password); err != nil {
+		return err
+	}
 	u.Password = hashPassword(u.Password)
 	newUID, err := us.dc.GetUserRepository().AddUser(u)
 	if err != nil {
@@ -82,16 +86,16 @@ func (us UserService) CheckConfirmationCode(userID string, confirmationCode stri
 func (us UserService) addConfirmationCode(u domain.User) error {
 	confirmationCode := randomString(7)
 	err := us.dc.GetUserRepository().AddConfirmationCode(u.ID, confirmationCode)
-	if err == nil {
-		// Send email to user with the confirmation code
-		sendConfirmationEmail(u, confirmationCode)
+	if err != nil {
+		return err
 	}
+	// Send email to user with the confirmation code
+	sendConfirmationEmail(u, confirmationCode)
 	return nil
 }
 
 func randomString(n int) string {
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
 	s := make([]rune, n)
 	for i := range s {
 		s[i] = letters[rand.Intn(len(letters))]
@@ -133,7 +137,7 @@ func comparePasswords(plaintextPassword string, hashedPassword string) bool {
 
 func checkPassword(password string) error {
 	if len(password) < 6 {
-		return fmt.Errorf("password must be at least 6 characters")
+		return apperr.ErrPasswordNotStrong{Reason: "password must be at least 6 characters"}
 	}
 next:
 	for name, classes := range map[string][]*unicode.RangeTable{
@@ -147,7 +151,7 @@ next:
 				continue next
 			}
 		}
-		return fmt.Errorf("password must have at least one %s character", name)
+		return apperr.ErrPasswordNotStrong{Reason: fmt.Sprintf("password must have at least one %s character", name)}
 	}
 	return nil
 }
