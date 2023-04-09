@@ -8,6 +8,7 @@ RUN apk update && apk add --no-cache git
 WORKDIR $GOPATH/src/carpool/
 COPY . .
 # Fetch dependencies. Install go-swagger package to automate the generation of RESTful API documentation.
+RUN go get github.com/go-swagger/go-swagger/cmd/swagger
 RUN go install github.com/go-swagger/go-swagger/cmd/swagger
 # Using go get.
 RUN go get -d -v
