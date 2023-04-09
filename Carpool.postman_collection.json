@@ -248,7 +248,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"countryid\":\"641f01dfcc0d85792b29d254\",\n    \"origin\":\"Tilburg\",\n    \"destination\":\"Rotterdam\",\n    \"stops\":[\"Haarlem\", \"Almere\",\"Eindhoven\"],\n    \"tripdate\": \"2023-03-26\",\n    \"availableseats\":5,\n    \"note\":\"not yok bu kez\"\n}",
+					"raw": "{\n    \"countryid\":\"641f01dfcc0d85792b29d254\",\n    \"origin\":\"Almere\",\n    \"destination\":\"Amsterdam\",\n    \"stops\":[\"Haarlem\", \"Eindhoven\"],\n    \"tripdate\": \"2023-03-26\",\n    \"availableseats\":5,\n    \"note\":\"not yok bu kez\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -314,13 +314,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/conversation/6428245df5a1ed328039974f",
+					"raw": "{{url}}/conversation/64297829ba8c37c6e6504778",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"conversation",
-						"6428245df5a1ed328039974f"
+						"64297829ba8c37c6e6504778"
 					]
 				}
 			},
@@ -360,7 +360,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"tripID\": \"642823e0f5a1ed328039974e\",\n    \"message\": \"bize kaca olur?\"\n}",
+					"raw": "{\n    \"tripID\": \"642823e0f5a1ed328039974e\",\n    \"capacity\": 3,\n    \"message\": \"ben gelebilirim\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -394,14 +394,81 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/conversation/6428245df5a1ed328039974f/approval",
+					"raw": "{{url}}/conversation/64297829ba8c37c6e6504778/approval",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"conversation",
-						"6428245df5a1ed328039974f",
+						"64297829ba8c37c6e6504778",
 						"approval"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Trip Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"countryid\": \"641f01dfcc0d85792b29d254\",\n    \"origin\": \"Haarlem\",\n    \"destination\": \"Amsterdam\",\n    \"requestedseats\": 2,\n    \"dates\": [\n        \"2023-03-26\", \"2023-03-27\", \"2023-03-28\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/request",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Requests",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/request?countryid=641f01dfcc0d85792b29d254",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"request"
+					],
+					"query": [
+						{
+							"key": "countryid",
+							"value": "641f01dfcc0d85792b29d254"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Request",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/request/642a0555d7891179f018cbf1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"request",
+						"642a0555d7891179f018cbf1"
 					]
 				}
 			},
