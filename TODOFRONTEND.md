@@ -1,3 +1,0 @@
-# carpool
-
-[![Go](https://github.com/serdarkalayci/carpool/actions/workflows/go.yml/badge.svg)](https://github.com/serdarkalayci/carpool/actions/workflows/go.yml)  [![CodeQL](https://github.com/serdarkalayci/carpool/actions/workflows/codeql.yml/badge.svg)](https://github.com/serdarkalayci/carpool/actions/workflows/codeql.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/serdarkalayci/carpool/api)](https://goreportcard.com/report/github.com/serdarkalayci/carpool/api)  [![Coverage Status](https://coveralls.io/repos/github/serdarkalayci/carpool/badge.svg?branch=main)](https://coveralls.io/github/serdarkalayci/carpool?branch=main)
