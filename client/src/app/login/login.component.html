@@ -1,1 +1,16 @@
-<p>login works!</p>
+<div class='row'>
+    <div class='col-md-2'>Username:</div>
+    <div class='col-md-4'><input type='text' [(ngModel)]='username'/></div>
+</div>
+
+<div class='row'>
+    <div class='col-md-2'>Password:</div>
+    <div class='col-md-4'><input type='text' [(ngModel)]='password'/></div>
+</div>
+
+<div class='row'>
+    <button class='btn btn-primary'
+            (click)='login()'>
+        Submit
+    </button>
+</div>
