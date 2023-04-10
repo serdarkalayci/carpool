@@ -19,3 +19,4 @@ api/api
 .DS_Store
 api/__debug_bin
 .vscode
+wasmclient/html/carpool.wasm

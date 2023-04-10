@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+  carpoolapi:
+    build: ./api/.
+    container_name: carpoolAPI
+    ports:
+      - "5550:5550"
+    environment: 
+      BASE_URL : ":5550"
+      JAEGER_AGENT_HOST : "jaeger"
+      JAEGER_AGENT_PORT : 6831
+      ConnectionString: "mongodb://{username}:{password}@mongo:27017"
+      DatabaseName: carpool
+      DbUserName: mongoadmin
+      DbPassword: secret
+    networks:
+      - carpool-network
+    depends_on:
+      - mongo
+  mongo:
+    build: ./mongodb/.
+    container_name: carpool-mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: carpool
+    volumes: 
+      - carpool-mongodata:/data/db
+    networks:
+      - carpool-network
+networks:
+  carpool-network:    
+volumes:
+  carpool-mongodata:
+

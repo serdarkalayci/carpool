@@ -8,7 +8,8 @@ db.users.insertMany([
         "name": "Serdar Kalaycı",
         "email": "s@s.s",
         "phone": "1234567890",
-        "password": "$2a$10$posOxYV44LyCyfXeuYazw.kBDNQGfWkE2Vb2rkLmVznQPJNvvcaV6"
+        "password": "$2a$10$posOxYV44LyCyfXeuYazw.kBDNQGfWkE2Vb2rkLmVznQPJNvvcaV6",
+        "active": true,
     }
 ])
 

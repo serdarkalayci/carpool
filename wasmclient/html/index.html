@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css" type="text/css" media="screen" />
+</head>
+<body>
+<script src="wasm_exec.js"></script>
+<script src="load_wasm.js"></script>
+<script>
+    function do_login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        login(email, password);
+        
+    }
+</script>
+<script>
+    loadWasm("./carpool.wasm")
+        .then((wasm) => {
+            console.log("carpool.wasm is loaded 👋");
+        })
+        .catch((error) => {
+            console.log("ouch", error);
+        });
+</script>
+<div id="wrapper">
+    <div id="login"=>
+        <h1>Car Pool</h1>
+        <form action="javascript:do_login()">
+            <label for="email">Email:</label>
+            <input type="text" name="email" id="email" />
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" />
+            <input type="submit" value="Login" />
+        </form>
+    </div>
+    <div id="nav"></div>
+    <div id="content">No content to show</div>
+</div>
+</div>
+</body>
+</html>
