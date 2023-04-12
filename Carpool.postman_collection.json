@@ -473,6 +473,29 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Relate Request to Trip",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/request/642a0555d7891179f018cbf1/trip/64346ae55ea80b6d77583b31",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"request",
+						"642a0555d7891179f018cbf1",
+						"trip",
+						"64346ae55ea80b6d77583b31"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

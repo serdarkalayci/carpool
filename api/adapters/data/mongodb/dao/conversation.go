@@ -7,6 +7,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type ConversationDAO struct {
 	ID                primitive.ObjectID `bson:"_id"`
 	TripID            primitive.ObjectID `bson:"tripid"`
+	RequestID         primitive.ObjectID `bson:"requestid"`
 	RequesterID       primitive.ObjectID `bson:"requesterid"`
 	RequesterName     string             `bson:"requestername"`
 	SupplierID        primitive.ObjectID `bson:"supplierid"`

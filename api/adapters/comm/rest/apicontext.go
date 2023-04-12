@@ -123,6 +123,8 @@ func (apiContext *APIContext) prepareContext(bindAddress *string) *http.Server {
 	postTRR.HandleFunc("/request", apiContext.AddRequest)
 	getR.HandleFunc("/request", apiContext.GetRequests)
 	getR.HandleFunc("/request/{requestid}", apiContext.GetRequest)
+	putTRR := sm.Methods(http.MethodPut).Subrouter() // TripRequest subrouter for PUT method
+	putTRR.HandleFunc("/request/{requestid}/trip/{tripid}", apiContext.RelateRequestToTrip)
 	// Documentation handler
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := openapimw.Redoc(opts, nil)

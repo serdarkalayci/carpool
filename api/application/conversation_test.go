@@ -62,6 +62,93 @@ func (m mockConversationRepository) UpdateApproval(conversationID string, suppli
 	return updateApprovalFunc(conversationID, supplierApprove, requesterApprove)
 }
 
+func TestInitiateConversationForRequest(t *testing.T) {
+	mc := &MockContext{}
+	mc.SetRepositories(&mockUserRepository{}, nil, nil, &mockTripRepository{}, &mockConversationRepository{}, &mockRequestRepository{})
+	cs := NewConversationService(mc)
+	// Check the case when GetTripCapacity returns an error
+	getTripByIDFunc = func(tripID string) (*domain.TripDetail, error) {
+		return nil, apperr.ErrTripNotFound{}
+	}
+	err := cs.InitiateConversationForRequest("trip1", "request1")
+	assert.ErrorAs(t, err, &apperr.ErrTripNotFound{})
+	// Check the case when GetTripCapacity returns a trip detail and GetRequest returns an error
+	getTripByIDFunc = func(tripID string) (*domain.TripDetail, error) {
+		return &domain.TripDetail{
+			ID:             "trip1",
+			SupplierID:     "supplier1",
+			AvailableSeats: 3,
+		}, nil
+	}
+	getRequestFunc = func(requestID string) (*domain.Request, error) {
+		return nil, apperr.ErrRequestNotFound{}
+	}
+	err = cs.InitiateConversationForRequest("trip1", "request1")
+	assert.ErrorAs(t, err, &apperr.ErrRequestNotFound{})
+	// Fix the GetRequest function
+	getRequestFunc = func(requestID string) (*domain.Request, error) {
+		return &domain.Request{
+			ID:             "request1",
+			RequesterID:    "requester1",
+			RequesterName:  "requester1",
+			RequestedSeats: 2,
+		}, nil
+	}
+	// now, the application will try to get requster by its ID and the supplier by its ID from the trip
+	// because it's the same method which returns the users, we have to set it accordingly
+	// first set it to return and error for the requester
+	getUserFunc = func(userID string) (domain.User, error) {
+		if userID == "requester1" {
+			return domain.User{}, apperr.ErrUserNotFound{}
+		}
+		return domain.User{
+			ID:   "supplier1",
+			Name: "supplier1",
+		}, nil
+	}
+	err = cs.InitiateConversationForRequest("trip1", "request1")
+	assert.ErrorAs(t, err, &apperr.ErrUserNotFound{})
+	// now, set it to return an error for the supplier
+	getUserFunc = func(userID string) (domain.User, error) {
+		if userID == "requester1" {
+			return domain.User{
+				ID:   "requester1",
+				Name: "requester1",
+			}, nil
+
+		}
+		return domain.User{}, apperr.ErrUserNotFound{}
+	}
+	err = cs.InitiateConversationForRequest("trip1", "request1")
+	assert.ErrorAs(t, err, &apperr.ErrUserNotFound{})
+	// now, set it to return a user for both the requester and the supplier
+	// now, set it to return an error for the supplier
+	getUserFunc = func(userID string) (domain.User, error) {
+		if userID == "requester1" {
+			return domain.User{
+				ID:   "requester1",
+				Name: "requester1",
+			}, nil
+
+		}
+		return domain.User{
+			ID:   "supplier1",
+			Name: "supplier1",
+		}, nil
+	}
+	// now, the application will try to initiate a conversation
+	initiateConversationFunc = func(conversation domain.Conversation) error {
+		return errors.New("some database error")
+	}
+	err = cs.InitiateConversationForRequest("trip1", "request1")
+	assert.EqualError(t, err, "some database error")
+	// now test the case where 1nitiateConversation does not return an error
+	initiateConversationFunc = func(conversation domain.Conversation) error {
+		return nil
+	}
+	err = cs.InitiateConversationForRequest("trip1", "request1")
+	assert.NoError(t, err)
+}
 func TestInitiateConversation(t *testing.T) {
 	mc := &MockContext{}
 	mc.SetRepositories(&mockUserRepository{}, nil, nil, &mockTripRepository{}, &mockConversationRepository{}, nil)

@@ -6,6 +6,7 @@ import "time"
 // Conversation is the domain object for a conversation
 type Conversation struct {
 	TripID            string
+	RequestID         string
 	ConversationID    string
 	RequesterID       string
 	RequesterName     string

@@ -78,6 +78,7 @@ func (apiContext *APIContext) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Aceess-Control-Expose-Headers", "Set-Cookie")
 
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
@@ -138,6 +139,8 @@ func checkLogin(r *http.Request) (status bool, httpStatusCode int, claims *Claim
 
 // Refresh handles the refresh request, and refreshes the validity period of the token
 func (apiContext *APIContext) Refresh(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	status, _, claims := checkLogin(r)
 	if status {
 		// We ensure that a new token is not issued until enough time has elapsed

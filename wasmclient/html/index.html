@@ -23,19 +23,20 @@
             console.log("ouch", error);
         });
 </script>
-<div id="wrapper">
-    <div id="login"=>
+<div id="wrapper" align="center" style="width: 90%; align-items: center;">
+    <p id="error" />
+    <div id="login">
         <h1>Car Pool</h1>
         <form action="javascript:do_login()">
             <label for="email">Email:</label>
             <input type="text" name="email" id="email" />
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" />
-            <input type="submit" value="Login" />
+            <br><input type="submit" value="Login" />
+            <br><p id="login_status" />
         </form>
     </div>
-    <div id="nav"></div>
-    <div id="content">No content to show</div>
+    <div id="main">MAIN</div>
 </div>
 </div>
 </body>

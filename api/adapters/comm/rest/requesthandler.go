@@ -94,3 +94,28 @@ func (apiContext *APIContext) GetRequest(rw http.ResponseWriter, r *http.Request
 		respondWithError(rw, r, 401, "Unauthorized")
 	}
 }
+
+// swagger:route PUT /request/{requestID}/trip/{tripID} Request RelateRequestToTrip
+// Relates a request to a trip
+// responses:
+//	200: OK
+//	404: errorResponse
+
+// RelateRequestToTrip creates a new conversation connecting a request and a trip
+func (apiContext *APIContext) RelateRequestToTrip(rw http.ResponseWriter, r *http.Request) {
+	status, _, _ := checkLogin(r)
+	if status {
+		requestService := application.NewRequestService(apiContext.dbContext)
+		vars := mux.Vars(r)
+		requestID := vars["requestid"]
+		tripID := vars["tripid"]
+		err := requestService.RelateRequestToTrip(requestID, tripID)
+		if err == nil {
+			respondOK(rw, r, 200)
+		} else {
+			respondWithError(rw, r, 500, err.Error())
+		}
+	} else {
+		respondWithError(rw, r, 401, "Unauthorized")
+	}
+}

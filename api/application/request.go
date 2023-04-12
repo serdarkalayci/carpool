@@ -10,6 +10,7 @@ type RequestRepository interface {
 	AddRequest(request domain.Request) error
 	GetRequests(countryID string, origin string, destination string) (*[]domain.Request, error)
 	GetRequest(requestID string) (*domain.Request, error)
+	SetRequestStatus(requestID string, state int) error
 }
 
 // RequestService is the struct that holds the methods for request service. RequestHandler depends on this interface.
@@ -37,4 +38,14 @@ func (rs RequestService) AddRequest(request domain.Request) error {
 // GetRequest is the method that gets a request from the repository bu its ID.
 func (rs RequestService) GetRequest(requestID string) (*domain.Request, error) {
 	return rs.dc.GetRequestRepository().GetRequest(requestID)
+}
+
+// RelateRequestToTrip is the method that relates a request to a trip by creating a conversation between them.
+func (rs RequestService) RelateRequestToTrip(requestID string, tripID string) error {
+	cs := NewConversationService(rs.dc)
+	err := cs.InitiateConversationForRequest(tripID, requestID)
+	if err != nil {
+		return err
+	}
+	return rs.dc.GetRequestRepository().SetRequestStatus(requestID, 1)
 }

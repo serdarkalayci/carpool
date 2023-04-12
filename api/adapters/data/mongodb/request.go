@@ -103,3 +103,25 @@ func (rr RequestRepository) GetRequest(requestID string) (*domain.Request, error
 	}
 	return mappers.MapRequestDAO2Request(&request), nil
 }
+
+// SetRequestStatus sets the status of a request
+func (rr RequestRepository) SetRequestStatus(requestID string, state int) error {
+	collection := rr.dbClient.Database(rr.dbName).Collection(viper.GetString("RequestCollection"))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	requestObjID, err := primitive.ObjectIDFromHex(requestID)
+	if err != nil {
+		log.Error().Err(err).Msgf("invalid requestID: %s", requestID)
+		return apperr.ErrInvalidID{Name: "requestID", Value: requestID}
+	}
+	update := bson.M{"$set": bson.M{"state": state}}
+	result, err := collection.UpdateByID(ctx, requestObjID, update)
+	if err != nil {
+		log.Error().Err(err).Msgf("error updating request with ID: %s", requestID)
+		return apperr.ErrRequestNotUpdated{}
+	}
+	if result.MatchedCount == 0 {
+		return apperr.ErrRequestNotFound{}
+	}
+	return nil
+}

@@ -14,3 +14,10 @@ type ErrRequestNotInserted struct{}
 func (e ErrRequestNotInserted) Error() string {
 	return "cannot add request"
 }
+
+// ErrRequestNotUpdated is returned when a request cannot be updated in the database.
+type ErrRequestNotUpdated struct{}
+
+func (e ErrRequestNotUpdated) Error() string {
+	return "cannot update request"
+}

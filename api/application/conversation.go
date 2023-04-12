@@ -35,6 +35,64 @@ func NewConversationService(dc DataContextCarrier) ConversationService {
 	}
 }
 
+func (cs ConversationService) InitiateConversationForRequest(tripID string, requestID string) error {
+	// First let's get Supplier details from trip. For this we need to set up the trip service
+	ts := NewTripService(cs.dc)
+	trip, err := ts.GetTripByID(tripID)
+	if err != nil {
+		return err
+	}
+	// Get Request details from request
+	rs := NewRequestService(cs.dc)
+	request, err := rs.GetRequest(requestID)
+	if err != nil {
+		return err
+	}
+	// Then let's get Requester details from user
+	us := NewUserService(cs.dc)
+	requester, err := us.GetUser(request.RequesterID)
+	if err != nil {
+		return err
+	}
+	// Also let's get the supplier details from user because we need their contact details
+	supplier, err := us.GetUser(trip.SupplierID)
+	if err != nil {
+		return err
+	}
+	// This must be an invitation from the supplier, so we'll autogenerate the message and its direction will be "out"
+	message := fmt.Sprintf(viper.GetViper().GetString("InvitationMessage"), trip.SupplierName)
+	direction := "out"
+	conversation := domain.Conversation{
+		TripID:            tripID,
+		RequestID:         requestID,
+		RequesterID:       request.RequesterID,
+		RequesterName:     requester.Name,
+		SupplierID:        trip.SupplierID,
+		SupplierName:      trip.SupplierName,
+		RequestedCapacity: request.RequestedSeats,
+		Messages: []domain.Message{
+			{
+				Direction: direction,
+				Text:      message,
+				Date:      time.Now(),
+			},
+		},
+		RequesterContact: domain.ContactDetails{
+			Email: requester.Email,
+			Phone: requester.Phone,
+		},
+		SupplierContact: domain.ContactDetails{
+			Email: supplier.Email,
+			Phone: supplier.Phone,
+		},
+	}
+	err = cs.dc.GetConversationRepository().InitiateConversation(conversation)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // InitiateConversation initiates a conversation between a supplier and a requester
 func (cs ConversationService) InitiateConversation(tripID string, requesterID string, capacity int, message string) error {
 	// First let's get Supplier details from trip. For this we need to set up the trip service
