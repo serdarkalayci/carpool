@@ -12,8 +12,14 @@ export class TripService {
   constructor(private http: HttpClient, private errorsService: ErrorsService) {
   }
 
-  getTripsFromCountry(countryId: string): Observable<ITrip[]> {
-    return this.http.get<ITrip[]>("/api/trip?countryid=" + countryId)
+  getTripsFromCountry(countryId: string, from: string, to: string): Observable<ITrip[]> {
+    let url = "/api/trip?countryid=" + countryId;
+    console.log("from and to")
+    console.log(from);
+    console.log(to);
+    url += "&origin="+from;
+    url += "&destination="+to;
+    return this.http.get<ITrip[]>(url)
       .pipe(
         tap(data => console.log('All: ', data)),
         catchError(this.errorsService.handleError)
