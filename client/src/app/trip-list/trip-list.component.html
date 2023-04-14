@@ -1,1 +1,44 @@
-<p>trip-list works!</p>
+<div class='card'>
+    <div class='card-header'>
+        Yolculuklar
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Ulkeler:</div>
+            <div class='col-md-4'>
+                <select class="form-control">
+                    <option *ngFor="let country of countryList">{{country.name}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class='table-responsive'>
+        <table class='table'
+               *ngIf='tripList.length'>
+            <thead>
+            <tr>
+
+                <th>id</th>
+                <th>origin</th>
+                <th>destination</th>
+                <th>tripdate</th>
+                <th>availableseats</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor='let trip of tripList'>
+                <td>{{ trip.id}}</td>
+                <td>{{ trip.origin}}</td>
+                <td>{{ trip.destination}}</td>
+                <td>{{ trip.tripdate}}</td>
+                <td>{{ trip.availableseats}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div *ngIf='errorMessage'
+     class='alert alert-danger'>
+    Error: {{ errorMessage }}
+</div>
+
