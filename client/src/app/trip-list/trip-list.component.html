@@ -6,8 +6,8 @@
         <div class='row'>
             <div class='col-md-2'>Ulkeler:</div>
             <div class='col-md-4'>
-                <select class="form-control">
-                    <option *ngFor="let country of countryList">{{country.name}}</option>
+                <select [(ngModel)]="selectedCountryId" class="form-control" (change)="onChange()">
+                    <option *ngFor="let country of countryList" [value]="country.id">{{country.name}}</option>
                 </select>
             </div>
         </div>
@@ -17,17 +17,14 @@
                *ngIf='tripList.length'>
             <thead>
             <tr>
-
-                <th>id</th>
-                <th>origin</th>
-                <th>destination</th>
-                <th>tripdate</th>
-                <th>availableseats</th>
+                <th>nereden</th>
+                <th>nereye</th>
+                <th>ne zaman</th>
+                <th>kac kisi</th>
             </tr>
             </thead>
             <tbody>
             <tr *ngFor='let trip of tripList'>
-                <td>{{ trip.id}}</td>
                 <td>{{ trip.origin}}</td>
                 <td>{{ trip.destination}}</td>
                 <td>{{ trip.tripdate}}</td>

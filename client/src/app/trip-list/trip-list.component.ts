@@ -15,6 +15,7 @@ export class TripListComponent {
   countryList: ICountry[] = [];
   tripList: ITrip[] = []
   errorMessage = '';
+  selectedCountryId: string="";
 
   constructor(private countryService: CountryService,
               private tripService: TripService) {
@@ -24,19 +25,23 @@ export class TripListComponent {
     this.sub = this.countryService.getAllCountries().subscribe({
       next: countries => {
         this.countryList = countries;
-        this.setTrips(this.countryList[1]);
+        this.selectedCountryId =this.countryList[1].id;
+        this.setTrips();
       },
       error: err => this.errorMessage = err
     });
   }
 
-  private setTrips(country: ICountry) {
-    console.log(country.id);
-    this.tripService.getTripsFromCountry(country.id).subscribe({
+  private setTrips() {
+    this.tripService.getTripsFromCountry(this.selectedCountryId).subscribe({
       next: trips => {
         this.tripList = trips;
       },
       error: err => this.errorMessage = err
     });
+  }
+
+  onChange() {
+    this.setTrips()
   }
 }

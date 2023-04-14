@@ -14,7 +14,6 @@ In production, you should configure your backend API to allow cross-origin reque
 2. degisik env.lar yazilacak 
 3. cors ayari yapilacal
 4. i8s yapilacak
-5. login form bitecek.
 6. sag ustte kullanici adi goster
 7. input validations yapilacak
 8. error handling duzeltilecek
@@ -23,3 +22,4 @@ In production, you should configure your backend API to allow cross-origin reque
 Serdara sorular:
 
 UTC kaydedilmeli?
+trip list bossa empty trip donmeli
