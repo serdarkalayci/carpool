@@ -1,4 +1,4 @@
-import {inject, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {AppComponent} from './app.component';
@@ -11,12 +11,14 @@ import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from '@angular/common/http';
 import {NgxWebstorageModule} from "ngx-webstorage";
 import {domainGuard} from "./services/authenticationguard";
+import { LogoutComponent } from './logout/logout.component';
 
 const routes: Routes = [
   {path: 'welcome',component: WelcomeComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'trip-list', canActivate:[domainGuard],component: TripListComponent},
   {path: 'login', component: LoginComponent},
+  {path: 'logout', component: LogoutComponent},
   {path: '', redirectTo: 'welcome', pathMatch: 'full'},
   {path: '**', redirectTo: 'welcome', pathMatch: 'full'}
 ];
@@ -27,7 +29,8 @@ const routes: Routes = [
     WelcomeComponent,
     TripListComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserModule,

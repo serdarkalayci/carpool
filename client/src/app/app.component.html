@@ -4,7 +4,8 @@
         <li><a class='nav-link' routerLinkActive='active' routerLink='/trip-list'>Trip List</a></li>
     </ul>
     <ul class='nav nav-pills'>
-        <li><a class='nav-link' routerLinkActive='active' routerLink='/login'>Login</a></li>
+        <li><a class='nav-link' *ngIf=!isLoggedIn() routerLinkActive='active' routerLink='/login'>Login</a></li>
+        <li><a class='nav-link' *ngIf=isLoggedIn() routerLinkActive='active' routerLink='/logout'>Logout</a></li>
         <li><a class='nav-link' routerLinkActive='active' routerLink='/register'>Register</a></li>
     </ul>
 </nav>
