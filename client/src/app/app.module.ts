@@ -10,13 +10,13 @@ import {RouterModule, Routes} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from '@angular/common/http';
 import {NgxWebstorageModule} from "ngx-webstorage";
-import {domainGuard} from "./services/authenticationguard";
+import {authenticationGuard} from "./services/authenticationguard";
 import { LogoutComponent } from './logout/logout.component';
 
 const routes: Routes = [
   {path: 'welcome',component: WelcomeComponent},
   {path: 'register', component: RegisterComponent},
-  {path: 'trip-list', canActivate:[domainGuard],component: TripListComponent},
+  {path: 'trip-list', canActivate:[authenticationGuard],component: TripListComponent},
   {path: 'login', component: LoginComponent},
   {path: 'logout', component: LogoutComponent},
   {path: '', redirectTo: 'welcome', pathMatch: 'full'},

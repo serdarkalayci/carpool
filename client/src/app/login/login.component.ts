@@ -1,7 +1,5 @@
 import {Component} from '@angular/core';
 import {CarpoolusersService} from "../services/carpoolusers.service";
-import {LocalStorageService} from "ngx-webstorage";
-import {CookieService} from "ngx-cookie-service";
 
 @Component({
   selector: 'cp-login',
@@ -12,9 +10,7 @@ export class LoginComponent {
   private _username = '';
   private _password = '';
 
-  constructor(private carpoolusersService: CarpoolusersService,
-              private localStorage: LocalStorageService,
-              private cookieService: CookieService) {
+  constructor(private carpoolusersService: CarpoolusersService) {
   }
 
   get username(): string {
@@ -34,8 +30,6 @@ export class LoginComponent {
   }
 
   login() {
-
     this.carpoolusersService.login(this._username, this._password);
-
   }
 }
