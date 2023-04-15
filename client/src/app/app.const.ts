@@ -1,0 +1,1 @@
+export const BUTUN_SEHIRLER = 'Butun Sehirler';
