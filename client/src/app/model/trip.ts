@@ -4,4 +4,5 @@ export interface ITrip {
   destination: string;
   tripdate: string;
   availableseats:number;
+  stops: string[];
 }
