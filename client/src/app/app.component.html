@@ -9,10 +9,17 @@
         <li><a class='nav-link' routerLinkActive='active' routerLink='/register'>Kayit Ol</a></li>
     </ul>
 </nav>
-<div class='container'>
-    <div *ngIf=isError()
-         class='alert alert-danger'>
-        Error: {{ getErrorMessage() }}
+<div *ngIf=isError() [ngClass]="errorDivClass">
+    <div>
+        Hata: {{ errorMessage }}
     </div>
+</div>
+<div *ngIf=isInfo() [ngClass]="infoDivClass">
+    <div>
+        Bilgi: {{ infoMessage }}
+    </div>
+</div>
+
+<div class="container">
     <router-outlet></router-outlet>
 </div>
