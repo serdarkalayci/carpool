@@ -28,39 +28,26 @@ export class AppComponent {
   ngOnInit() {
     this.errorMessage = this.localStorageService.retrieve(ERROR_MESSAGE);
     this.localStorageService.observe(ERROR_MESSAGE).subscribe((newValue) => {
-      console.log(newValue);
-      console.log("new value came to error");
       this.errorMessage = newValue;
       if (newValue != null) {
         this.errorDivClass = this.ERROR_MESSAGE_VISIBLE;
-        this.delayedExecutionError();
-        console.log("right after")
+        this.delayedExecution(ERROR_MESSAGE);
       }
     });
     this.infoMessage = this.localStorageService.retrieve(INFO_MESSAGE);
     this.localStorageService.observe(INFO_MESSAGE).subscribe((newValue) => {
-      console.log("new value came to info");
-      console.log(newValue);
       this.infoMessage = newValue;
       if (newValue != null) {
-        this.infoDivClass = this.INFO_MESSAGE_HIDDEN;
-        this.delayedExecutionInfo();
-        console.log("right after")
+        this.infoDivClass = this.INFO_MESSAGE_VISIBLE;
+        this.delayedExecution(INFO_MESSAGE);
       }
     });
   }
 
-  delayedExecutionError() {
-    setTimeout(() => {
-      console.log("Hello world after 5 seconds!");
-      this.localStorageService.clear(ERROR_MESSAGE);
-    }, 5000);
-  }
 
-  delayedExecutionInfo() {
+  delayedExecution(key:string) {
     setTimeout(() => {
-      console.log("Hello world after 5 seconds!");
-      this.localStorageService.clear(INFO_MESSAGE);
+      this.localStorageService.clear(key);
     }, 5000);
   }
 

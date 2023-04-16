@@ -1,0 +1,8 @@
+<div class='card'>
+    <div class='card-header'>
+        Yolculuk ekle
+    </div>
+    <cp-location [allowAllCities]="false"
+                 (locationChanged)="onLocationChange($event)">
+    </cp-location>
+</div>

@@ -19,7 +19,7 @@ export class RegisterComponent {
   }
 
 
-  kaydol() {
+  register() {
     if (this.password == this.passwordAgain) {
       this.carpoolusersService.saveUser(this.name, this.password, this.email, this.phone);
     } else {

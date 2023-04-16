@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {ErrorsService} from "./errors.service";
 import {catchError, Observable} from "rxjs";
 import {ITrip} from "../model/trip";
-import {BUTUN_SEHIRLER} from "../app.const";
+import {ALL_CITIES} from "../app.const";
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +15,10 @@ export class TripService {
 
   getTripsFromCountry(countryId: string, from: string, to: string): Observable<ITrip[]> {
     let url = "/api/trip?countryid=" + countryId;
-    if(from!=BUTUN_SEHIRLER){
+    if(from!=ALL_CITIES){
       url += "&origin="+from;
     }
-    if(to!=BUTUN_SEHIRLER){
+    if(to!=ALL_CITIES){
       url += "&destination="+to;
     }
     return this.http.get<ITrip[]>(url)

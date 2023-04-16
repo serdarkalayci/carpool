@@ -40,7 +40,21 @@ export class CarpoolusersService {
           }
         },
         error => {
-          this.localStorageService.store(ERROR_MESSAGE, "E posta ya da sifre hatali! Kayit yapilamadi.");
+          this.localStorageService.store(ERROR_MESSAGE, "E posta ya da sifre hatali. Kayit yapilamadi.");
+        });
+  }
+
+  confirmUser(_code:string) {
+    const body = {code: _code};
+    this.http.put<HttpResponse<any>>("/user/"+_code+"/confirm", body, {observe: 'response'})
+      .subscribe(resp => {
+          if (resp.status == 200) {
+            this.localStorageService.store(INFO_MESSAGE, "Kullanici onayi tamamlandi.");
+            this.router.navigate(["/trip-list"]);
+          }
+        },
+        error => {
+          this.localStorageService.store(ERROR_MESSAGE, "Kullanici onayinda hata var. Lutfen tekrar deneyin.");
         });
   }
 }

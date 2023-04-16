@@ -1,0 +1,30 @@
+<div class='card-body'>
+    <div class='row'>
+        <div class='col-md-2'>Ulkeler:</div>
+        <div class='col-md-4'>
+            <select [(ngModel)]="selectedCountryId" class="form-control" (change)="countryChanged()">
+                <option *ngFor="let country of countryList" [value]="country.id">{{country.name}}</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class='card-body'>
+    <div class='row'>
+        <div class='col-md-2'>Nereden:</div>
+        <div class='col-md-4'>
+            <select [(ngModel)]="from" class="form-control" (change)="cityChanged()">
+                <option *ngFor="let fromCity of fromCitiesList" [value]="fromCity">{{fromCity}}</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class='card-body'>
+    <div class='row'>
+        <div class='col-md-2'>Nereye:</div>
+        <div class='col-md-4'>
+            <select [(ngModel)]="to" class="form-control" (change)="cityChanged()">
+                <option *ngFor="let toCity of toCitiesList" [value]="toCity">{{toCity}}</option>
+            </select>
+        </div>
+    </div>
+</div>

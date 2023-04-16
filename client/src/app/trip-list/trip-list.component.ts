@@ -3,7 +3,7 @@ import {ICountry} from "../model/country";
 import {CountryService} from "../services/country.service";
 import {ITrip} from "../model/trip";
 import {TripService} from "../services/trip.service";
-import {BUTUN_SEHIRLER} from "../app.const";
+import {ILocation} from "../model/location";
 
 @Component({
   selector: 'cp-trip-list',
@@ -24,35 +24,9 @@ export class TripListComponent {
               private tripService: TripService) {
   }
 
-  ngOnInit(): void {
-    this.countryService.getAllCountries().subscribe({
-      next: countries => {
-        this.countryList = countries;
-        this.selectedCountryId = this.countryList[1].id;
-        this.countryChanged();
-      },
-      error: err => this.errorMessage = err
-    });
-
-  }
-
-  countryChanged() {
-    this.countryService.getCountryDetail(this.selectedCountryId).subscribe({
-      next: country => {
-        this.fromCitiesList = country.cities.map(x => x.name);
-        this.fromCitiesList.unshift(BUTUN_SEHIRLER);
-        this.toCitiesList = country.ballotCities.map(x => x.name);
-        this.toCitiesList.unshift(BUTUN_SEHIRLER);
-        this.from = this.fromCitiesList[0];
-        this.to = this.toCitiesList[0];
-        this.cityChanged();
-      },
-      error: err => this.errorMessage = err
-    });
-  }
-
-  cityChanged() {
-    this.tripService.getTripsFromCountry(this.selectedCountryId, this.from, this.to).subscribe({
+  onLocationChange(location: ILocation) {
+    this.tripService.getTripsFromCountry(location.countryId,location.from,location.to)
+      .subscribe({
       next: trips => {
         if (trips == null) {
           this.tripList = [];
@@ -62,5 +36,6 @@ export class TripListComponent {
       },
       error: err => this.errorMessage = err
     });
+
   }
 }

@@ -11,14 +11,19 @@ import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from '@angular/common/http';
 import {NgxWebstorageModule} from "ngx-webstorage";
 import {authenticationGuard} from "./services/authenticationguard";
-import { LogoutComponent } from './logout/logout.component';
+import {LogoutComponent} from './logout/logout.component';
+import {ConfirmuserComponent} from './confirmuser/confirmuser.component';
+import {AddtripComponent} from './addtrip/addtrip.component';
+import { LocationComponent } from './location/location.component';
 
 const routes: Routes = [
-  {path: 'welcome',component: WelcomeComponent},
+  {path: 'welcome', component: WelcomeComponent},
   {path: 'register', component: RegisterComponent},
-  {path: 'trip-list', canActivate:[authenticationGuard],component: TripListComponent},
+  {path: 'trip-list', canActivate: [authenticationGuard], component: TripListComponent},
   {path: 'login', component: LoginComponent},
   {path: 'logout', component: LogoutComponent},
+  {path: 'confirmuser', component: ConfirmuserComponent},
+  {path: 'add-trip', canActivate: [authenticationGuard], component: AddtripComponent},
   {path: '', redirectTo: 'welcome', pathMatch: 'full'},
   {path: '**', redirectTo: 'welcome', pathMatch: 'full'}
 ];
@@ -30,7 +35,10 @@ const routes: Routes = [
     TripListComponent,
     LoginComponent,
     RegisterComponent,
-    LogoutComponent
+    LogoutComponent,
+    ConfirmuserComponent,
+    AddtripComponent,
+    LocationComponent
   ],
   imports: [
     BrowserModule,
