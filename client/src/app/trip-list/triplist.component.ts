@@ -6,11 +6,11 @@ import {TripService} from "../services/trip.service";
 import {ILocation} from "../model/location";
 
 @Component({
-  selector: 'cp-trip-list',
-  templateUrl: './trip-list.component.html',
-  styleUrls: ['./trip-list.component.css']
+  selector: 'cp-triplist',
+  templateUrl: './triplist.component.html',
+  styleUrls: ['./triplist.component.css']
 })
-export class TripListComponent {
+export class TriplistComponent {
   countryList: ICountry[] = [];
   tripList: ITrip[] = []
   fromCitiesList: string[] = []
@@ -36,6 +36,5 @@ export class TripListComponent {
       },
       error: err => this.errorMessage = err
     });
-
   }
 }

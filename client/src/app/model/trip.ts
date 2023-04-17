@@ -1,4 +1,5 @@
 export interface ITrip {
+  id?:string;
   countryid: string;
   origin: string;
   destination: string;

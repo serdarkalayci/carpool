@@ -1,0 +1,36 @@
+<div class='card'>
+    <div class='card-header'>
+        Yolculuk ayrintisi
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Nereden:</div>
+            <div class='col-md-4'>{{currentTrip?.origin}}
+            </div>
+        </div>
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Nereye:</div>
+            <div class='col-md-4'> {{currentTrip?.destination}}</div>
+        </div>
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Kac kisi?</div>
+            <div class='col-md-4'>{{currentTrip?.availableseats}}</div>
+        </div>
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Ne zaman?</div>
+            <div class='col-md-4'>{{currentTrip?.tripdate}}</div>
+        </div>
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Duraklar</div>
+            <div class='col-md-4'>{{currentTrip?.stops}}</div>
+        </div>
+    </div>
+</div>

@@ -13,6 +13,8 @@
                 <th>nereye</th>
                 <th>ne zaman</th>
                 <th>kac kisi</th>
+
+                <th>ayrintilar</th>
             </tr>
             </thead>
             <tbody>
@@ -21,6 +23,11 @@
                 <td>{{ trip.destination}}</td>
                 <td>{{ trip.tripdate}}</td>
                 <td>{{ trip.availableseats}}</td>
+                <td>
+                    <a [routerLink]="['/tripdetails', trip.id]">
+                    Ayrinti Gor
+                </a>
+                </td>
             </tr>
             </tbody>
         </table>

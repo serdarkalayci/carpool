@@ -13,6 +13,15 @@ export class TripService {
   constructor(private http: HttpClient, private errorsService: ErrorsService) {
   }
 
+  getTripDetails(id: string): Observable<ITrip> {
+    let url = "/api/trip/"+id;
+    return this.http.get<ITrip>(url)
+      .pipe(
+        tap(data => console.log('All: ', data)),
+        catchError(this.errorsService.handleError)
+      );
+  }
+
   getTripsFromCountry(countryId: string, from: string, to: string): Observable<ITrip[]> {
     let url = "/api/trip?countryid=" + countryId;
     if(from!=ALL_CITIES){
@@ -32,7 +41,7 @@ export class TripService {
     console.log(trip);
     return this.http.post<HttpResponse<string>>("/api/trip", trip)
       .pipe(
-      //  tap(data => console.log('All: ', data)),
+        tap(data => console.log('All: ', data)),
         catchError(this.errorsService.handleError)
       );
   }
