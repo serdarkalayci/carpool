@@ -25,7 +25,7 @@ export class TripListComponent {
   }
 
   onLocationChange(location: ILocation) {
-    this.tripService.getTripsFromCountry(location.countryId,location.from,location.to)
+    this.tripService.getTripsFromCountry(location.countryid,location.from,location.to)
       .subscribe({
       next: trips => {
         if (trips == null) {

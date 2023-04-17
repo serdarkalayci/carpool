@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpResponse} from "@angular/common/http";
 import {ErrorsService} from "./errors.service";
-import {catchError, Observable} from "rxjs";
+import {catchError, Observable, tap} from "rxjs";
 import {ITrip} from "../model/trip";
 import {ALL_CITIES} from "../app.const";
 
@@ -22,6 +22,15 @@ export class TripService {
       url += "&destination="+to;
     }
     return this.http.get<ITrip[]>(url)
+      .pipe(
+      //  tap(data => console.log('All: ', data)),
+        catchError(this.errorsService.handleError)
+      );
+  }
+
+  saveTrip(trip: ITrip | undefined):Observable<HttpResponse<string>>{
+    console.log(trip);
+    return this.http.post<HttpResponse<string>>("/api/trip", trip)
       .pipe(
       //  tap(data => console.log('All: ', data)),
         catchError(this.errorsService.handleError)

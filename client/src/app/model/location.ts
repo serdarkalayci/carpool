@@ -1,6 +1,6 @@
 
 export interface ILocation {
-  countryId: string;
+  countryid: string;
   from: string;
   to: string;
 }

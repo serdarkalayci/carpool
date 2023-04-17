@@ -25,6 +25,7 @@ export class LocationComponent {
   }
 
   ngOnInit(): void {
+    console.log("whats up this is child!");
     this.countryService.getAllCountries().subscribe({
       next: countries => {
         this.countryList = countries;
@@ -57,7 +58,7 @@ export class LocationComponent {
 
   cityChanged() {
     this.locationChanged.emit({
-      countryId: this.selectedCountryId,
+      countryid: this.selectedCountryId,
       from: this.from,
       to: this.to
     });
