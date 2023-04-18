@@ -14,8 +14,9 @@ import {authenticationGuard} from "./services/authenticationguard";
 import {LogoutComponent} from './logout/logout.component';
 import {ConfirmuserComponent} from './confirmuser/confirmuser.component';
 import {AddtripComponent} from './addtrip/addtrip.component';
-import { LocationComponent } from './location/location.component';
-import { TripdetailsComponent } from './tripdetails/tripdetails.component';
+import {LocationComponent} from './location/location.component';
+import {TripdetailsComponent} from './tripdetails/tripdetails.component';
+import {TripconversationsComponent} from './tripconversations/tripconversations.component';
 
 const routes: Routes = [
   {path: 'welcome', component: WelcomeComponent},
@@ -24,7 +25,7 @@ const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'logout', component: LogoutComponent},
   {path: 'confirmuser', component: ConfirmuserComponent},
-  {path: 'tripdetails/:id', component: TripdetailsComponent},
+  {path: 'tripconversations/:id', canActivate: [authenticationGuard], component: TripconversationsComponent},
   {path: 'add-trip', canActivate: [authenticationGuard], component: AddtripComponent},
   {path: '', redirectTo: 'welcome', pathMatch: 'full'},
   {path: '**', redirectTo: 'welcome', pathMatch: 'full'}
@@ -41,7 +42,8 @@ const routes: Routes = [
     ConfirmuserComponent,
     AddtripComponent,
     LocationComponent,
-    TripdetailsComponent
+    TripdetailsComponent,
+    TripconversationsComponent
   ],
   imports: [
     BrowserModule,

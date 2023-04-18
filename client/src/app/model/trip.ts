@@ -1,3 +1,5 @@
+import {IConversation} from "./converstaion";
+
 export interface ITrip {
   id?:string;
   countryid: string;
@@ -7,4 +9,5 @@ export interface ITrip {
   availableseats: number;
   stops: string[];
   note:string;
+  conversation:IConversation[];
 }

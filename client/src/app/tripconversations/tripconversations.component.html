@@ -1,0 +1,24 @@
+<cp-tripdetails [currentTrip]="currentTrip"></cp-tripdetails>
+<div class='table-responsive'>
+    <table class='table' *ngIf='currentTrip!.conversation.length'>
+        <thead>
+        <tr>
+            <th>kac kisi</th>
+            <th>mesaj sayisi</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor='let c of currentTrip!.conversation'>
+            <td>dsa</td>
+            <td>asd</td>
+            <td></td>
+            <td>
+                <a [routerLink]="['/messages', c.conversationid]">
+                    Ayrinti Gor
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

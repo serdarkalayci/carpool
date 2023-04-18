@@ -38,7 +38,6 @@ export class TripService {
   }
 
   saveTrip(trip: ITrip | undefined):Observable<HttpResponse<string>>{
-    console.log(trip);
     return this.http.post<HttpResponse<string>>("/api/trip", trip)
       .pipe(
         tap(data => console.log('All: ', data)),

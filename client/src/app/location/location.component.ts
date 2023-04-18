@@ -25,7 +25,6 @@ export class LocationComponent {
   }
 
   ngOnInit(): void {
-    console.log("whats up this is child!");
     this.countryService.getAllCountries().subscribe({
       next: countries => {
         this.countryList = countries;
@@ -42,8 +41,6 @@ export class LocationComponent {
       next: country => {
         this.fromCitiesList = country.cities.map(x => x.name);
         this.toCitiesList = country.ballotCities.map(x => x.name);
-        console.log(this.allowAllCities);
-        console.log("hey");
         if (this.allowAllCities) {
           this.fromCitiesList.unshift(ALL_CITIES);
           this.toCitiesList.unshift(ALL_CITIES);

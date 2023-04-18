@@ -18,7 +18,6 @@ export class CarpoolusersService {
 
   login(_username: string, _password: string) {
     const body = {email: _username, password: _password};
-    console.log(body);
     this.http.put<HttpResponse<any>>("/api/login", body, {observe: 'response'})
       .subscribe(resp => {
           if (resp.status == 200) {
