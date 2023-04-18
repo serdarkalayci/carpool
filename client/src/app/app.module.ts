@@ -3,7 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppComponent} from './app.component';
 import {WelcomeComponent} from './welcome/welcome.component';
-import {TriplistComponent} from './trip-list/triplist.component';
+import {TriplistComponent} from './triplist/triplist.component';
 import {LoginComponent} from './login/login.component';
 import {RegisterComponent} from './register/register.component';
 import {RouterModule, Routes} from "@angular/router";
@@ -17,16 +17,20 @@ import {AddtripComponent} from './addtrip/addtrip.component';
 import {LocationComponent} from './location/location.component';
 import {TripdetailsComponent} from './tripdetails/tripdetails.component';
 import {TripconversationsComponent} from './tripconversations/tripconversations.component';
+import {InitconverstationComponent} from './initconverstation/initconverstation.component';
+import { MessagesComponent } from './messages/messages.component';
 
 const routes: Routes = [
   {path: 'welcome', component: WelcomeComponent},
   {path: 'register', component: RegisterComponent},
-  {path: 'trip-list', canActivate: [authenticationGuard], component: TriplistComponent},
+  {path: 'triplist', canActivate: [authenticationGuard], component: TriplistComponent},
   {path: 'login', component: LoginComponent},
   {path: 'logout', component: LogoutComponent},
-  {path: 'confirmuser', component: ConfirmuserComponent},
+  {path: 'confirm-user', component: ConfirmuserComponent},
+  {path: 'initconversation/:id', canActivate: [authenticationGuard], component: InitconverstationComponent},
   {path: 'tripconversations/:id', canActivate: [authenticationGuard], component: TripconversationsComponent},
-  {path: 'add-trip', canActivate: [authenticationGuard], component: AddtripComponent},
+  {path: 'addtrip', canActivate: [authenticationGuard], component: AddtripComponent},
+  {path: 'messages/:id/:tripId', canActivate: [authenticationGuard], component: MessagesComponent},
   {path: '', redirectTo: 'welcome', pathMatch: 'full'},
   {path: '**', redirectTo: 'welcome', pathMatch: 'full'}
 ];
@@ -43,7 +47,9 @@ const routes: Routes = [
     AddtripComponent,
     LocationComponent,
     TripdetailsComponent,
-    TripconversationsComponent
+    TripconversationsComponent,
+    InitconverstationComponent,
+    MessagesComponent
   ],
   imports: [
     BrowserModule,

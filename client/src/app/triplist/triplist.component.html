@@ -13,8 +13,8 @@
                 <th>nereye</th>
                 <th>ne zaman</th>
                 <th>kac kisi</th>
-
                 <th>ayrintilar</th>
+                <th>konusma baslat</th>
             </tr>
             </thead>
             <tbody>
@@ -26,8 +26,14 @@
                 <td>
                     <a [routerLink]="['/tripconversations', trip.id]">
                     Ayrinti Gor
-                </a>
+                    </a>
                 </td>
+                <td>
+                    <a [routerLink]="['/initconversation', trip.id]">
+                        Konusma Baslat
+                    </a>
+                </td>
+
             </tr>
             </tbody>
         </table>

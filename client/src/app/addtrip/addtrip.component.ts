@@ -34,7 +34,7 @@ export class AddtripComponent {
       this.tripService.saveTrip(this.trip)
         .subscribe({
           next: x => {
-            this.router.navigate(['trip-list'])
+            this.router.navigate(['triplist'])
           },
           error: err => this.errorsService.handleError(err)
         });

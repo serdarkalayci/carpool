@@ -3,19 +3,26 @@
     <table class='table' *ngIf='currentTrip!.conversation.length'>
         <thead>
         <tr>
-            <th>kac kisi</th>
-            <th>mesaj sayisi</th>
+            <th>yolcu onayi</th>
+            <th>yolcu e posta</th>
+            <th>yolcu telefon</th>
+            <th>surucu onayi</th>
+            <th>surucu e posta</th>
+            <th>surucu telefon</th>
             <th></th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor='let c of currentTrip!.conversation'>
-            <td>dsa</td>
-            <td>asd</td>
-            <td></td>
+            <td>{{c.requesterapproved}}</td>
+            <td>{{c.suppliercontact.email}}</td>
+            <td>{{c.suppliercontact.phone}}</td>
+            <td>{{c.supplierapproved}}</td>
+            <td>{{c.requestercontact.email}}</td>
+            <td>{{c.requestercontact.phone}}</td>
             <td>
-                <a [routerLink]="['/messages', c.conversationid]">
-                    Ayrinti Gor
+                <a [routerLink]="['/messages', c.conversationid,currentTrip!.id]">
+                    Mesajlari Gor
                 </a>
             </td>
         </tr>

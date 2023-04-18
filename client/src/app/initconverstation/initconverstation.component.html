@@ -1,0 +1,28 @@
+<div class='card'>
+    <div class='card-header'>
+        Yolculuga katilmayi talep et
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Kac kisi katilmak istiyor?</div>
+            <div class='col-md-4'><input type="number" min="0" max="100" [(ngModel)]='passengerCount'/></div>
+        </div>
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Mesajiniz ne?</div>
+            <div class='col-md-4'><input type='text' [(ngModel)]='message'/></div>
+        </div>
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'></div>
+            <div class='col-md-4'>
+                <button class=' btn btn-primary'
+                        (click)='onSave()'>
+                    Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -21,7 +21,7 @@ export class CarpoolusersService {
     this.http.put<HttpResponse<any>>("/api/login", body, {observe: 'response'})
       .subscribe(resp => {
           if (resp.status == 200) {
-            this.router.navigate(["/trip-list"]);
+            this.router.navigate(["/triplist"]);
             this.localStorageService.clear(ERROR_MESSAGE);
           }
         },
@@ -50,7 +50,7 @@ export class CarpoolusersService {
       .subscribe(resp => {
           if (resp.status == 200) {
             this.localStorageService.store(INFO_MESSAGE, "Kullanici onayi tamamlandi.");
-            this.router.navigate(["/trip-list"]);
+            this.router.navigate(["/triplist"]);
           }
         },
         error => {

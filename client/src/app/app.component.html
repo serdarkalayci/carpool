@@ -1,8 +1,8 @@
 <nav class='navbar navbar-expand navbar-light bg-light'>
     <a class='navbar-brand' routerLinkActive='active' routerLink='/welcome'>{{pageTitle}}</a>
     <ul class='nav nav-pills'>
-        <li><a class='nav-link' routerLinkActive='active' routerLink='/trip-list'>Yolculuk Listesi</a></li>
-        <li><a class='nav-link' routerLinkActive='active' routerLink='/add-trip'>Yolculuk Ekle</a></li>
+        <li><a class='nav-link' routerLinkActive='active' routerLink='/triplist'>Yolculuk Listesi</a></li>
+        <li><a class='nav-link' routerLinkActive='active' routerLink='/addtrip'>Yolculuk Ekle</a></li>
     </ul>
     <ul class='nav nav-pills'>
         <li><a class='nav-link' *ngIf=!isLoggedIn() routerLinkActive='active' routerLink='/login'>Giris Yap</a></li>

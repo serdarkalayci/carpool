@@ -23,4 +23,8 @@ export class ErrorsService {
     console.error(errorMessage);
     return throwError(() => errorMessage);
   }
+
+  addInfoMessage(s: string) {
+    
+  }
 }
