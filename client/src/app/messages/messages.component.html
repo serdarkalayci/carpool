@@ -1,13 +1,22 @@
 <cp-tripdetails [currentTrip]="currentTrip"></cp-tripdetails>
-<div class='table-responsive'>
-    <table class='table'>
-        <tbody>
-        <tr *ngFor='let m of this.conversation?.messages'>
-            <td>{{m.text}}</td>
-            <td>{{m.date}}</td>
-        </tr>
-        </tbody>
-    </table>
+
+<div class='card' *ngFor='let m of this.conversation?.messages; let i = index'>
+    <div class='card-header'>
+        {{i + 1}}. Mesaj {{m.direction == 'in' ? "(Gelen)" : "(Giden)"}}
+    </div>
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Tarih:</div>
+            <div class='col-md-4'>{{m.date}}</div>
+        </div>
+    </div>
+
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Mesaj:</div>
+            <div class='col-md-4'>{{m.text}}</div>
+        </div>
+    </div>
 </div>
 <div class='card'>
     <div class='card-body'>
@@ -19,7 +28,7 @@
     <div class='card-body'>
         <div class='row'>
             <div class='col-md-2'>Yeni Mesaj:</div>
-            <div class='col-md-4'> <div class='col-md-4'><input type='text' [(ngModel)]='newmessage'/></div></div>
+            <div class='col-md-4'><input type='text' size ="60" [(ngModel)]='newmessage'/></div>
         </div>
     </div>
 
@@ -32,6 +41,25 @@
                     Gonder
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div *ngIf="this.canViewContactInfo()" class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Talep eden telefon:</div>
+            <div class='col-md-4'>{{this.conversation?.requestercontact?.phone}}</div>
+        </div>
+        <div class='row'>
+            <div class='col-md-2'>Talep eden e-posta:</div>
+            <div class='col-md-4'>{{this.conversation?.requestercontact?.email}}</div>
+        </div>
+        <div class='row'>
+            <div class='col-md-2'>Yolculuk sunan telefon:</div>
+            <div class='col-md-4'>{{this.conversation?.suppliercontact?.phone}}</div>
+        </div>
+        <div class='row'>
+            <div class='col-md-2'>Talep eden e-posta:</div>
+            <div class='col-md-4'>{{this.conversation?.suppliercontact?.email}}</div>
         </div>
     </div>
 

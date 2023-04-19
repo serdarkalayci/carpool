@@ -1,5 +1,6 @@
+<div class='card'>
 <nav class='navbar navbar-expand navbar-light bg-light'>
-    <a class='navbar-brand' routerLinkActive='active' routerLink='/welcome'>{{pageTitle}}</a>
+    <a class='navbar-brand bosluk' routerLinkActive='active' routerLink='/welcome'>{{pageTitle}}</a>
     <ul class='nav nav-pills'>
         <li><a class='nav-link' routerLinkActive='active' routerLink='/triplist'>Yolculuk Listesi</a></li>
         <li><a class='nav-link' routerLinkActive='active' routerLink='/addtrip'>Yolculuk Ekle</a></li>
@@ -10,6 +11,7 @@
         <li><a class='nav-link' routerLinkActive='active' routerLink='/register'>Kayit Ol</a></li>
     </ul>
 </nav>
+</div>
 <div *ngIf=isError() [ngClass]="errorDivClass">
     <div>
         Hata: {{ errorMessage }}

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component} from '@angular/core';
 import {ITrip} from "../model/trip";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TripService} from "../services/trip.service";
@@ -11,10 +11,10 @@ import {IConversation} from "../model/converstaion";
   styleUrls: ['./messages.component.css']
 })
 export class MessagesComponent {
-  @Input() currentTrip: ITrip |undefined;
+  currentTrip: ITrip |undefined;
   conversation: IConversation |undefined;
   id:string|undefined;
-  approval: boolean=false;
+  approval: boolean = false;
   newmessage: string='';
 
   constructor(private route: ActivatedRoute,
@@ -67,5 +67,10 @@ export class MessagesComponent {
           error: err => this.errorsService.handleError(err)
         });
     }
+  }
+
+  canViewContactInfo() {
+    return this.conversation?.requesterapproved &&
+      this.conversation?.supplierapproved;
   }
 }
