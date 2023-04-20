@@ -1,0 +1,28 @@
+<div class='card'>
+    <div class='card-header'>
+        Bi Yolculuk Giris
+    </div>
+    <div class='card-body'>
+
+        <div class='row'>
+            <div class='col-md-2'>E posta:</div>
+            <div class='col-md-4'><input type='text' [(ngModel)]='username'/></div>
+        </div>
+
+        <div class='row'>
+            <div class='col-md-2'>Sifre:</div>
+            <div class='col-md-4'><input type='password' [(ngModel)]='password'/></div>
+        </div>
+
+
+        <div class='row'>
+            <div class='col-md-2'></div>
+            <div class='col-md-4'>
+                <button class=' btn btn-primary'
+                        (click)='login()'>
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -22,7 +22,7 @@ db.trips.insertMany([
     "origin":"The Hague",
     "destination":"Amsterdam",
     "stops":["Haarlem","Almere"],
-    "tripdate": ISODate("2023-03-26T00:00:00Z"),
+    "tripdate": ISODate("2024-03-26T00:00:00Z"),
     "availableseats":3,
     "note":"not yok bu kez"
 },
@@ -33,7 +33,7 @@ db.trips.insertMany([
     "origin":"Utrecht",
     "destination":"Amsterdam",
     "stops":["Haarlem","Almere","Eindhoven"],
-    "tripdate":ISODate("2023-03-26T00:00:00Z"),
+    "tripdate":ISODate("2024-03-26T00:00:00Z"),
     "availableseats":3,
     "note":"not yok bu kez"
 },
@@ -44,7 +44,7 @@ db.trips.insertMany([
     "origin":"Tilburg",
     "destination":"Amsterdam",
     "stops":["Haarlem","Almere","Eindhoven"],
-    "tripdate":ISODate("2023-03-26T00:00:00Z"),
+    "tripdate":ISODate("2024-03-26T00:00:00Z"),
     "availableseats":3,
     "note":"not yok bu kez"
 },
@@ -55,10 +55,33 @@ db.trips.insertMany([
     "origin":"Tilburg",
     "destination":"Rotterdam",
     "stops":["Haarlem","Almere","Eindhoven"],
-    "tripdate":ISODate("2023-03-26T00:00:00Z"),
+    "tripdate":ISODate("2024-03-26T00:00:00Z"),
+    "availableseats":3,
+    "note":"not yok bu kez"
+},
+{
+    "_id":ObjectId("642075f49e46e44d46172af6"),
+    "supplierid":ObjectId("5fb7b1d521e4f91673dc2293"),
+    "countryid":ObjectId("6420af53150f72f9e1feeb7c"),
+    "origin":"Marseille",
+    "destination":"Paris",
+    "stops":[],
+    "tripdate":ISODate("2024-03-26T00:00:00Z"),
     "availableseats":3,
     "note":"not yok bu kez"
 }
+,
+{
+    "_id":ObjectId("642075f49e46e44d46172af7"),
+    "supplierid":ObjectId("5fb7b1d521e4f91673dc2293"),
+    "countryid":ObjectId("6420af53150f72f9e1feeb7c"),
+    "origin":"Montpellier",
+    "destination":"Paris",
+    "stops":[],
+    "tripdate":ISODate("2024-03-26T00:00:00Z"),
+    "availableseats":3,
+    "note":"not yok bu kez"
+  }
 ])
 
 db.createView( "tripdetail", "trips", [
@@ -126,7 +149,7 @@ db.geography.insertMany([
         "cities": [
           {
             "name": "Paris",
-            "ballot": false
+            "ballot": true
           },
           {
             "name": "Marseille",
