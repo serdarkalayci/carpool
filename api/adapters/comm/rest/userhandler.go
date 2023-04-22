@@ -46,7 +46,7 @@ func (apiContext *APIContext) AddUser(rw http.ResponseWriter, r *http.Request) {
 	} else if e, ok := err.(apperr.DuplicateKeyError); ok {
 		respondWithError(rw, r, 400, e.Error())
 	} else {
-		respondWithError(rw, r, 500, e.Error())
+		respondWithError(rw, r, 500, err.Error())
 	}
 }
 
