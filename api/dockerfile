@@ -19,7 +19,8 @@ RUN swagger generate spec -o /go/bin/swagger.yaml --scan-models
 ############################
 # STEP 2 build a small image
 ############################
-FROM scratch
+FROM alpine:latest
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 # Copy our static executable.
 COPY --from=builder /go/bin/carpool /go/bin/carpool
 WORKDIR /go/bin/
