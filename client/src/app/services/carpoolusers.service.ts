@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from "@angular/common/http";
-import {ErrorsService} from "./errors.service";
+
 import {Router} from "@angular/router";
-import {LocalStorageService} from "ngx-webstorage";
-import {ERROR_MESSAGE, INFO_MESSAGE} from "../app.const";
+import {CommunicationsService} from "./communications.service";
+import {handleErrorFromConst} from "../app.const";
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +11,8 @@ import {ERROR_MESSAGE, INFO_MESSAGE} from "../app.const";
 export class CarpoolusersService {
 
   constructor(private http: HttpClient,
-              private errorsService: ErrorsService,
-              private router: Router,
-              private localStorageService: LocalStorageService) {
+              private communicationsService: CommunicationsService,
+              private router: Router) {
   }
 
   login(_username: string, _password: string) {
@@ -22,11 +21,10 @@ export class CarpoolusersService {
       .subscribe(resp => {
           if (resp.status == 200) {
             this.router.navigate(["/triplist"]);
-            this.localStorageService.clear(ERROR_MESSAGE);
           }
         },
         error => {
-          this.localStorageService.store(ERROR_MESSAGE, "E posta ya da sifre hatali!");
+          this.communicationsService.addErrorMessage("E-posta ya da şifre hatalı!");
         });
   }
 
@@ -36,25 +34,30 @@ export class CarpoolusersService {
       .subscribe(resp => {
           if (resp.status == 200) {
             this.router.navigate(["/welcome"]);
-            this.localStorageService.store(INFO_MESSAGE, "Kayit basarili. Lutfen e-postanizi kontrol edin.");
+            this.communicationsService.addInfoMessage("Kayıt başarılı. Lütfen e-postanızı kontrol edin.");
           }
         },
         error => {
-          this.localStorageService.store(ERROR_MESSAGE, "E posta ya da sifre hatali. Kayit yapilamadi.");
-        });
+          handleErrorFromConst(error, this.router, this.communicationsService);
+        }
+      );
   }
 
-  confirmUser(_code:string) {
+  confirmUser(_code: string) {
     const body = {code: _code};
-    this.http.put<HttpResponse<any>>("/user/"+_code+"/confirm", body, {observe: 'response'})
+    this.http.put<HttpResponse<any>>("/user/" + _code + "/confirm", body, {observe: 'response'})
       .subscribe(resp => {
           if (resp.status == 200) {
-            this.localStorageService.store(INFO_MESSAGE, "Kullanici onayi tamamlandi.");
+            this.communicationsService.addInfoMessage("Kullanıcı onayı tamamlandı.");
             this.router.navigate(["/triplist"]);
           }
         },
         error => {
-          this.localStorageService.store(ERROR_MESSAGE, "Kullanici onayinda hata var. Lutfen tekrar deneyin.");
+          if (error.status === 404) {
+            this.communicationsService.addErrorMessage("Onay kodu bulunamadı");
+          } else {
+            this.communicationsService.addErrorMessage(error.error);
+          }
         });
   }
 }

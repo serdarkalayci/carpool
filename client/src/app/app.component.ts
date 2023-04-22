@@ -1,7 +1,8 @@
 import {Component} from '@angular/core';
 import {CookieService} from "ngx-cookie-service";
 import {LocalStorageService} from "ngx-webstorage";
-import {ERROR_MESSAGE, INFO_MESSAGE} from "./app.const";
+import {COOKIE_NAME, ERROR_MESSAGE, INFO_MESSAGE} from "./app.const";
+import {CommunicationsService} from "./services/communications.service";
 
 @Component({
   selector: 'cp-root',
@@ -11,18 +12,17 @@ import {ERROR_MESSAGE, INFO_MESSAGE} from "./app.const";
 export class AppComponent {
 
   ERROR_MESSAGE_VISIBLE: string = 'alert alert-danger container';
-  ERROR_MESSAGE_HIDDEN: string = 'alert alert-danger container hidden';
   INFO_MESSAGE_VISIBLE: string = 'alert alert-info container';
-  INFO_MESSAGE_HIDDEN: string = 'alert alert-info container hidden';
 
   pageTitle = 'Bi Yolculuk';
   errorDivClass = this.ERROR_MESSAGE_VISIBLE;
   infoDivClass = this.INFO_MESSAGE_VISIBLE;
-  private _errorMessage: string | null = "test12";
-  private _infoMessage: string | null = "test12";
+  private _errorMessage: string | null = "";
+  private _infoMessage: string | null = "";
 
   constructor(private cookieService: CookieService,
-              private localStorageService: LocalStorageService) {
+              private localStorageService: LocalStorageService,
+              private comms:CommunicationsService) {
   }
 
   ngOnInit() {
@@ -34,6 +34,7 @@ export class AppComponent {
         this.delayedExecution(ERROR_MESSAGE);
       }
     });
+
     this.infoMessage = this.localStorageService.retrieve(INFO_MESSAGE);
     this.localStorageService.observe(INFO_MESSAGE).subscribe((newValue) => {
       this.infoMessage = newValue;
@@ -44,7 +45,6 @@ export class AppComponent {
     });
   }
 
-
   delayedExecution(key:string) {
     setTimeout(() => {
       this.localStorageService.clear(key);
@@ -52,7 +52,7 @@ export class AppComponent {
   }
 
   isLoggedIn() {
-    return this.cookieService.get("carpooltoken").length != 0;
+    return this.cookieService.get(COOKIE_NAME).length != 0;
   }
 
   isError() {

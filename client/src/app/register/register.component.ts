@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {CarpoolusersService} from "../services/carpoolusers.service";
 import {LocalStorageService} from "ngx-webstorage";
 import {ERROR_MESSAGE} from "../app.const";
+import {CommunicationsService} from "../services/communications.service";
 
 @Component({
   selector: 'cp-register',
@@ -15,15 +16,15 @@ export class RegisterComponent {
   phone: string = ''
   passwordAgain: string = '';
 
-  constructor(private carpoolusersService: CarpoolusersService, private localStorageService: LocalStorageService) {
+  constructor(private carpoolusersService: CarpoolusersService,
+              private communicationsService: CommunicationsService) {
   }
-
 
   register() {
     if (this.password == this.passwordAgain) {
       this.carpoolusersService.saveUser(this.name, this.password, this.email, this.phone);
     } else {
-      this.localStorageService.store(ERROR_MESSAGE,"Sifreler uyumsuz tekrar deneyin!");
+      this.communicationsService.addErrorMessage("Şifreler uyumsuz tekrar deneyin!");
     }
   }
 }

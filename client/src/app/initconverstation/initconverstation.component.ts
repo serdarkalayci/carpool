@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {TripService} from "../services/trip.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {ErrorsService} from "../services/errors.service";
+import {CommunicationsService} from "../services/communications.service";
 
 @Component({
   selector: 'cp-initconverstation',
@@ -16,19 +16,20 @@ export class InitconverstationComponent {
   constructor(private tripService: TripService,
               private router: Router,
               private route: ActivatedRoute,
-              private errorsService: ErrorsService) {
+              private communicationsService: CommunicationsService) {
   }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
   }
+
   onSave() {
     this.tripService.initConversation(this.passengerCount,this.message,this.id!).subscribe(
       next=>{
-        this.errorsService.addInfoMessage("eklendi!");
+        this.communicationsService.addInfoMessage("Konuşma eklendi.");
         this.router.navigate(['/tripconversations',this.id]);
       } ,
-    err => this.errorsService.handleError(err)
+    err => this.communicationsService.handleError(err)
     );
   }
 }

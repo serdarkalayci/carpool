@@ -1,9 +1,11 @@
 import {Component} from '@angular/core';
-import {ICountry} from "../model/country";
 import {CountryService} from "../services/country.service";
 import {ITrip} from "../model/trip";
 import {TripService} from "../services/trip.service";
 import {ILocation} from "../model/location";
+import {CommunicationsService} from "../services/communications.service";
+import {handleErrorFromConst} from "../app.const";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'cp-triplist',
@@ -11,30 +13,28 @@ import {ILocation} from "../model/location";
   styleUrls: ['./triplist.component.css']
 })
 export class TriplistComponent {
-  countryList: ICountry[] = [];
   tripList: ITrip[] = []
-  fromCitiesList: string[] = []
-  toCitiesList: string[] = []
   errorMessage = '';
-  selectedCountryId: string = "";
   from = '';
   to = '';
 
   constructor(private countryService: CountryService,
-              private tripService: TripService) {
+              private tripService: TripService,
+              private comm:CommunicationsService,
+              private router:Router) {
   }
 
   onLocationChange(location: ILocation) {
-    this.tripService.getTripsFromCountry(location.countryid,location.from,location.to)
+    this.tripService.getTripsFromCountry(location.countryid, location.from, location.to)
       .subscribe({
-      next: trips => {
-        if (trips == null) {
-          this.tripList = [];
-        } else {
-          this.tripList = trips;
-        }
-      },
-      error: err => this.errorMessage = err
-    });
+        next: trips => {
+          if (trips == null) {
+            this.tripList = [];
+          } else {
+            this.tripList = trips;
+          }
+        },
+        error: err => handleErrorFromConst(err,this.router,this.comm)
+      });
   }
 }

@@ -6,7 +6,7 @@ import {WelcomeComponent} from './welcome/welcome.component';
 import {TriplistComponent} from './triplist/triplist.component';
 import {LoginComponent} from './login/login.component';
 import {RegisterComponent} from './register/register.component';
-import {RouterModule, Routes} from "@angular/router";
+import {Router, RouterModule, Routes} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from '@angular/common/http';
 import {NgxWebstorageModule} from "ngx-webstorage";
@@ -19,6 +19,8 @@ import {TripdetailsComponent} from './tripdetails/tripdetails.component';
 import {TripconversationsComponent} from './tripconversations/tripconversations.component';
 import {InitconverstationComponent} from './initconverstation/initconverstation.component';
 import { MessagesComponent } from './messages/messages.component';
+import {FormatDatePipe} from "./services/convert-to-spaces.pipe";
+import {CommunicationsService} from "./services/communications.service";
 
 const routes: Routes = [
   {path: 'welcome', component: WelcomeComponent},
@@ -26,7 +28,8 @@ const routes: Routes = [
   {path: 'triplist', canActivate: [authenticationGuard], component: TriplistComponent},
   {path: 'login', component: LoginComponent},
   {path: 'logout', component: LogoutComponent},
-  {path: 'confirm-user', component: ConfirmuserComponent},
+  {path: 'confirmuser/:code', component: ConfirmuserComponent},
+  {path: 'confirmuser', component: ConfirmuserComponent},
   {path: 'initconversation/:id', canActivate: [authenticationGuard], component: InitconverstationComponent},
   {path: 'tripconversations/:id', canActivate: [authenticationGuard], component: TripconversationsComponent},
   {path: 'addtrip', canActivate: [authenticationGuard], component: AddtripComponent},
@@ -49,7 +52,8 @@ const routes: Routes = [
     TripdetailsComponent,
     TripconversationsComponent,
     InitconverstationComponent,
-    MessagesComponent
+    MessagesComponent,
+    FormatDatePipe,
   ],
   imports: [
     BrowserModule,
@@ -58,7 +62,7 @@ const routes: Routes = [
     NgxWebstorageModule.forRoot(),
     [RouterModule.forRoot(routes)]
   ],
-  providers: [],
+  providers: [Router,CommunicationsService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

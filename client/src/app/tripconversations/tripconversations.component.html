@@ -1,28 +1,13 @@
 <cp-tripdetails [currentTrip]="currentTrip"></cp-tripdetails>
 <div class='table-responsive'>
     <table class='table' *ngIf='currentTrip!.conversation.length'>
-        <thead>
-        <tr>
-            <th>yolcu onayi</th>
-            <th>yolcu e posta</th>
-            <th>yolcu telefon</th>
-            <th>surucu onayi</th>
-            <th>surucu e posta</th>
-            <th>surucu telefon</th>
-            <th></th>
-        </tr>
-        </thead>
+
         <tbody>
-        <tr *ngFor='let c of currentTrip!.conversation'>
-            <td>{{c.requesterapproved}}</td>
-            <td>{{c.suppliercontact.email}}</td>
-            <td>{{c.suppliercontact.phone}}</td>
-            <td>{{c.supplierapproved}}</td>
-            <td>{{c.requestercontact.email}}</td>
-            <td>{{c.requestercontact.phone}}</td>
+        <tr *ngFor='let c of currentTrip!.conversation ; let i = index'>
+            <td>{{i+1}}.Konuşma</td>
             <td>
                 <a [routerLink]="['/messages', c.conversationid,currentTrip!.id]">
-                    Mesajlari Gor
+                    Ayrıntı Gör
                 </a>
             </td>
         </tr>

@@ -1,17 +1,18 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from "@angular/common/http";
-import {ErrorsService} from "./errors.service";
+
 import {catchError, Observable, tap} from "rxjs";
 import {ITrip} from "../model/trip";
-import {ALL_CITIES} from "../app.const";
+import {ALL_CITIES, handleErrorFromConst} from "../app.const";
 import {IConversation} from "../model/converstaion";
+import {CommunicationsService} from "./communications.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TripService {
 
-  constructor(private http: HttpClient, private errorsService: ErrorsService) {
+  constructor(private http: HttpClient, private communicationsService: CommunicationsService) {
   }
 
   getTripDetails(id: string): Observable<ITrip> {
@@ -19,7 +20,7 @@ export class TripService {
     return this.http.get<ITrip>(url)
       .pipe(
         tap(data => console.log('All: ', data)),
-        catchError(this.errorsService.handleError)
+        catchError(this.communicationsService.handleError)
       );
   }
 
@@ -31,18 +32,14 @@ export class TripService {
     if (to != ALL_CITIES) {
       url += "&destination=" + to;
     }
-    return this.http.get<ITrip[]>(url)
-      .pipe(
-        //  tap(data => console.log('All: ', data)),
-        catchError(this.errorsService.handleError)
-      );
+    return this.http.get<ITrip[]>(url);
   }
 
   saveTrip(trip: ITrip | undefined): Observable<HttpResponse<string>> {
     return this.http.post<HttpResponse<string>>("/api/trip", trip)
       .pipe(
         tap(data => console.log('All: ', data)),
-        catchError(this.errorsService.handleError)
+        catchError(this.communicationsService.handleError)
       );
   }
 
@@ -56,7 +53,7 @@ export class TripService {
     return this.http.post<HttpResponse<string>>("/api/conversation", body)
       .pipe(
         tap(data => console.log('All: ', data)),
-        catchError(this.errorsService.handleError)
+        catchError(this.communicationsService.handleError)
       )
   }
 
@@ -65,7 +62,7 @@ export class TripService {
     return this.http.get<IConversation>(url)
       .pipe(
         tap(data => console.log('All: ', data)),
-        catchError(this.errorsService.handleError)
+        catchError(this.communicationsService.handleError)
       );
   }
 
@@ -75,7 +72,7 @@ export class TripService {
     return this.http.put<any>(url,body)
       .pipe(
         tap(data => console.log('All: ', data)),
-        catchError(this.errorsService.handleError)
+        catchError(this.communicationsService.handleError)
       );
   }
 
@@ -85,7 +82,7 @@ export class TripService {
     return this.http.put<any>(url,body)
       .pipe(
         tap(data => console.log('All: ', data)),
-        catchError(this.errorsService.handleError)
+        catchError(this.communicationsService.handleError)
       );
   }
 }

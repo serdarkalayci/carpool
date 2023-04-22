@@ -2,8 +2,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ICountry} from "../model/country";
 import {CountryService} from "../services/country.service";
 import {ALL_CITIES} from "../app.const";
-import {ErrorsService} from "../services/errors.service";
 import {ILocation} from "../model/location";
+import {CommunicationsService} from "../services/communications.service";
 
 @Component({
   selector: 'cp-location',
@@ -21,7 +21,7 @@ export class LocationComponent {
   to = '';
 
   constructor(private countryService: CountryService,
-              private errorsService: ErrorsService) {
+              private communicationsService: CommunicationsService) {
   }
 
   ngOnInit(): void {
@@ -31,7 +31,7 @@ export class LocationComponent {
         this.selectedCountryId = this.countryList[0].id;
         this.countryChanged();
       },
-      error: err => this.errorsService.handleError(err)
+      error: err => this.communicationsService.handleError(err)
     });
 
   }
@@ -49,15 +49,16 @@ export class LocationComponent {
         this.to = this.toCitiesList[0];
         this.cityChanged();
       },
-      error: err => this.errorsService.handleError(err)
+      error: err => this.communicationsService.handleError(err)
     });
   }
 
   cityChanged() {
-    this.locationChanged.emit({
+    var body = {
       countryid: this.selectedCountryId,
       from: this.from,
       to: this.to
-    });
+    };
+    this.locationChanged.emit(body);
   }
 }

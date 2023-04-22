@@ -2,8 +2,8 @@ import {Component} from '@angular/core';
 import {ITrip} from "../model/trip";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TripService} from "../services/trip.service";
-import {ErrorsService} from "../services/errors.service";
 import {IConversation} from "../model/converstaion";
+import {CommunicationsService} from "../services/communications.service";
 
 @Component({
   selector: 'cp-messages',
@@ -20,7 +20,7 @@ export class MessagesComponent {
   constructor(private route: ActivatedRoute,
               private router: Router,
               private tripService: TripService,
-              private errorsService: ErrorsService) {
+              private communicationsService: CommunicationsService) {
   }
 
   ngOnInit(): void {
@@ -32,7 +32,7 @@ export class MessagesComponent {
           next: trip => {
             this.currentTrip = trip;
           },
-          error: err => this.errorsService.handleError(err)
+          error: err => this.communicationsService.handleError(err)
         });
     }
     this.update(this.id);
@@ -41,7 +41,7 @@ export class MessagesComponent {
   onApprovalChange() {
     console.log(this.id);
     this.tripService.updateApproval(this.approval,this.id!).subscribe(
-      next => this.errorsService.addInfoMessage("Onay durumu degisti.")
+      next => this.communicationsService.addInfoMessage("Onay durumu degisti.")
     );
   }
 
@@ -49,10 +49,10 @@ export class MessagesComponent {
     console.log(this.id);
     this.tripService.addMessage(this.newmessage,this.id!).subscribe(
       next => {
-        this.errorsService.addInfoMessage("Onay durumu degisti.")
+        this.communicationsService.addInfoMessage("Onay durumu degisti.")
         this.update(this.id!);
       },
-      err => this.errorsService.handleError(err)
+      err => this.communicationsService.handleError(err)
     );
   }
 
@@ -64,7 +64,7 @@ export class MessagesComponent {
             this.conversation = c;
             this.approval=true;
           },
-          error: err => this.errorsService.handleError(err)
+          error: err => this.communicationsService.handleError(err)
         });
     }
   }

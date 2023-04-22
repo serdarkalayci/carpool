@@ -1,6 +1,6 @@
 <div class='card-body'>
     <div class='row'>
-        <div class='col-md-2'>Ulkeler:</div>
+        <div class='col-md-2'>Ülkeler:</div>
         <div class='col-md-4'>
             <select [(ngModel)]="selectedCountryId" class="form-control" (change)="countryChanged()">
                 <option *ngFor="let country of countryList" [value]="country.id">{{country.name}}</option>

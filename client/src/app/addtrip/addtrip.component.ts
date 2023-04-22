@@ -3,7 +3,7 @@ import {ILocation} from "../model/location";
 import {ITrip} from "../model/trip";
 import {TripService} from "../services/trip.service";
 import {Router} from "@angular/router";
-import {ErrorsService} from "../services/errors.service";
+import {CommunicationsService} from "../services/communications.service";
 
 @Component({
   selector: 'cp-addtrip',
@@ -11,34 +11,35 @@ import {ErrorsService} from "../services/errors.service";
   styleUrls: ['./addtrip.component.css']
 })
 export class AddtripComponent {
-  trip: ITrip | undefined;
-  location: ILocation = {countryid: "", from: "", to: ""};
+  trip: ITrip = { countryid: "", origin: "", destination: "", tripdate: "", availableseats: 0, stops: [],note:"",conversation:[]}
+  tripLocation: ILocation |undefined;
   stops: string = "";
+
 
   constructor(private tripService: TripService,
               private router: Router,
-              private errorsService: ErrorsService) {
+              private communicationsService: CommunicationsService) {
   }
 
-  onLocationChange(_location: ILocation) {
-    this.location = _location
+  onLocationChange(_tripLocation: ILocation) {
+    this.tripLocation = _tripLocation;
+    console.log(this.tripLocation);
   }
 
   onSave() {
     if (this.trip !== undefined) {
-      this.trip.origin = this.location.from;
-      this.trip.destination = this.location.to;
-      this.trip.countryid = this.location.countryid;
-      this.trip.origin = this.location.from;
+      this.trip.origin = this.tripLocation!.from;
+      this.trip.destination = this.tripLocation!.to;
+      this.trip.countryid = this.tripLocation!.countryid;
+      this.trip.origin = this.tripLocation!.from;
       this.trip.stops = this.stops.split(",");
       this.tripService.saveTrip(this.trip)
         .subscribe({
           next: x => {
             this.router.navigate(['triplist'])
           },
-          error: err => this.errorsService.handleError(err)
+          error: err => this.communicationsService.handleError(err)
         });
     }
   }
 }
-
