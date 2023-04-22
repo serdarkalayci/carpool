@@ -17,6 +17,15 @@ services:
       - carpool-network
     depends_on:
       - mongo
+  carpoolweb:
+    build: ./client/.
+    container_name: carpoolWEB
+    ports:
+      - "8080:80"
+    networks:
+      - carpool-network
+    depends_on:
+      - carpoolapi
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: carpool_jaeger
