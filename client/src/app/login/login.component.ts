@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {CarpoolusersService} from "../services/carpoolusers.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'cp-login',
@@ -7,29 +8,13 @@ import {CarpoolusersService} from "../services/carpoolusers.service";
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  private _username = '';
-  private _password = '';
+  username = '';
+  password = '';
 
   constructor(private carpoolusersService: CarpoolusersService) {
   }
 
-  get username(): string {
-    return this._username;
-  }
-
-  set username(value: string) {
-    this._username = value;
-  }
-
-  get password(): string {
-    return this._password;
-  }
-
-  set password(value: string) {
-    this._password = value;
-  }
-
   login() {
-    this.carpoolusersService.login(this._username, this._password);
+    this.carpoolusersService.login(this.username, this.password);
   }
 }

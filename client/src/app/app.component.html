@@ -1,18 +1,28 @@
+<div class='card'>
 <nav class='navbar navbar-expand navbar-light bg-light'>
-    <a class='navbar-brand' routerLinkActive='active' routerLink='/welcome'>{{pageTitle}}</a>
+    <a class='navbar-brand bosluk' routerLinkActive='active' routerLink='/welcome'>{{pageTitle}}</a>
     <ul class='nav nav-pills'>
-        <li><a class='nav-link' routerLinkActive='active' routerLink='/trip-list'>Yolculuk Listesi</a></li>
+        <li><a class='nav-link' routerLinkActive='active' routerLink='/triplist'>Yolculuk Listesi</a></li>
+        <li><a class='nav-link' routerLinkActive='active' routerLink='/addtrip'>Yolculuk Ekle</a></li>
     </ul>
     <ul class='nav nav-pills'>
-        <li><a class='nav-link' *ngIf=!isLoggedIn() routerLinkActive='active' routerLink='/login'>Giris Yap</a></li>
-        <li><a class='nav-link' *ngIf=isLoggedIn() routerLinkActive='active' routerLink='/logout'>Cikis Yap</a></li>
-        <li><a class='nav-link' routerLinkActive='active' routerLink='/register'>Kayit Ol</a></li>
+        <li><a class='nav-link' *ngIf=!isLoggedIn() routerLinkActive='active' routerLink='/login'>Giriş Yap</a></li>
+        <li><a class='nav-link' *ngIf=isLoggedIn() routerLinkActive='active' routerLink='/logout'>Çıkış Yap</a></li>
+        <li><a class='nav-link' routerLinkActive='active' routerLink='/register'>Kayıt Ol</a></li>
     </ul>
 </nav>
-<div class='container'>
-    <div *ngIf=isError()
-         class='alert alert-danger'>
-        Error: {{ getErrorMessage() }}
+</div>
+<div *ngIf=isError() [ngClass]="errorDivClass">
+    <div>
+        Hata: {{ errorMessage }}
     </div>
+</div>
+<div *ngIf=isInfo() [ngClass]="infoDivClass">
+    <div>
+        Bilgi: {{ infoMessage }}
+    </div>
+</div>
+
+<div class="container">
     <router-outlet></router-outlet>
 </div>

@@ -1,0 +1,16 @@
+<cp-tripdetails [currentTrip]="currentTrip"></cp-tripdetails>
+<div class='table-responsive'>
+    <table class='table' *ngIf='currentTrip!.conversation.length'>
+
+        <tbody>
+        <tr *ngFor='let c of currentTrip!.conversation ; let i = index'>
+            <td>{{i+1}}.Konuşma</td>
+            <td>
+                <a [routerLink]="['/messages', c.conversationid,currentTrip!.id]">
+                    Ayrıntı Gör
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

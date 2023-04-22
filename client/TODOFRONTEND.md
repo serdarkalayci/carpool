@@ -1,26 +1,56 @@
 docker compose up -d --build
 npm start
 
-https://levelup.gitconnected.com/fixing-cors-errors-with-angular-cli-proxy-e5e0ef143f85
+1. Docker compose'a eklenecek 
+2. degisik env.lar yazilacak prodda calistir 
+3. i8s yapilacak
+4. input validations yapilacak
+5. error handling duzeltilecek
 
-Open AI cors: 
-
-With this configuration, you should be able to make requests to your backend API without getting CORS exceptions.
-Note that this configuration is only intended for development mode, and should not be used in production. 
-In production, you should configure your backend API to allow cross-origin requests from your Angular application.
-
-
-1. Docker compose'a eklenecek
- 
-2. degisik env.lar yazilacak 
-3. cors ayari yapilacak
-4. i8s yapilacak
- 
-5. input validations yapilacak
-6. error handling duzeltilecek
- 
 
 Serdara sorular:
 
 UTC kaydedilmeli?
 trip list bossa empty trip donmeli
+
+
+Extra notlar
+soru isaretleri hallet
+1. Kullanici kayi, donen hata mesajini parse et!
+
+{
+"headers": {
+"normalizedNames": {},
+"lazyUpdate": null
+},
+"status": 422,
+"statusText": "Unprocessable Entity",
+"url": "http://localhost:4200/api/user",
+"ok": false,
+"name": "HttpErrorResponse",
+"message": "Http failure response for http://localhost:4200/api/user: 422 Unprocessable Entity",
+"error": [
+"Key: 'AddUserRequest.Email' Error: Field validation for 'Email' failed on the 'email' tag",
+"Key: 'AddUserRequest.Phone' Error: Field validation for 'Phone' failed on the 'e164' tag"
+]
+}
+
+{
+"headers": {
+"normalizedNames": {},
+"lazyUpdate": null
+},
+"status": 500,
+"statusText": "Internal Server Error",
+"url": "http://localhost:4200/api/user",
+"ok": false,
+"name": "HttpErrorResponse",
+"message": "Http failure response for http://localhost:4200/api/user: 500 Internal Server Error",
+"error": {
+"error": "email and/or phone number already exists"
+}
+}
+
+2. Kayit formu validation ekle
+3. add trip tarih secmek icin date picker kullan
+4. 

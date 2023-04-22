@@ -1,0 +1,41 @@
+<div class='card'>
+    <div class='card-header'>
+        Yolculuklar
+    </div>
+    <cp-location [allowAllCities]="true"
+                 (locationChanged)="onLocationChange($event)">
+    </cp-location>
+    <div class='table-responsive'>
+        <table class='table' *ngIf='tripList.length'>
+            <thead>
+            <tr>
+                <th>Nereden</th>
+                <th>Nereye</th>
+                <th>Ne zaman</th>
+                <th>Kaç kişi</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor='let trip of tripList'>
+                <td>{{ trip.origin}}</td>
+                <td>{{ trip.destination}}</td>
+                <td>{{ trip.tripdate | FormatDate}}</td>
+                <td>{{ trip.availableseats}}</td>
+                <td>
+                    <a [routerLink]="['/tripconversations', trip.id]">
+                        Ayrıntı Gör
+                    </a>
+                </td>
+                <td>
+                    <a [routerLink]="['/initconversation', trip.id]">
+                        Konuşma Başlat
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
