@@ -28,7 +28,13 @@ func (apiContext *APIContext) GetConversation(rw http.ResponseWriter, r *http.Re
 			respondWithError(rw, r, 500, err.Error())
 			return
 		}
-		respondWithJSON(rw, r, 200, mappers.MapConversation2ConversationResponse(*conversation))
+		dto := mappers.MapConversation2ConversationResponse(*conversation)
+		if claims.UserID == conversation.RequesterID {
+			dto.ViewPointOf = "requester"
+		} else {
+			dto.ViewPointOf = "supplier"
+		}
+		respondWithJSON(rw, r, 200, dto)
 	} else {
 		respondWithError(rw, r, 401, "Unauthorized")
 	}

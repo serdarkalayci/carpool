@@ -190,6 +190,18 @@ func (cs ConversationService) GetConversation(conversationID string, userID stri
 		conversation.RequesterContact = domain.ContactDetails{}
 		conversation.SupplierContact = domain.ContactDetails{}
 	}
+	for i, msg := range conversation.Messages {
+		switch {
+		case msg.Direction == "in" && userID == conversation.RequesterID :
+			conversation.Messages[i].Direction = "From You"
+		case msg.Direction == "in" && userID == conversation.SupplierID :
+			conversation.Messages[i].Direction = "To You"
+		case msg.Direction == "out" && userID == conversation.RequesterID :
+			conversation.Messages[i].Direction = "To You"
+		case msg.Direction == "out" && userID == conversation.SupplierID :
+			conversation.Messages[i].Direction = "From You"
+		}
+	}
 	return conversation, nil
 }
 

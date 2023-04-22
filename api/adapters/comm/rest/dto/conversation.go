@@ -8,6 +8,7 @@ import (
 // ConversationResponse is the response object for a conversation
 type ConversationResponse struct {
 	ConversationID    string            `json:"conversationid"`
+	ViewPointOf	   string            `json:"viewpointof"`
 	RequesterName     string            `json:"requestername"`
 	RequesterApproved bool              `json:"requesterapproved"`
 	SupplierApproved  bool              `json:"supplierapproved"`
