@@ -1,4 +1,4 @@
-name: Build and Publish API image
+name: Build and Publish Web image
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ on:
 
 
 env:
-  IMAGE_NAME: carpoolapi
+  IMAGE_NAME: carpoolweb
 
 jobs:
   push_to_registries:
@@ -34,6 +34,6 @@ jobs:
       - name: Build and push Docker images
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
-          context: api/.
+          context: client/.
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ inputs.tag }}
