@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {TripService} from "../services/trip.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {CommunicationsService} from "../services/communications.service";
+import {handleErrorFromConst} from "../app.const";
 
 @Component({
   selector: 'cp-initconverstation',
@@ -9,9 +10,9 @@ import {CommunicationsService} from "../services/communications.service";
   styleUrls: ['./initconverstation.component.css']
 })
 export class InitconverstationComponent {
-  passengerCount: number=0;
-  message: string='';
-  id:string|null='';
+  passengerCount: number = 1;
+  message: string = '';
+  id: string | null = '';
 
   constructor(private tripService: TripService,
               private router: Router,
@@ -24,12 +25,18 @@ export class InitconverstationComponent {
   }
 
   onSave() {
-    this.tripService.initConversation(this.passengerCount,this.message,this.id!).subscribe(
-      next=>{
+    this.tripService.initConversation(this.passengerCount, this.message, this.id!).subscribe(
+      next => {
         this.communicationsService.addInfoMessage("Konuşma eklendi.");
-        this.router.navigate(['/tripconversations',this.id]);
-      } ,
-    err => this.communicationsService.handleError(err)
+        this.router.navigate(['/tripconversations', this.id]);
+      },
+      err => {
+        if (err.status === 422) {
+          this.communicationsService.addErrorMessage("Konuşma metni girmelisiniz. Yolcu sayısı en az 1 olmalıdır.");
+        } else {
+          handleErrorFromConst(err, this.router, this.communicationsService);
+        }
+      }
     );
   }
 }

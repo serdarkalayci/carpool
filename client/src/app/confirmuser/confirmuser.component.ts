@@ -11,26 +11,26 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class ConfirmuserComponent {
 
-  code: string | null;
+  code: string | null='';
+  userid: string | null='';
 
   constructor(private carpoolusersService: CarpoolusersService,
               private route: ActivatedRoute,
               private communicationsService: CommunicationsService) {
-    this.code='';
   }
 
   ngOnInit(): void {
-    this.code = this.route.snapshot.paramMap.get('code');
-    if (this.code != null) {
-      this.confirmUser();
-    } else {
-      this.communicationsService.addInfoMessage("Onay kodu giriniz.")
+    this.userid = this.route.snapshot.paramMap.get('userid');
+    if (this.userid == null) {
+      this.communicationsService.addErrorMessage("Kullanıcı bulunamadı.");
     }
   }
 
   confirmUser() {
     if (this.code != null) {
-      this.carpoolusersService.confirmUser(this.code);
+      this.carpoolusersService.confirmUser(this.userid!,this.code);
+    }else{
+      this.communicationsService.addErrorMessage("Onay Kodunu giriniz.");
     }
   }
 }

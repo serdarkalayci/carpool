@@ -28,12 +28,11 @@ const routes: Routes = [
   {path: 'triplist', canActivate: [authenticationGuard], component: TriplistComponent},
   {path: 'login', component: LoginComponent},
   {path: 'logout', component: LogoutComponent},
-  {path: 'confirmuser/:code', component: ConfirmuserComponent},
-  {path: 'confirmuser', component: ConfirmuserComponent},
+  {path: 'confirmuser/:userid', component: ConfirmuserComponent},
   {path: 'initconversation/:id', canActivate: [authenticationGuard], component: InitconverstationComponent},
   {path: 'tripconversations/:id', canActivate: [authenticationGuard], component: TripconversationsComponent},
   {path: 'addtrip', canActivate: [authenticationGuard], component: AddtripComponent},
-  {path: 'messages/:id/:tripId', canActivate: [authenticationGuard], component: MessagesComponent},
+  {path: 'messages/:tripId/:id', canActivate: [authenticationGuard], component: MessagesComponent},
   {path: '', redirectTo: 'welcome', pathMatch: 'full'},
   {path: '**', redirectTo: 'welcome', pathMatch: 'full'}
 ];

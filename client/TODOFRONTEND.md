@@ -6,7 +6,8 @@ npm start
 3. i8s yapilacak
 4. input validations yapilacak
 5. error handling duzeltilecek
-
+6. password de validation hatasidir
+8. 
 
 Serdara sorular:
 

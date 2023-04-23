@@ -38,18 +38,42 @@ export class CarpoolusersService {
           }
         },
         error => {
-          handleErrorFromConst(error, this.router, this.communicationsService);
+        console.log(error);
+          if (error.status == 422) {
+            console.log(error);
+            let errorsTranslated = error.error.map((e: string) => {
+              if (e.includes("AddUserRequest.Name")) {
+                return "Ad zorunlu bir alandır.";
+              }
+              if (e.includes("AddUserRequest.Email")) {
+                return "E-posta zorunlu bir alandır. abc@example.com formatına uygun bir email girilmelidir.";
+              }
+              if (e.includes("AddUserRequest.Password")||e.includes("strong enough")) {
+                return "Şifre zorunlu bir alandır. En az bir büyük harf, bir küçük harf, bir rakam ve bir özel" +
+                  " karakter içermelidir." +
+                  " 6 karakterden az olamaz.";
+              }
+              if (e.includes("AddUserRequest.Phone")) {
+                return "Telefon + karakteri ve ülke kodu ile başlamalıdır ve zorunludur.";
+              }
+              return "Formda hata var";
+            });
+            let errorMessage = errorsTranslated.join('\n');
+            this.communicationsService.addErrorMessage(errorMessage);
+          } else {
+            handleErrorFromConst(error, this.router, this.communicationsService);
+          }
         }
       );
   }
 
-  confirmUser(_code: string) {
+  confirmUser(_userid:string,_code: string) {
     const body = {code: _code};
-    this.http.put<HttpResponse<any>>("/user/" + _code + "/confirm", body, {observe: 'response'})
+    this.http.put<HttpResponse<any>>("/api/user/" + _userid + "/confirm", body, {observe: 'response'})
       .subscribe(resp => {
           if (resp.status == 200) {
-            this.communicationsService.addInfoMessage("Kullanıcı onayı tamamlandı.");
-            this.router.navigate(["/triplist"]);
+            this.communicationsService.addInfoMessage("Kullanıcı onayı tamamlandı. Giriş yapabilirsiniz.");
+            this.router.navigate(["/login"]);
           }
         },
         error => {

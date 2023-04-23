@@ -6,7 +6,7 @@
         <tr *ngFor='let c of currentTrip!.conversation ; let i = index'>
             <td>{{i+1}}.Konuşma</td>
             <td>
-                <a [routerLink]="['/messages', c.conversationid,currentTrip!.id]">
+                <a [routerLink]="['/messages',currentTrip!.id, c.conversationid]">
                     Ayrıntı Gör
                 </a>
             </td>

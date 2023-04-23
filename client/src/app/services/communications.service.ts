@@ -39,11 +39,4 @@ export class CommunicationsService {
   addErrorMessage(s: string) {
     this.localStorageService.store(ERROR_MESSAGE, s);
   }
-
-  handleError(err: any) :Observable<any>{
-    console.log(err);
-    console.log(err.status);
-
-    return err;
-  }
 }

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ICountry} from "../model/country";
-import {catchError, Observable} from "rxjs";
+import {Observable} from "rxjs";
 import {CommunicationsService} from "./communications.service";
 
 
@@ -14,16 +14,10 @@ export class CountryService {
   }
 
   getAllCountries(): Observable<ICountry[]> {
-    return this.http.get<ICountry[]>("/api/country").pipe(
-      //tap(data => console.log('All: ', JSON.stringify(data))),
-      catchError(this.communicationsService.handleError)
-    );
+    return this.http.get<ICountry[]>("/api/country");
   }
 
   getCountryDetail(countryId:string): Observable<ICountry> {
-    return this.http.get<ICountry>("/api/country/"+countryId).pipe(
-   //   tap(data => console.log('All: ', JSON.stringify(data))),
-      catchError(this.communicationsService.handleError)
-    );
+    return this.http.get<ICountry>("/api/country/"+countryId);
   }
 }

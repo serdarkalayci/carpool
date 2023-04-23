@@ -11,12 +11,10 @@ export function handleErrorFromConst(err: any, router: Router, comms: Communicat
   if (err.error instanceof ErrorEvent) {
     errorMessage = "Bir hata : " + err.error.message;
   } else if (err.status === 401) {
-    console.log("hey")
     router.navigate(["/login"]);
     errorMessage = "Tekrar giriş yapmalısınız."
-  }
-  if (err.status == 422) {
-    errorMessage = "Kayıt formunda hatalar var."; //+ err.error.join(', ');
+  } else if (err.status == 422) {
+    errorMessage = "Formda hatalar var.";
   } else {
     errorMessage = "Server returned code: " + err.status + ", error message is: " + err.message;
   }

@@ -4,6 +4,7 @@ import {ITrip} from "../model/trip";
 import {TripService} from "../services/trip.service";
 import {Router} from "@angular/router";
 import {CommunicationsService} from "../services/communications.service";
+import {handleErrorFromConst} from "../app.const";
 
 @Component({
   selector: 'cp-addtrip',
@@ -11,8 +12,17 @@ import {CommunicationsService} from "../services/communications.service";
   styleUrls: ['./addtrip.component.css']
 })
 export class AddtripComponent {
-  trip: ITrip = { countryid: "", origin: "", destination: "", tripdate: "", availableseats: 0, stops: [],note:"",conversation:[]}
-  tripLocation: ILocation |undefined;
+  trip: ITrip = {
+    countryid: "",
+    origin: "",
+    destination: "",
+    tripdate: "",
+    availableseats: 0,
+    stops: [],
+    note: "",
+    conversation: []
+  }
+  tripLocation: ILocation | undefined;
   stops: string = "";
 
 
@@ -38,7 +48,7 @@ export class AddtripComponent {
           next: x => {
             this.router.navigate(['triplist'])
           },
-          error: err => this.communicationsService.handleError(err)
+          error: err => handleErrorFromConst(err, this.router, this.communicationsService)
         });
     }
   }

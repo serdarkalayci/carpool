@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {TripService} from "../services/trip.service";
 import {ITrip} from "../model/trip";
 import {CommunicationsService} from "../services/communications.service";
+import {handleErrorFromConst} from "../app.const";
 
 @Component({
   selector: 'cp-tripconversations',
@@ -25,8 +26,11 @@ export class TripconversationsComponent {
         .subscribe({
           next: trip => {
             this.currentTrip = trip;
+            if(this.currentTrip.conversation==undefined){
+              this.currentTrip.conversation=[];
+            }
           },
-          error: err => this.communicationsService.handleError(err)
+          error: err => handleErrorFromConst(err, this.router, this.communicationsService)
         });
     }
   }

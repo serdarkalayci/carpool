@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {TripService} from "../services/trip.service";
 import {IConversation} from "../model/converstaion";
 import {CommunicationsService} from "../services/communications.service";
+import {handleErrorFromConst} from "../app.const";
 
 @Component({
   selector: 'cp-messages',
@@ -11,11 +12,11 @@ import {CommunicationsService} from "../services/communications.service";
   styleUrls: ['./messages.component.css']
 })
 export class MessagesComponent {
-  currentTrip: ITrip |undefined;
-  conversation: IConversation |undefined;
-  id:string|undefined;
+  currentTrip: ITrip | undefined;
+  conversation: IConversation | undefined;
+  id: string | undefined;
   approval: boolean = false;
-  newmessage: string='';
+  newmessage: string = '';
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -32,39 +33,43 @@ export class MessagesComponent {
           next: trip => {
             this.currentTrip = trip;
           },
-          error: err => this.communicationsService.handleError(err)
+          error: err => handleErrorFromConst(err, this.router, this.communicationsService)
         });
     }
     this.update(this.id);
   }
 
   onApprovalChange() {
-    console.log(this.id);
-    this.tripService.updateApproval(this.approval,this.id!).subscribe(
+    this.tripService.updateApproval(this.approval, this.id!).subscribe(
       next => this.communicationsService.addInfoMessage("Onay durumu degisti.")
     );
   }
 
   sendMessage() {
-    console.log(this.id);
-    this.tripService.addMessage(this.newmessage,this.id!).subscribe(
+    this.tripService.addMessage(this.newmessage, this.id!).subscribe(
       next => {
         this.communicationsService.addInfoMessage("Onay durumu degisti.")
         this.update(this.id!);
       },
-      err => this.communicationsService.handleError(err)
+      err => {
+        if(err.status==422){
+          this.communicationsService.addErrorMessage("Mesaj zorunludur.")
+        }else{
+          handleErrorFromConst(err, this.router, this.communicationsService);
+        }
+      }
     );
   }
 
-  private update(id:string) {
+  private update(id: string) {
     if (id) {
       this.tripService.getConversation(id)
         .subscribe({
           next: c => {
             this.conversation = c;
-            this.approval=true;
+            this.approval = true;
           },
-          error: err => this.communicationsService.handleError(err)
+          error: err => handleErrorFromConst(err, this.router, this.communicationsService)
         });
     }
   }
