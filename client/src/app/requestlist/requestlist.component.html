@@ -1,0 +1,33 @@
+<div class='card'>
+    <div class='card-header'>
+        Yolculuklar
+    </div>
+    <cp-location [allowAllCities]="true"
+                 (locationChanged)="onLocationChange($event)">
+    </cp-location>
+    <div class='table-responsive'>
+        <table class='table' *ngIf='requestsList.length'>
+            <thead>
+            <tr>
+                <th>Nereden</th>
+                <th>Nereye</th>
+                <th>Ne zaman</th>
+                <th>Kaç kişi</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr *ngFor='let request of requestsList'>
+                <td>{{ request.origin}}</td>
+                <td>{{ request.destination}}</td>
+                <td>{{ request.dates}}</td>
+                <td>{{ request.requestedseats}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

@@ -21,14 +21,31 @@
 <div class='card'>
     <div class='card-body'>
         <div class='row'>
-            <div class='col-md-2'>Onay ver:</div>
-            <div class='col-md-4'><input type="checkbox" [(ngModel)]='approval' (change)="onApprovalChange()"></div>
+            <div class='col-md-8'><p>
+                Hem teklif eden, hem de yolcu onayladığında iletişim bilgileri erişilebilir olacaktır.
+            </p></div>
+        </div>
+    </div>
+
+    <div class='card-body'>
+        <div class='row'>
+            <div class='col-md-2'>Onay durumu:</div>
+            <div class='col-md-4'>
+                <input type="checkbox" [(ngModel)]='approval' (change)="onApprovalChange()">
+                <div class='col-md-4'>
+                    <button class='bosluk btn btn-primary'
+                            (click)='onApprovalChange()'>
+                        Onay Değiştir
+                    </button>
+                </div>
+
+            </div>
         </div>
     </div>
     <div class='card-body'>
         <div class='row'>
             <div class='col-md-2'>Yeni Mesaj:</div>
-            <div class='col-md-4'><input type='text' size ="60" [(ngModel)]='newmessage'/></div>
+            <div class='col-md-4'><input type='text' size="60" [(ngModel)]='newmessage'/></div>
         </div>
     </div>
 
@@ -38,7 +55,7 @@
             <div class='col-md-4'>
                 <button class=' btn btn-primary'
                         (click)='sendMessage()'>
-                    Gonder
+                    Gönder
                 </button>
             </div>
         </div>

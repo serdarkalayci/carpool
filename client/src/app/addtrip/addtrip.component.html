@@ -14,7 +14,9 @@
     <div class='card-body'>
         <div class='row'>
             <div class='col-md-2'>Ne zaman?</div>
-            <div class='col-md-4'><input type='text' [(ngModel)]='trip!.tripdate'/></div>
+            <div class='col-md-4'>
+                <ngb-datepicker [(ngModel)]="mydate" [minDate]="minDate"></ngb-datepicker>
+            </div>
         </div>
     </div>
     <div class='card-body'>

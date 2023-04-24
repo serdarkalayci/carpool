@@ -18,14 +18,17 @@ import {LocationComponent} from './location/location.component';
 import {TripdetailsComponent} from './tripdetails/tripdetails.component';
 import {TripconversationsComponent} from './tripconversations/tripconversations.component';
 import {InitconverstationComponent} from './initconverstation/initconverstation.component';
-import { MessagesComponent } from './messages/messages.component';
-import {FormatDatePipe} from "./services/convert-to-spaces.pipe";
+import {MessagesComponent} from './messages/messages.component';
+import {FormatDatePipe} from "./services/format-date.pipe";
 import {CommunicationsService} from "./services/communications.service";
+import {NgbDatepickerModule} from "@ng-bootstrap/ng-bootstrap";
+import {RequestlistComponent} from './requestlist/requestlist.component';
 
 const routes: Routes = [
   {path: 'welcome', component: WelcomeComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'triplist', canActivate: [authenticationGuard], component: TriplistComponent},
+  {path: 'requestlist', canActivate: [authenticationGuard], component: RequestlistComponent},
   {path: 'login', component: LoginComponent},
   {path: 'logout', component: LogoutComponent},
   {path: 'confirmuser/:userid', component: ConfirmuserComponent},
@@ -53,15 +56,17 @@ const routes: Routes = [
     InitconverstationComponent,
     MessagesComponent,
     FormatDatePipe,
+    RequestlistComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     NgxWebstorageModule.forRoot(),
-    [RouterModule.forRoot(routes)]
+    [RouterModule.forRoot(routes)],
+    NgbDatepickerModule
   ],
-  providers: [Router,CommunicationsService],
+  providers: [Router, CommunicationsService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

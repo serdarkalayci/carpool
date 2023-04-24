@@ -41,14 +41,14 @@ export class MessagesComponent {
 
   onApprovalChange() {
     this.tripService.updateApproval(this.approval, this.id!).subscribe(
-      next => this.communicationsService.addInfoMessage("Onay durumu degisti.")
+      next => this.communicationsService.addInfoMessage("Onay durumu değişti.")
     );
   }
 
   sendMessage() {
     this.tripService.addMessage(this.newmessage, this.id!).subscribe(
       next => {
-        this.communicationsService.addInfoMessage("Onay durumu degisti.")
+        this.communicationsService.addInfoMessage("Mesaj iletildi.")
         this.update(this.id!);
       },
       err => {
